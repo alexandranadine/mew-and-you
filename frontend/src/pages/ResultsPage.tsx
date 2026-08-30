@@ -2,7 +2,10 @@ import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { CatCard } from "../components/cats/CatCard";
 import { CatCardSkeleton } from "../components/cats/CatCardSkeleton";
-import { CatFilterBar, type CatFilterBarChange } from "../components/cats/CatFilterBar";
+import {
+  CatFilterBar,
+  type CatFilterBarChange,
+} from "../components/cats/CatFilterBar";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
 import { getMockOrganizations } from "../data/mockCats";
 import { useCatsSearch } from "../hooks/useCatsSearch";
@@ -42,9 +45,9 @@ export function ResultsPage() {
   const { query: activeQuery } = parsed;
   const hasActiveFilters = Boolean(
     activeQuery.filters.ageGroup ||
-      activeQuery.filters.sex ||
-      activeQuery.filters.size ||
-      activeQuery.filters.organizationId,
+    activeQuery.filters.sex ||
+    activeQuery.filters.size ||
+    activeQuery.filters.organizationId,
   );
 
   function handleFilterChange(patch: CatFilterBarChange) {
@@ -125,7 +128,11 @@ export function ResultsPage() {
           message="Try a larger radius or fewer filters — new cats are added often."
         >
           {hasActiveFilters && (
-            <button type="button" onClick={handleResetFilters} className="btn-secondary">
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="btn-secondary"
+            >
               Reset filters
             </button>
           )}
@@ -206,4 +213,3 @@ function SearchErrorState({ error }: { error: CatSearchParamsError }) {
     </SearchStateCard>
   );
 }
-

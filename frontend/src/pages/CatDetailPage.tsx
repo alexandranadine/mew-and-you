@@ -25,7 +25,11 @@ export function CatDetailPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-4xl px-6 py-16">
-        <SearchStateCard icon="🐾" title="Fetching this cat's profile…" message="One moment." />
+        <SearchStateCard
+          icon="🐾"
+          title="Fetching this cat's profile…"
+          message="One moment."
+        />
       </div>
     );
   }
@@ -189,4 +193,3 @@ export function CatDetailPage() {
     </div>
   );
 }
-

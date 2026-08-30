@@ -1,5 +1,9 @@
 import type { CatAgeGroup, CatSex, CatSize } from "../types/cat";
-import type { CatFilters, CatSearchQuery, CatSortOption } from "../types/search";
+import type {
+  CatFilters,
+  CatSearchQuery,
+  CatSortOption,
+} from "../types/search";
 import { DEFAULT_RADIUS_MILES, RADIUS_OPTIONS_MILES } from "./searchOptions";
 import { getCoordinatesForZip, isValidZipFormat } from "./zipLookup";
 
@@ -22,7 +26,8 @@ function parseEnumParam<T extends string>(
   value: string | null,
   allowed: readonly T[],
 ): T | undefined {
-  if (value && (allowed as readonly string[]).includes(value)) return value as T;
+  if (value && (allowed as readonly string[]).includes(value))
+    return value as T;
   return undefined;
 }
 
@@ -32,15 +37,20 @@ export function parseCatSearchParams(
 ): ParseCatSearchParamsResult {
   const zip = searchParams.get("zip")?.trim() ?? "";
   if (!zip) return { ok: false, error: { code: "missing-zip" } };
-  if (!isValidZipFormat(zip)) return { ok: false, error: { code: "invalid-zip", zip } };
-  if (!getCoordinatesForZip(zip)) return { ok: false, error: { code: "unknown-zip", zip } };
+  if (!isValidZipFormat(zip))
+    return { ok: false, error: { code: "invalid-zip", zip } };
+  if (!getCoordinatesForZip(zip))
+    return { ok: false, error: { code: "unknown-zip", zip } };
 
   const radiusParam = searchParams.get("radius");
   let radiusMiles: number = DEFAULT_RADIUS_MILES;
   if (radiusParam) {
     const parsedRadius = Number(radiusParam);
     if (!(RADIUS_OPTIONS_MILES as readonly number[]).includes(parsedRadius)) {
-      return { ok: false, error: { code: "invalid-radius", value: radiusParam } };
+      return {
+        ok: false,
+        error: { code: "invalid-radius", value: radiusParam },
+      };
     }
     radiusMiles = parsedRadius;
   }
@@ -52,7 +62,8 @@ export function parseCatSearchParams(
     organizationId: searchParams.get("org") ?? undefined,
   };
 
-  const sort = parseEnumParam(searchParams.get("sort"), SORT_VALUES) ?? "distance";
+  const sort =
+    parseEnumParam(searchParams.get("sort"), SORT_VALUES) ?? "distance";
 
   return { ok: true, query: { zip, radiusMiles, filters, sort } };
 }
@@ -70,7 +81,8 @@ export function catSearchQueryToParams(query: CatSearchQuery): URLSearchParams {
   if (query.filters.ageGroup) params.set("ageGroup", query.filters.ageGroup);
   if (query.filters.sex) params.set("sex", query.filters.sex);
   if (query.filters.size) params.set("size", query.filters.size);
-  if (query.filters.organizationId) params.set("org", query.filters.organizationId);
+  if (query.filters.organizationId)
+    params.set("org", query.filters.organizationId);
   if (query.sort !== "distance") params.set("sort", query.sort);
   return params;
 }

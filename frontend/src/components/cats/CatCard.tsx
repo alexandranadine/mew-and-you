@@ -40,9 +40,7 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-lg font-semibold text-mauve-700">{cat.name}</h3>
           {typeof distanceMiles === "number" && (
-            <span className="pill shrink-0">
-              {distanceMiles.toFixed(1)} mi
-            </span>
+            <span className="pill shrink-0">{distanceMiles.toFixed(1)} mi</span>
           )}
         </div>
 
@@ -71,4 +69,3 @@ function sexLabel(sex: Cat["sex"]): string {
 function sizeLabel(size: Cat["size"]): string {
   return size.charAt(0).toUpperCase() + size.slice(1);
 }
-

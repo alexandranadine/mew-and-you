@@ -93,9 +93,7 @@ export function CatFilterBar({
             value={filters.size ?? ""}
             onChange={(event) =>
               onChange({
-                size: (event.target.value || undefined) as
-                  | CatSize
-                  | undefined,
+                size: (event.target.value || undefined) as CatSize | undefined,
               })
             }
           >

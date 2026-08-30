@@ -14,7 +14,10 @@ const TRAIT_DEFS: { key: keyof CatTraits; icon: string; label: string }[] = [
   { key: "spayedNeutered", icon: "⚕️", label: "Spayed/neutered" },
 ];
 
-export function CatTraitBadges({ traits, compact = false }: CatTraitBadgesProps) {
+export function CatTraitBadges({
+  traits,
+  compact = false,
+}: CatTraitBadgesProps) {
   const known = TRAIT_DEFS.filter((def) => traits[def.key] !== undefined);
   const visible = compact ? known.filter((def) => traits[def.key]) : known;
 

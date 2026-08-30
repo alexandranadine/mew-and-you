@@ -20,7 +20,10 @@ export class UnknownZipError extends Error {
  * attribute filters, then sorts. No UI or network concerns live here, so
  * this can run against mock data today and real API results later.
  */
-export function searchCats(cats: Cat[], query: CatSearchQuery): CatSearchResult {
+export function searchCats(
+  cats: Cat[],
+  query: CatSearchQuery,
+): CatSearchResult {
   const origin = getCoordinatesForZip(query.zip);
   if (!origin) {
     throw new UnknownZipError(query.zip);

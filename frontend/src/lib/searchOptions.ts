@@ -29,7 +29,7 @@ export const SORT_OPTIONS: { value: CatSortOption; label: string }[] = [
 ];
 
 export function ageGroupLabel(value: CatAgeGroup): string {
-  return AGE_GROUP_OPTIONS.find((option) => option.value === value)?.label ?? value;
+  return (
+    AGE_GROUP_OPTIONS.find((option) => option.value === value)?.label ?? value
+  );
 }
-
-

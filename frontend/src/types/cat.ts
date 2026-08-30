@@ -69,4 +69,3 @@ export interface Cat {
   /** Link back to the source listing where a user can start an adoption inquiry. */
   adoptionUrl: string;
 }
-
