@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens for the storybook / cat-cafe aesthetic: dusty pinks, cream,
+ * and muted mauve, with soft rounded shapes throughout. Component classes
+ * below build on these tokens so re-theming later only touches this file.
+ */
+@theme {
+  --font-display: "Fredoka", ui-rounded, "Segoe UI", sans-serif;
+  --font-body: "Quicksand", "Segoe UI", sans-serif;
+
+  --color-cream-50: #fffbf6;
+  --color-cream-100: #fdf4ea;
+  --color-cream-200: #fbecdc;
+
+  --color-blush-50: #fdf1f2;
+  --color-blush-100: #fbe1e4;
+  --color-blush-200: #f6c9d0;
+  --color-blush-300: #efa9b5;
+  --color-blush-400: #e3849a;
+  --color-blush-500: #d1647e;
+
+  --color-mauve-50: #f7eff2;
+  --color-mauve-100: #ecd9e0;
+  --color-mauve-200: #d9b7c4;
+  --color-mauve-300: #b98ca0;
+  --color-mauve-400: #96677e;
+  --color-mauve-500: #7a4d64;
+  --color-mauve-600: #5f3a4d;
+  --color-mauve-700: #482c3b;
+  --color-mauve-800: #331f29;
+
+  --color-sage-100: #e7ecdd;
+  --color-sage-300: #bccaa4;
+  --color-sage-500: #8fa06f;
+
+  --shadow-cozy: 0 12px 30px -12px rgba(95, 58, 77, 0.28);
+  --shadow-cozy-sm: 0 6px 16px -8px rgba(95, 58, 77, 0.22);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--color-cream-50);
+  color: var(--color-mauve-800);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+}
+
+/* Reusable component classes so pages/components stay declarative. */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-mauve-600 px-6 py-3
+      font-display font-medium text-cream-50 shadow-[var(--shadow-cozy-sm)] transition
+      hover:bg-mauve-700 focus-visible:outline focus-visible:outline-2
+      focus-visible:outline-offset-2 focus-visible:outline-mauve-400 disabled:cursor-not-allowed
+      disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-blush-300
+      bg-white/70 px-6 py-3 font-display font-medium text-mauve-700 transition
+      hover:border-blush-400 hover:bg-blush-50 focus-visible:outline focus-visible:outline-2
+      focus-visible:outline-offset-2 focus-visible:outline-mauve-400;
+  }
+
+  .field-label {
+    @apply mb-1.5 block font-display text-sm font-medium text-mauve-700;
+  }
+
+  .field-input {
+    @apply w-full rounded-2xl border-2 border-blush-200 bg-white/80 px-4 py-2.5 text-mauve-800
+      placeholder:text-mauve-300 transition focus:border-blush-400 focus:outline-none
+      focus:ring-4 focus:ring-blush-100;
+  }
+
+  .card {
+    @apply rounded-3xl border border-blush-100 bg-white/80 shadow-[var(--shadow-cozy)]
+      backdrop-blur-sm;
+  }
+
+  .pill {
+    @apply inline-flex items-center rounded-full bg-blush-50 px-3 py-1 text-xs font-medium
+      text-mauve-600;
+  }
+}
