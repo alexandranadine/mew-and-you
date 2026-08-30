@@ -41,7 +41,7 @@ export interface CatTraits {
   houseTrained?: boolean;
 }
 
-export type CatSource = "rescuegroups";
+export type CatSource = "rescuegroups" | "mock";
 
 export interface Cat {
   id: string;

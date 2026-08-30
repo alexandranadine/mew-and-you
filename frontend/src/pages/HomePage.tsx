@@ -3,6 +3,7 @@ import { PawDivider } from "../components/decorative/PawDivider";
 import { SearchForm } from "../components/search/SearchForm";
 import { brand } from "../config/brand";
 import { mockCats } from "../data/mockCats";
+import RotatingTagline from "../components/layout/RotatingTagline";
 
 const FEATURED_CATS = mockCats.slice(0, 3);
 
@@ -21,12 +22,14 @@ export function HomePage() {
         />
 
         <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
-          <span className="pill mb-4">🌸 Serving {brand.serviceArea}</span>
+          <span className="pill mb-4 px-4 py-2 text-[13px]">
+            🌸 Serving {brand.serviceArea}
+          </span>
           <h1 className="text-4xl font-semibold text-mauve-700 sm:text-5xl">
             {brand.name}
           </h1>
-          <p className="mt-4 max-w-xl text-lg text-mauve-500">
-            {brand.tagline}
+          <p className="mt-4 max-w-xl font-semibold text-lg text-mauve-500">
+            <RotatingTagline />
           </p>
           <p className="mt-2 max-w-xl text-mauve-400">{brand.description}</p>
 
@@ -41,10 +44,10 @@ export function HomePage() {
       <section className="mx-auto max-w-6xl px-6 pb-20">
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-semibold text-mauve-700">
-            A few cats waiting for you
+            Your puurrfect pal is waiting for you~{" "}
           </h2>
           <p className="mt-2 text-mauve-400">
-            Sample listings shown here — search above to see cats near you.
+            Sample listings shown here — search above to see cats near you!
           </p>
         </div>
 

@@ -9,7 +9,7 @@ export function PawDivider({ className = "" }: { className?: string }) {
         <svg
           key={i}
           viewBox="0 0 24 24"
-          className="h-3 w-3 opacity-70"
+          className="h-5 w-5 opacity-70"
           style={{ transform: i % 2 === 0 ? "rotate(-8deg)" : "rotate(8deg)" }}
           fill="currentColor"
         >
