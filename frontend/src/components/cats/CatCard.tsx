@@ -1,29 +1,29 @@
-import { Link } from 'react-router-dom'
-import type { Cat } from '../../types/cat'
+import { Link } from "react-router-dom";
+import type { Cat } from "../../types/cat";
 
-const AGE_LABEL: Record<Cat['age'], string> = {
-  baby: 'Baby',
-  young: 'Young',
-  adult: 'Adult',
-  senior: 'Senior',
-  unknown: 'Unknown age',
-}
+const AGE_LABEL: Record<Cat["age"], string> = {
+  baby: "Baby",
+  young: "Young",
+  adult: "Adult",
+  senior: "Senior",
+  unknown: "Unknown age",
+};
 
-const SEX_LABEL: Record<Cat['sex'], string> = {
-  male: 'Male',
-  female: 'Female',
-  unknown: 'Unknown',
-}
+const SEX_LABEL: Record<Cat["sex"], string> = {
+  male: "Male",
+  female: "Female",
+  unknown: "Unknown",
+};
 
 interface CatCardProps {
-  cat: Cat
+  cat: Cat;
 }
 
 export function CatCard({ cat }: CatCardProps) {
-  const photo = cat.photos[0]
+  const photo = cat.photos[0];
   const breedLabel = cat.breeds.mixed
     ? `${cat.breeds.primary} mix`
-    : cat.breeds.primary
+    : cat.breeds.primary;
 
   return (
     <Link
@@ -48,8 +48,10 @@ export function CatCard({ cat }: CatCardProps) {
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-lg font-semibold text-mauve-700">{cat.name}</h3>
-          {typeof cat.distanceMiles === 'number' && (
-            <span className="pill shrink-0">{cat.distanceMiles.toFixed(1)} mi</span>
+          {typeof cat.distanceMiles === "number" && (
+            <span className="pill shrink-0">
+              {cat.distanceMiles.toFixed(1)} mi
+            </span>
           )}
         </div>
 
@@ -64,5 +66,5 @@ export function CatCard({ cat }: CatCardProps) {
         </p>
       </div>
     </Link>
-  )
+  );
 }

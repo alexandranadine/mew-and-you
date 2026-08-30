@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { brand } from '../../config/brand'
+import { Link } from "react-router-dom";
+import { brand } from "../../config/brand";
 
 export function SiteHeader() {
   return (
@@ -27,5 +27,5 @@ export function SiteHeader() {
         </nav>
       </div>
     </header>
-  )
+  );
 }

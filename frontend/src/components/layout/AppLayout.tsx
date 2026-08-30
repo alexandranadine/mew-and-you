@@ -1,6 +1,6 @@
-import { Outlet } from 'react-router-dom'
-import { SiteFooter } from './SiteFooter'
-import { SiteHeader } from './SiteHeader'
+import { Outlet } from "react-router-dom";
+import { SiteFooter } from "./SiteFooter";
+import { SiteHeader } from "./SiteHeader";
 
 export function AppLayout() {
   return (
@@ -11,5 +11,5 @@ export function AppLayout() {
       </main>
       <SiteFooter />
     </div>
-  )
+  );
 }

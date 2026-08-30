@@ -1,28 +1,31 @@
-import { type FormEvent, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { DEFAULT_RADIUS_MILES, RADIUS_OPTIONS_MILES } from '../../lib/searchOptions'
+import { type FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  DEFAULT_RADIUS_MILES,
+  RADIUS_OPTIONS_MILES,
+} from "../../lib/searchOptions";
 
 export function SearchForm() {
-  const navigate = useNavigate()
-  const [location, setLocation] = useState('')
-  const [radius, setRadius] = useState(DEFAULT_RADIUS_MILES)
-  const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate();
+  const [location, setLocation] = useState("");
+  const [radius, setRadius] = useState(DEFAULT_RADIUS_MILES);
+  const [error, setError] = useState<string | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+    event.preventDefault();
 
-    const trimmedLocation = location.trim()
+    const trimmedLocation = location.trim();
     if (!trimmedLocation) {
-      setError('Enter a ZIP code or city to start searching.')
-      return
+      setError("Enter a ZIP code or city to start searching.");
+      return;
     }
 
-    setError(null)
+    setError(null);
     const params = new URLSearchParams({
       location: trimmedLocation,
       radius: String(radius),
-    })
-    navigate(`/results?${params.toString()}`)
+    });
+    navigate(`/results?${params.toString()}`);
   }
 
   return (
@@ -45,8 +48,8 @@ export function SearchForm() {
           className="field-input"
           value={location}
           onChange={(event) => setLocation(event.target.value)}
-          aria-invalid={error ? 'true' : 'false'}
-          aria-describedby={error ? 'location-error' : undefined}
+          aria-invalid={error ? "true" : "false"}
+          aria-describedby={error ? "location-error" : undefined}
         />
         {error && (
           <p id="location-error" className="mt-1.5 text-sm text-blush-500">
@@ -79,5 +82,5 @@ export function SearchForm() {
         Find cats nearby
       </button>
     </form>
-  )
+  );
 }

@@ -1,5 +1,5 @@
 /** A row of small paw prints used as a soft section divider. */
-export function PawDivider({ className = '' }: { className?: string }) {
+export function PawDivider({ className = "" }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
@@ -10,7 +10,7 @@ export function PawDivider({ className = '' }: { className?: string }) {
           key={i}
           viewBox="0 0 24 24"
           className="h-3 w-3 opacity-70"
-          style={{ transform: i % 2 === 0 ? 'rotate(-8deg)' : 'rotate(8deg)' }}
+          style={{ transform: i % 2 === 0 ? "rotate(-8deg)" : "rotate(8deg)" }}
           fill="currentColor"
         >
           <circle cx="12" cy="15" r="5" />
@@ -21,5 +21,5 @@ export function PawDivider({ className = '' }: { className?: string }) {
         </svg>
       ))}
     </div>
-  )
+  );
 }

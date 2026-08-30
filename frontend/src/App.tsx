@@ -1,9 +1,9 @@
-import { Route, Routes } from 'react-router-dom'
-import { AppLayout } from './components/layout/AppLayout'
-import { CatDetailPage } from './pages/CatDetailPage'
-import { HomePage } from './pages/HomePage'
-import { NotFoundPage } from './pages/NotFoundPage'
-import { ResultsPage } from './pages/ResultsPage'
+import { Route, Routes } from "react-router-dom";
+import { AppLayout } from "./components/layout/AppLayout";
+import { CatDetailPage } from "./pages/CatDetailPage";
+import { HomePage } from "./pages/HomePage";
+import { NotFoundPage } from "./pages/NotFoundPage";
+import { ResultsPage } from "./pages/ResultsPage";
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
-  )
+  );
 }
 
-export default App
+export default App;

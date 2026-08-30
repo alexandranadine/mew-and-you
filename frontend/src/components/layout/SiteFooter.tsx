@@ -1,4 +1,4 @@
-import { brand } from '../../config/brand'
+import { brand } from "../../config/brand";
 
 export function SiteFooter() {
   return (
@@ -9,10 +9,8 @@ export function SiteFooter() {
           rescues across {brand.serviceArea}. Always confirm availability
           directly with the organization.
         </p>
-        <p className="mt-2">
-          🐾 Made with love for cats without homes yet.
-        </p>
+        <p className="mt-2">🐾 Made with love for cats without homes yet.</p>
       </div>
     </footer>
-  )
+  );
 }

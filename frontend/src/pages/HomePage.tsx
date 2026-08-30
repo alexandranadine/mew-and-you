@@ -1,10 +1,10 @@
-import { CatCard } from '../components/cats/CatCard'
-import { PawDivider } from '../components/decorative/PawDivider'
-import { SearchForm } from '../components/search/SearchForm'
-import { brand } from '../config/brand'
-import { mockCats } from '../data/mockCats'
+import { CatCard } from "../components/cats/CatCard";
+import { PawDivider } from "../components/decorative/PawDivider";
+import { SearchForm } from "../components/search/SearchForm";
+import { brand } from "../config/brand";
+import { mockCats } from "../data/mockCats";
 
-const FEATURED_CATS = mockCats.slice(0, 3)
+const FEATURED_CATS = mockCats.slice(0, 3);
 
 export function HomePage() {
   return (
@@ -21,18 +21,14 @@ export function HomePage() {
         />
 
         <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
-          <span className="pill mb-4">
-            🌸 Serving {brand.serviceArea}
-          </span>
+          <span className="pill mb-4">🌸 Serving {brand.serviceArea}</span>
           <h1 className="text-4xl font-semibold text-mauve-700 sm:text-5xl">
             {brand.name}
           </h1>
           <p className="mt-4 max-w-xl text-lg text-mauve-500">
             {brand.tagline}
           </p>
-          <p className="mt-2 max-w-xl text-mauve-400">
-            {brand.description}
-          </p>
+          <p className="mt-2 max-w-xl text-mauve-400">{brand.description}</p>
 
           <div className="mt-10 w-full max-w-md">
             <SearchForm />
@@ -59,5 +55,5 @@ export function HomePage() {
         </div>
       </section>
     </div>
-  )
+  );
 }
