@@ -6,9 +6,9 @@
 
 export type CatSex = "male" | "female" | "unknown";
 
-export type CatAgeGroup = "baby" | "young" | "adult" | "senior" | "unknown";
+export type CatAgeGroup = "baby" | "young" | "adult" | "senior";
 
-export type CatSize = "small" | "medium" | "large" | "unknown";
+export type CatSize = "small" | "medium" | "large";
 
 export interface CatPhoto {
   /** Full-size image URL. */
@@ -21,18 +21,30 @@ export interface CatOrganization {
   /** Normalized org id, namespaced by source, e.g. `rescuegroups:1234`. */
   id: string;
   name: string;
-  city?: string;
-  state?: string;
-  zip?: string;
+  city: string;
+  state: string;
+  zip: string;
   phone?: string;
   email?: string;
   website?: string;
 }
 
-export interface CatBreedInfo {
-  primary: string;
-  secondary?: string;
-  mixed?: boolean;
+/** Where the cat can be met, used for distance calculations. */
+export interface CatLocation {
+  zip: string;
+  city: string;
+  state: string;
+  lat: number;
+  lng: number;
+}
+
+/** Tri-state (true/false/unknown) behavioral traits, common to shelter data. */
+export interface CatTraits {
+  goodWithDogs?: boolean;
+  goodWithCats?: boolean;
+  goodWithChildren?: boolean;
+  spayedNeutered?: boolean;
+  houseTrained?: boolean;
 }
 
 /** Identifies which adapter produced a `Cat` record. Extend as sources are added. */
@@ -43,34 +55,18 @@ export interface Cat {
   id: string;
   source: CatSource;
   name: string;
-  breeds: CatBreedInfo;
-  age: CatAgeGroup;
+  breed: string;
+  /** Human-readable age, e.g. "2 years". Use `ageGroup` for filtering/sorting. */
+  age: string;
+  ageGroup: CatAgeGroup;
   sex: CatSex;
-  size?: CatSize;
-  color?: string;
+  size: CatSize;
+  description: string;
   photos: CatPhoto[];
-  description?: string;
-  /** Short attribute tags, e.g. "Good with kids", "Litter trained". */
-  traits: string[];
-  /** Distance from the searched location, in miles, when a location search was performed. */
-  distanceMiles?: number;
   organization: CatOrganization;
+  location: CatLocation;
+  traits: CatTraits;
   /** Link back to the source listing where a user can start an adoption inquiry. */
   adoptionUrl: string;
-  status?: string;
-  publishedAt?: string;
 }
 
-export interface CatSearchParams {
-  /** ZIP code or free-text location string entered by the user. */
-  location: string;
-  radiusMiles: number;
-  page?: number;
-}
-
-export interface CatSearchResult {
-  cats: Cat[];
-  totalCount: number;
-  page: number;
-  pageSize: number;
-}

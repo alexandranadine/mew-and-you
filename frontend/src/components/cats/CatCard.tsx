@@ -1,33 +1,24 @@
 import { Link } from "react-router-dom";
 import type { Cat } from "../../types/cat";
-
-const AGE_LABEL: Record<Cat["age"], string> = {
-  baby: "Baby",
-  young: "Young",
-  adult: "Adult",
-  senior: "Senior",
-  unknown: "Unknown age",
-};
-
-const SEX_LABEL: Record<Cat["sex"], string> = {
-  male: "Male",
-  female: "Female",
-  unknown: "Unknown",
-};
+import { CatTraitBadges } from "./CatTraitBadges";
 
 interface CatCardProps {
   cat: Cat;
+  /** Distance from the searched ZIP, when shown in search results. */
+  distanceMiles?: number;
+  /** Query string (no leading "?") to carry search context onto the detail page, e.g. "zip=91350". */
+  detailQuery?: string;
 }
 
-export function CatCard({ cat }: CatCardProps) {
+export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
   const photo = cat.photos[0];
-  const breedLabel = cat.breeds.mixed
-    ? `${cat.breeds.primary} mix`
-    : cat.breeds.primary;
+  const detailHref = detailQuery
+    ? `/cats/${encodeURIComponent(cat.id)}?${detailQuery}`
+    : `/cats/${encodeURIComponent(cat.id)}`;
 
   return (
     <Link
-      to={`/cats/${encodeURIComponent(cat.id)}`}
+      to={detailHref}
       className="card group flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-[var(--shadow-cozy)]"
     >
       <div className="aspect-[4/3] w-full overflow-hidden bg-blush-100">
@@ -48,18 +39,20 @@ export function CatCard({ cat }: CatCardProps) {
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-lg font-semibold text-mauve-700">{cat.name}</h3>
-          {typeof cat.distanceMiles === "number" && (
+          {typeof distanceMiles === "number" && (
             <span className="pill shrink-0">
-              {cat.distanceMiles.toFixed(1)} mi
+              {distanceMiles.toFixed(1)} mi
             </span>
           )}
         </div>
 
-        <p className="text-sm text-mauve-500">{breedLabel}</p>
+        <p className="text-sm text-mauve-500">{cat.breed}</p>
 
         <p className="text-sm text-mauve-400">
-          {AGE_LABEL[cat.age]} &middot; {SEX_LABEL[cat.sex]}
+          {cat.age} &middot; {sexLabel(cat.sex)} &middot; {sizeLabel(cat.size)}
         </p>
+
+        <CatTraitBadges traits={cat.traits} compact />
 
         <p className="mt-auto pt-2 text-sm font-medium text-mauve-600">
           {cat.organization.name}
@@ -68,3 +61,14 @@ export function CatCard({ cat }: CatCardProps) {
     </Link>
   );
 }
+
+function sexLabel(sex: Cat["sex"]): string {
+  if (sex === "male") return "Male";
+  if (sex === "female") return "Female";
+  return "Unknown sex";
+}
+
+function sizeLabel(size: Cat["size"]): string {
+  return size.charAt(0).toUpperCase() + size.slice(1);
+}
+

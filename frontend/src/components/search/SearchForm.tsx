@@ -4,28 +4,33 @@ import {
   DEFAULT_RADIUS_MILES,
   RADIUS_OPTIONS_MILES,
 } from "../../lib/searchOptions";
+import { isValidZipFormat, SAMPLE_KNOWN_ZIPS } from "../../lib/zipLookup";
 
 export function SearchForm() {
   const navigate = useNavigate();
-  const [location, setLocation] = useState("");
+  const [zip, setZip] = useState("");
   const [radius, setRadius] = useState(DEFAULT_RADIUS_MILES);
   const [error, setError] = useState<string | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const trimmedLocation = location.trim();
-    if (!trimmedLocation) {
-      setError("Enter a ZIP code or city to start searching.");
+    const trimmedZip = zip.trim();
+    if (!trimmedZip) {
+      setError("Enter a ZIP code to start searching.");
+      return;
+    }
+    if (!isValidZipFormat(trimmedZip)) {
+      setError("Please enter a valid 5-digit ZIP code.");
       return;
     }
 
     setError(null);
     const params = new URLSearchParams({
-      location: trimmedLocation,
+      zip: trimmedZip,
       radius: String(radius),
     });
-    navigate(`/results?${params.toString()}`);
+    navigate(`/cats?${params.toString()}`);
   }
 
   return (
@@ -35,27 +40,43 @@ export function SearchForm() {
       noValidate
     >
       <div>
-        <label htmlFor="location" className="field-label">
-          ZIP code or city
+        <label htmlFor="zip" className="field-label">
+          ZIP code
         </label>
         <input
-          id="location"
-          name="location"
+          id="zip"
+          name="zip"
           type="text"
-          inputMode="text"
+          inputMode="numeric"
           autoComplete="postal-code"
-          placeholder="e.g. 90026 or Pasadena, CA"
+          maxLength={5}
+          placeholder="e.g. 91350"
           className="field-input"
-          value={location}
-          onChange={(event) => setLocation(event.target.value)}
+          value={zip}
+          onChange={(event) => setZip(event.target.value)}
           aria-invalid={error ? "true" : "false"}
-          aria-describedby={error ? "location-error" : undefined}
+          aria-describedby={error ? "zip-error" : undefined}
         />
         {error && (
-          <p id="location-error" className="mt-1.5 text-sm text-blush-500">
+          <p id="zip-error" className="mt-1.5 text-sm text-blush-500">
             {error}
           </p>
         )}
+        <p className="mt-1.5 text-xs text-mauve-400">
+          Try:{" "}
+          {SAMPLE_KNOWN_ZIPS.map((sampleZip, index) => (
+            <span key={sampleZip}>
+              <button
+                type="button"
+                onClick={() => setZip(sampleZip)}
+                className="underline decoration-dotted underline-offset-2 hover:text-mauve-600"
+              >
+                {sampleZip}
+              </button>
+              {index < SAMPLE_KNOWN_ZIPS.length - 1 ? " · " : ""}
+            </span>
+          ))}
+        </p>
       </div>
 
       <div>
@@ -84,3 +105,4 @@ export function SearchForm() {
     </form>
   );
 }
+
