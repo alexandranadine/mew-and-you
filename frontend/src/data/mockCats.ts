@@ -13,7 +13,7 @@ function photoSet(
   fg: string,
 ): Cat["photos"] {
   const make = (b: string) => {
-    const url = `https://placehold.co/640x480/${b}/${fg}?text=${encodeURIComponent(label)}`;
+    const url = `https://placehold.co/640x480/${b}/${fg}?font=playfair-display&text=${encodeURIComponent(label)}`;
     return { url, thumbnailUrl: url.replace("640x480", "320x240") };
   };
   return [make(bg), make(bg2)];

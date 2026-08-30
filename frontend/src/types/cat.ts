@@ -6,9 +6,9 @@
 
 export type CatSex = "male" | "female" | "unknown";
 
-export type CatAgeGroup = "baby" | "young" | "adult" | "senior";
+export type CatAgeGroup = "baby" | "young" | "adult" | "senior" | "unknown";
 
-export type CatSize = "small" | "medium" | "large";
+export type CatSize = "small" | "medium" | "large" | "unknown";
 
 export interface CatPhoto {
   /** Full-size image URL. */

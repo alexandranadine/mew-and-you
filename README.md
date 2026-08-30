@@ -10,8 +10,8 @@ shelter and rescue data sources.
 
 ```
 mew-and-you/
-├─ frontend/   React + Vite + TypeScript + Tailwind CSS UI (this milestone)
-└─ backend/    Node.js + Express + TypeScript API (upcoming milestone)
+├─ frontend/   React + Vite + TypeScript + Tailwind CSS UI
+└─ api/        Node.js + Express + TypeScript backend (wraps RescueGroups.org)
 ```
 
 The frontend never talks to shelter/rescue APIs directly — it only calls our
@@ -22,21 +22,26 @@ own backend, which normalizes every source into one shared `Cat` model.
 - [x] Frontend scaffold (Vite + React + TS + Tailwind, React Router, TanStack Query)
 - [x] Shared `Cat` types, mock data, routing skeleton
 - [x] Home / search page
-- [ ] Results page wired to real search
-- [ ] Cat detail page
-- [ ] Backend (Express + TS) with RescueGroups adapter
+- [x] Results page (filters, sort, distance) + cat detail page
+- [x] Backend (Express + TS) with a RescueGroups adapter
 - [ ] Additional source adapters
+- [ ] Favorites, auth, persistence
 
-## Frontend
+## Running locally
+
+Two servers, two terminals:
+
+```
+cd api
+npm install
+cp .env.example .env   # add your RESCUEGROUPS_API_KEY
+npm run dev             # http://localhost:3001
+```
 
 ```
 cd frontend
 npm install
-npm run dev
+npm run dev             # http://localhost:5173, proxies /api/* to the backend above
 ```
 
-See [`frontend/README.md`](frontend/README.md) for details.
-
-## Backend
-
-Not yet scaffolded. See [`backend/README.md`](backend/README.md) for the plan.
+See [`api/README.md`](api/README.md) and [`frontend/README.md`](frontend/README.md) for details.

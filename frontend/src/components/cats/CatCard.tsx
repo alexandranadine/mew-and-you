@@ -19,6 +19,7 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
   return (
     <Link
       to={detailHref}
+      state={typeof distanceMiles === "number" ? { distanceMiles } : undefined}
       className="card group flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-[var(--shadow-cozy)]"
     >
       <div className="aspect-[4/3] w-full overflow-hidden bg-blush-100">

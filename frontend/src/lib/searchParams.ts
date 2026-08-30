@@ -5,7 +5,7 @@ import type {
   CatSortOption,
 } from "../types/search";
 import { DEFAULT_RADIUS_MILES, RADIUS_OPTIONS_MILES } from "./searchOptions";
-import { getCoordinatesForZip, isValidZipFormat } from "./zipLookup";
+import { isValidZipFormat } from "./zipLookup";
 
 const AGE_GROUPS: readonly CatAgeGroup[] = ["baby", "young", "adult", "senior"];
 const SEXES: readonly CatSex[] = ["male", "female"];
@@ -15,7 +15,6 @@ const SORT_VALUES: readonly CatSortOption[] = ["distance", "name"];
 export type CatSearchParamsError =
   | { code: "missing-zip" }
   | { code: "invalid-zip"; zip: string }
-  | { code: "unknown-zip"; zip: string }
   | { code: "invalid-radius"; value: string };
 
 export type ParseCatSearchParamsResult =
@@ -39,8 +38,6 @@ export function parseCatSearchParams(
   if (!zip) return { ok: false, error: { code: "missing-zip" } };
   if (!isValidZipFormat(zip))
     return { ok: false, error: { code: "invalid-zip", zip } };
-  if (!getCoordinatesForZip(zip))
-    return { ok: false, error: { code: "unknown-zip", zip } };
 
   const radiusParam = searchParams.get("radius");
   let radiusMiles: number = DEFAULT_RADIUS_MILES;

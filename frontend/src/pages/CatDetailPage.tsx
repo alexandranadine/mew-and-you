@@ -1,26 +1,26 @@
 import { useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import { CatTraitBadges } from "../components/cats/CatTraitBadges";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
 import { useCatDetail } from "../hooks/useCatDetail";
 import { ageGroupLabel } from "../lib/searchOptions";
-import { getDistanceInMiles } from "../lib/distance";
-import { getCoordinatesForZip, isValidZipFormat } from "../lib/zipLookup";
+
+interface CatDetailLocationState {
+  distanceMiles?: number;
+}
 
 export function CatDetailPage() {
   const { catId } = useParams<{ catId: string }>();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const { data: cat, isLoading } = useCatDetail(catId);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
 
+  // Distance is only known in the context of a search (passed along when
+  // navigating from a results card); there's no way to recompute it here
+  // without re-geocoding, so it's simply omitted otherwise.
+  const distanceMiles = (location.state as CatDetailLocationState | null)?.distanceMiles;
   const zip = searchParams.get("zip");
-  const distanceMiles =
-    cat && zip && isValidZipFormat(zip)
-      ? (() => {
-          const origin = getCoordinatesForZip(zip);
-          return origin ? getDistanceInMiles(origin, cat.location) : undefined;
-        })()
-      : undefined;
 
   if (isLoading) {
     return (

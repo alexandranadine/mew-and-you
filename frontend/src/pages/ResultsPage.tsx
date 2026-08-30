@@ -14,7 +14,6 @@ import {
   patchSearchParams,
   type CatSearchParamsError,
 } from "../lib/searchParams";
-import { SAMPLE_KNOWN_ZIPS } from "../lib/zipLookup";
 
 const ORGANIZATIONS = getMockOrganizations();
 
@@ -26,7 +25,7 @@ export function ResultsPage() {
   );
   const query = parsed.ok ? parsed.query : undefined;
 
-  const { data, isLoading, isError } = useCatsSearch(query);
+  const { data, isLoading, isError, error, refetch, isFetching } = useCatsSearch(query);
 
   function updateParams(patch: Record<string, string | undefined>) {
     setSearchParams((prev) => patchSearchParams(prev, patch), {
@@ -117,8 +116,21 @@ export function ResultsPage() {
         <SearchStateCard
           icon="⚠️"
           title="Something went wrong"
-          message="We couldn't load cats for this search. Please try again."
-        />
+          message={
+            error instanceof Error
+              ? error.message
+              : "We couldn't load cats for this search. Please try again."
+          }
+        >
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="btn-primary"
+          >
+            {isFetching ? "Retrying…" : "Try again"}
+          </button>
+        </SearchStateCard>
       )}
 
       {!isLoading && !isError && data && data.cats.length === 0 && (
@@ -179,20 +191,6 @@ function SearchErrorState({ error }: { error: CatSearchParamsError }) {
         icon="⚠️"
         title="That doesn't look like a ZIP code"
         message={`"${error.zip}" isn't a valid 5-digit ZIP code. Please try again.`}
-      >
-        <Link to="/" className="btn-primary">
-          Back to search
-        </Link>
-      </SearchStateCard>
-    );
-  }
-
-  if (error.code === "unknown-zip") {
-    return (
-      <SearchStateCard
-        icon="🗺️"
-        title="We don't recognize that ZIP yet"
-        message={`We don't have location data for "${error.zip}" in this demo. Try one of these LA County ZIPs: ${SAMPLE_KNOWN_ZIPS.join(", ")}.`}
       >
         <Link to="/" className="btn-primary">
           Back to search
