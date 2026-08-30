@@ -2,7 +2,12 @@ import type { Cat, CatOrganization } from "../models/cat";
 import { ZIP_COORDINATES } from "./zipCoordinates";
 
 /** Placeholder photos in the app's brand palette, matching the frontend's mock dataset. */
-function photoSet(label: string, bg: string, bg2: string, fg: string): Cat["photos"] {
+function photoSet(
+  label: string,
+  bg: string,
+  bg2: string,
+  fg: string,
+): Cat["photos"] {
   const make = (b: string) => {
     const url = `https://placehold.co/640x480/${b}/${fg}?font=playfair-display&text=${encodeURIComponent(label)}`;
     return { url, thumbnailUrl: url.replace("640x480", "320x240") };
@@ -10,7 +15,11 @@ function photoSet(label: string, bg: string, bg2: string, fg: string): Cat["phot
   return [make(bg), make(bg2)];
 }
 
-function locationForZip(zip: string, city: string, state: string): Cat["location"] {
+function locationForZip(
+  zip: string,
+  city: string,
+  state: string,
+): Cat["location"] {
   const coordinates = ZIP_COORDINATES[zip];
   if (!coordinates) {
     throw new Error(`Missing mock coordinates for ZIP "${zip}"`);
@@ -112,7 +121,12 @@ export const mockCats: Cat[] = [
     photos: photoSet("Mochi", "f4c9c0", "f7d9d0", "5b3a3a"),
     organization: ORGS.sunsetPaws,
     location: orgLocation(ORGS.sunsetPaws),
-    traits: { goodWithChildren: true, goodWithCats: true, spayedNeutered: true, houseTrained: true },
+    traits: {
+      goodWithChildren: true,
+      goodWithCats: true,
+      spayedNeutered: true,
+      houseTrained: true,
+    },
     adoptionUrl: "https://example.org/sunset-paws/cats/mochi",
   },
   {
@@ -129,7 +143,12 @@ export const mockCats: Cat[] = [
     photos: photoSet("Clementine", "f2c9d6", "f8dbe4", "6b2f45"),
     organization: ORGS.sunsetPaws,
     location: orgLocation(ORGS.sunsetPaws),
-    traits: { goodWithChildren: true, goodWithDogs: false, spayedNeutered: true, houseTrained: true },
+    traits: {
+      goodWithChildren: true,
+      goodWithDogs: false,
+      spayedNeutered: true,
+      houseTrained: true,
+    },
     adoptionUrl: "https://example.org/sunset-paws/cats/clementine",
   },
   {
@@ -163,7 +182,12 @@ export const mockCats: Cat[] = [
     photos: photoSet("Biscuit", "ead9c9", "f2e6d8", "5b4636"),
     organization: ORGS.eastsideKittens,
     location: orgLocation(ORGS.eastsideKittens),
-    traits: { goodWithDogs: true, goodWithChildren: true, spayedNeutered: true, houseTrained: true },
+    traits: {
+      goodWithDogs: true,
+      goodWithChildren: true,
+      spayedNeutered: true,
+      houseTrained: true,
+    },
     adoptionUrl: "https://example.org/eastside-kittens/cats/biscuit",
   },
   {
@@ -214,7 +238,12 @@ export const mockCats: Cat[] = [
     photos: photoSet("Juniper", "d7e4d3", "e3edde", "35492e"),
     organization: ORGS.angeleno,
     location: orgLocation(ORGS.angeleno),
-    traits: { goodWithChildren: true, goodWithDogs: true, spayedNeutered: true, houseTrained: true },
+    traits: {
+      goodWithChildren: true,
+      goodWithDogs: true,
+      spayedNeutered: true,
+      houseTrained: true,
+    },
     adoptionUrl: "https://example.org/angeleno-cat-rescue/cats/juniper",
   },
   {
@@ -248,7 +277,11 @@ export const mockCats: Cat[] = [
     photos: photoSet("Sir Reginald", "d9c7b8", "e5d8cb", "453529"),
     organization: ORGS.valleyWhiskers,
     location: orgLocation(ORGS.valleyWhiskers),
-    traits: { goodWithChildren: true, spayedNeutered: true, houseTrained: true },
+    traits: {
+      goodWithChildren: true,
+      spayedNeutered: true,
+      houseTrained: true,
+    },
     adoptionUrl: "https://example.org/valley-whiskers/cats/sir-reginald",
   },
   {
@@ -299,7 +332,12 @@ export const mockCats: Cat[] = [
     photos: photoSet("Salty", "c9dde0", "d8ebee", "2c454a"),
     organization: ORGS.harborCats,
     location: orgLocation(ORGS.harborCats),
-    traits: { goodWithDogs: true, goodWithChildren: true, spayedNeutered: true, houseTrained: true },
+    traits: {
+      goodWithDogs: true,
+      goodWithChildren: true,
+      spayedNeutered: true,
+      houseTrained: true,
+    },
     adoptionUrl: "https://example.org/harbor-cats/cats/salty",
   },
   {
@@ -316,7 +354,12 @@ export const mockCats: Cat[] = [
     photos: photoSet("Waffles", "f7e3c4", "fbedd9", "6b4a1c"),
     organization: ORGS.sanGabriel,
     location: orgLocation(ORGS.sanGabriel),
-    traits: { goodWithDogs: true, goodWithCats: true, spayedNeutered: true, houseTrained: true },
+    traits: {
+      goodWithDogs: true,
+      goodWithCats: true,
+      spayedNeutered: true,
+      houseTrained: true,
+    },
     adoptionUrl: "https://example.org/san-gabriel-cats/cats/waffles",
   },
   {
@@ -367,7 +410,12 @@ export const mockCats: Cat[] = [
     photos: photoSet("Willow", "e6ded0", "f0eae0", "574a36"),
     organization: ORGS.foothillFelines,
     location: orgLocation(ORGS.foothillFelines),
-    traits: { goodWithCats: true, goodWithChildren: true, spayedNeutered: true, houseTrained: true },
+    traits: {
+      goodWithCats: true,
+      goodWithChildren: true,
+      spayedNeutered: true,
+      houseTrained: true,
+    },
     adoptionUrl: "https://example.org/foothill-felines/cats/willow",
   },
   {
@@ -401,7 +449,12 @@ export const mockCats: Cat[] = [
     photos: photoSet("Olive", "e0e6c9", "ecf0dc", "4a5323"),
     organization: ORGS.southBay,
     location: orgLocation(ORGS.southBay),
-    traits: { goodWithChildren: true, goodWithDogs: true, spayedNeutered: true, houseTrained: true },
+    traits: {
+      goodWithChildren: true,
+      goodWithDogs: true,
+      spayedNeutered: true,
+      houseTrained: true,
+    },
     adoptionUrl: "https://example.org/south-bay-second-chance/cats/olive",
   },
   {

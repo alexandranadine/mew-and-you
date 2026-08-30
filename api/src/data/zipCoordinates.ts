@@ -33,6 +33,8 @@ export const ZIP_COORDINATES: Record<string, { lat: number; lng: number }> = {
 /** A few known ZIPs to suggest when mock mode can't resolve one. */
 export const SAMPLE_KNOWN_ZIPS = ["90026", "91101", "91350", "90802", "90503"];
 
-export function getMockCoordinatesForZip(zip: string): { lat: number; lng: number } | undefined {
+export function getMockCoordinatesForZip(
+  zip: string,
+): { lat: number; lng: number } | undefined {
   return ZIP_COORDINATES[zip];
 }

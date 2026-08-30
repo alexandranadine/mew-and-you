@@ -9,7 +9,9 @@ function readOrigins(value: string | undefined): string[] {
 }
 
 function readDataProvider(value: string | undefined): "mock" | "rescuegroups" {
-  return value?.trim().toLowerCase() === "rescuegroups" ? "rescuegroups" : "mock";
+  return value?.trim().toLowerCase() === "rescuegroups"
+    ? "rescuegroups"
+    : "mock";
 }
 
 export const env = {
@@ -23,7 +25,9 @@ export const env = {
 };
 
 if (env.dataProvider === "mock") {
-  console.log("[config] DATA_PROVIDER=mock — serving cats from local mock data, no RescueGroups API key needed.");
+  console.log(
+    "[config] DATA_PROVIDER=mock — serving cats from local mock data, no RescueGroups API key needed.",
+  );
 } else if (!env.rescueGroupsApiKey) {
   // Don't crash the server — allow it to run so /health etc. still work locally,
   // but every /api/cats request will fail fast with a clear error until this is set.
