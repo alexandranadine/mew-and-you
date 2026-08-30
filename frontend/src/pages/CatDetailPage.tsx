@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { CatTraitBadges } from "../components/cats/CatTraitBadges";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
 import { useCatDetail } from "../hooks/useCatDetail";
@@ -19,7 +24,8 @@ export function CatDetailPage() {
   // Distance is only known in the context of a search (passed along when
   // navigating from a results card); there's no way to recompute it here
   // without re-geocoding, so it's simply omitted otherwise.
-  const distanceMiles = (location.state as CatDetailLocationState | null)?.distanceMiles;
+  const distanceMiles = (location.state as CatDetailLocationState | null)
+    ?.distanceMiles;
   const zip = searchParams.get("zip");
 
   if (isLoading) {

@@ -35,7 +35,7 @@ export interface RgAnimalAttributes {
 }
 
 export interface RgAnimalResource {
-  type: 'animals';
+  type: "animals";
   id: string;
   attributes: RgAnimalAttributes;
   relationships?: {

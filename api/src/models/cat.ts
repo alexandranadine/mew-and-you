@@ -3,11 +3,11 @@
  * never sees RescueGroups-specific shapes — only this.
  */
 
-export type CatSex = 'male' | 'female' | 'unknown';
+export type CatSex = "male" | "female" | "unknown";
 
-export type CatAgeGroup = 'baby' | 'young' | 'adult' | 'senior' | 'unknown';
+export type CatAgeGroup = "baby" | "young" | "adult" | "senior" | "unknown";
 
-export type CatSize = 'small' | 'medium' | 'large' | 'unknown';
+export type CatSize = "small" | "medium" | "large" | "unknown";
 
 export interface CatPhoto {
   url: string;
@@ -41,7 +41,7 @@ export interface CatTraits {
   houseTrained?: boolean;
 }
 
-export type CatSource = 'rescuegroups';
+export type CatSource = "rescuegroups";
 
 export interface Cat {
   id: string;

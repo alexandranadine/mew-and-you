@@ -8,7 +8,10 @@ export function useCatDetail(catId: string | undefined) {
 
   return useQuery({
     queryKey: ["cats", "detail", catId],
-    queryFn: () => (isMock ? fetchMockCatById(catId as string) : fetchCatById(catId as string)),
+    queryFn: () =>
+      isMock
+        ? fetchMockCatById(catId as string)
+        : fetchCatById(catId as string),
     enabled: catId !== undefined,
   });
 }

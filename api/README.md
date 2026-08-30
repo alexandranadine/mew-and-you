@@ -18,11 +18,11 @@ Without a key the server still starts (with a warning), but every
 
 ## Endpoints
 
-| Method | Path | Description |
-| --- | --- | --- |
-| GET | `/api/cats?zip=91350&radius=25` | Available cats within `radius` miles of `zip`. |
-| GET | `/api/cats/:id` | A single cat's full profile, by normalized id (e.g. `rescuegroups:12345`). |
-| GET | `/health` | Liveness check. |
+| Method | Path                            | Description                                                                |
+| ------ | ------------------------------- | -------------------------------------------------------------------------- |
+| GET    | `/api/cats?zip=91350&radius=25` | Available cats within `radius` miles of `zip`.                             |
+| GET    | `/api/cats/:id`                 | A single cat's full profile, by normalized id (e.g. `rescuegroups:12345`). |
+| GET    | `/health`                       | Liveness check.                                                            |
 
 Errors are always `{ "error": { "code": string, "message": string } }` with
 an appropriate status code (400 invalid input, 404 not found, 429 upstream
@@ -60,4 +60,3 @@ npm run test
 Unit tests cover the RescueGroups mapper's handling of missing photos,
 missing breed, unknown/missing sex, missing organization/location data, and
 messy or blank descriptions — all common with real shelter data.
-

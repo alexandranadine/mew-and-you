@@ -1,7 +1,11 @@
 import { filterCats } from "../lib/catFilters";
 import { sortCats } from "../lib/catSort";
 import type { Cat } from "../types/cat";
-import type { CatSearchQuery, CatSearchResult, CatWithDistance } from "../types/search";
+import type {
+  CatSearchQuery,
+  CatSearchResult,
+  CatWithDistance,
+} from "../types/search";
 
 /**
  * Talks to our own backend only — never to RescueGroups (or any other
@@ -36,7 +40,9 @@ interface ApiErrorResponseBody {
 }
 
 async function parseErrorResponse(response: Response): Promise<never> {
-  const body = (await response.json().catch(() => undefined)) as ApiErrorResponseBody | undefined;
+  const body = (await response.json().catch(() => undefined)) as
+    | ApiErrorResponseBody
+    | undefined;
   throw new ApiRequestError(
     body?.error?.message ?? "Something went wrong. Please try again.",
     response.status,
@@ -44,8 +50,13 @@ async function parseErrorResponse(response: Response): Promise<never> {
   );
 }
 
-export async function fetchCats(query: CatSearchQuery): Promise<CatSearchResult> {
-  const params = new URLSearchParams({ zip: query.zip, radius: String(query.radiusMiles) });
+export async function fetchCats(
+  query: CatSearchQuery,
+): Promise<CatSearchResult> {
+  const params = new URLSearchParams({
+    zip: query.zip,
+    radius: String(query.radiusMiles),
+  });
   const response = await fetch(`/api/cats?${params.toString()}`);
 
   if (!response.ok) {
@@ -70,4 +81,3 @@ export async function fetchCatById(id: string): Promise<Cat | undefined> {
   const body = (await response.json()) as CatDetailResponseBody;
   return body.cat;
 }
-

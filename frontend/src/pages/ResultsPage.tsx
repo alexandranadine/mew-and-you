@@ -25,7 +25,8 @@ export function ResultsPage() {
   );
   const query = parsed.ok ? parsed.query : undefined;
 
-  const { data, isLoading, isError, error, refetch, isFetching } = useCatsSearch(query);
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    useCatsSearch(query);
 
   function updateParams(patch: Record<string, string | undefined>) {
     setSearchParams((prev) => patchSearchParams(prev, patch), {
