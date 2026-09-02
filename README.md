@@ -45,3 +45,8 @@ npm run dev             # http://localhost:5173, proxies /api/* to the backend a
 ```
 
 See [`api/README.md`](api/README.md) and [`frontend/README.md`](frontend/README.md) for details.
+
+## Deployment
+
+See [`DEPLOYMENT.md`](DEPLOYMENT.md) for staging/production build commands,
+environment variables, SPA routing, API proxying, and CORS configuration.

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { brand } from "../../config/brand";
 
 export function SiteFooter() {
@@ -10,6 +11,14 @@ export function SiteFooter() {
           directly with the organization.
         </p>
         <p className="mt-2">🐾 Made with love for cats without homes yet.</p>
+        <p className="mt-3">
+          <Link
+            to="/about"
+            className="focus-ring font-medium text-mauve-500 hover:text-mauve-700"
+          >
+            About
+          </Link>
+        </p>
       </div>
     </footer>
   );

@@ -21,12 +21,12 @@ export function SiteHeader() {
           <Link to="/" className="focus-ring transition hover:text-mauve-700">
             Search
           </Link>
-          <a
-            href="#about"
+          <Link
+            to="/about"
             className="focus-ring hidden transition hover:text-mauve-700 sm:inline"
           >
             About
-          </a>
+          </Link>
         </nav>
       </div>
     </header>

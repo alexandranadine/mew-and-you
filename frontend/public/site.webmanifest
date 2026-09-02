@@ -1,0 +1,23 @@
+{
+  "name": "Mew & You",
+  "short_name": "Mew & You",
+  "description": "Browse adoptable cats from shelters and rescues across Los Angeles County, all in one cozy place.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#fffbf6",
+  "theme_color": "#fffbf6",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

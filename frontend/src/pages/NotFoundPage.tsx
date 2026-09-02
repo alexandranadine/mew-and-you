@@ -1,8 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { PageMeta } from "../components/seo/PageMeta";
+import { notFoundSeo } from "../config/seo";
 
 export function NotFoundPage() {
+  const location = useLocation();
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-20 text-center">
+      <PageMeta
+        title={notFoundSeo.title}
+        description={notFoundSeo.description}
+        canonicalPath={location.pathname}
+        robots={notFoundSeo.robots}
+      />
       <h1 className="text-3xl font-semibold text-mauve-700">
         🐾 Page not found
       </h1>

@@ -7,8 +7,17 @@ import {
 } from "react-router-dom";
 import { CatTraitBadges } from "../components/cats/CatTraitBadges";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
+import { PageMeta } from "../components/seo/PageMeta";
 import { useCatDetail } from "../hooks/useCatDetail";
 import { ageGroupLabel } from "../lib/searchOptions";
+import {
+  catDetailLoadingSeo,
+  catDetailMissingSeo,
+  catDetailSeo,
+  catJsonLd,
+  getSiteOrigin,
+  toAbsoluteUrl,
+} from "../config/seo";
 
 interface CatDetailLocationState {
   distanceMiles?: number;
@@ -36,8 +45,14 @@ export function CatDetailPage() {
   const zip = searchParams.get("zip");
 
   if (isLoading) {
+    const meta = catDetailLoadingSeo(catId);
     return (
       <div className="mx-auto max-w-4xl px-6 py-16">
+        <PageMeta
+          title={meta.title}
+          description={meta.description}
+          canonicalPath={meta.canonicalPath}
+        />
         <SearchStateCard
           icon="🐾"
           title="Fetching this cat's profile…"
@@ -48,8 +63,15 @@ export function CatDetailPage() {
   }
 
   if (!cat) {
+    const meta = catDetailMissingSeo(catId);
     return (
       <div className="mx-auto max-w-3xl px-6 py-16">
+        <PageMeta
+          title={meta.title}
+          description={meta.description}
+          canonicalPath={meta.canonicalPath}
+          robots={meta.robots}
+        />
         <SearchStateCard
           icon="🙀"
           title="We couldn't find that cat"
@@ -67,8 +89,18 @@ export function CatDetailPage() {
   const mainPhotoFailed = mainPhoto ? failedPhotoUrls.has(mainPhoto.url) : true;
   const backHref = zip ? `/cats?zip=${encodeURIComponent(zip)}` : "/";
 
+  const meta = catDetailSeo(cat);
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
+      <PageMeta
+        title={meta.title}
+        description={meta.description}
+        canonicalPath={meta.canonicalPath}
+        image={meta.image}
+        imageAlt={meta.imageAlt}
+        jsonLd={catJsonLd(cat, toAbsoluteUrl(meta.canonicalPath, getSiteOrigin()))}
+      />
       <Link
         to={backHref}
         className="focus-ring inline-block py-1 text-sm font-medium text-mauve-500 hover:text-mauve-700"

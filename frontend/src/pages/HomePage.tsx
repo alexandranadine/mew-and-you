@@ -3,6 +3,12 @@ import { CatCardSkeleton } from "../components/cats/CatCardSkeleton";
 import { PawDivider } from "../components/decorative/PawDivider";
 import { SearchForm } from "../components/search/SearchForm";
 import { brand } from "../config/brand";
+import {
+  getSiteOrigin,
+  homeSeo,
+  websiteJsonLd,
+} from "../config/seo";
+import { PageMeta } from "../components/seo/PageMeta";
 import { useCatsSearch } from "../hooks/useCatsSearch";
 import RotatingTagline from "../components/layout/RotatingTagline";
 
@@ -21,6 +27,12 @@ export function HomePage() {
 
   return (
     <div>
+      <PageMeta
+        title={homeSeo.title}
+        description={homeSeo.description}
+        canonicalPath={homeSeo.canonicalPath}
+        jsonLd={websiteJsonLd(getSiteOrigin())}
+      />
       <section className="relative overflow-hidden px-6 pt-16 pb-8 sm:pt-24 sm:pb-8">
         {/* soft decorative blobs to echo the cozy stationery-shop mood */}
         <div

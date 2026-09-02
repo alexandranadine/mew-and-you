@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Mew &amp; You">
+  <rect width="180" height="180" rx="40" fill="#fffbf6"/>
+  <g fill="#7a4d64">
+    <circle cx="62" cy="62" r="18"/>
+    <circle cx="118" cy="62" r="18"/>
+    <circle cx="46" cy="102" r="15"/>
+    <circle cx="134" cy="102" r="15"/>
+    <ellipse cx="90" cy="118" rx="26" ry="22"/>
+  </g>
+</svg>

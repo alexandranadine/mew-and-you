@@ -1,0 +1,11 @@
+# Cloudflare Pages routing for the Mew & You SPA.
+# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
+#
+# Order matters: first match wins.
+#
+# /api/* is proxied by the Pages Function at functions/api/[[path]].js
+# (set API_ORIGIN in the Cloudflare dashboard when the backend is deployed).
+# Pages Functions take precedence over _redirects for those paths.
+
+# SPA fallback — client routes (/, /cats, /about, …) serve index.html.
+/* /index.html 200

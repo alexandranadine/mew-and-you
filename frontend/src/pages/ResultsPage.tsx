@@ -7,12 +7,14 @@ import {
   type CatFilterBarChange,
 } from "../components/cats/CatFilterBar";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
+import { PageMeta } from "../components/seo/PageMeta";
 import { useCatsSearch } from "../hooks/useCatsSearch";
 import {
   parseCatSearchParams,
   patchSearchParams,
   type CatSearchParamsError,
 } from "../lib/searchParams";
+import { invalidSearchSeo, searchSeo } from "../config/seo";
 
 export function ResultsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,8 +49,16 @@ export function ResultsPage() {
   }
 
   if (!parsed.ok) {
+    const meta =
+      parsed.error.code === "missing-zip" ? searchSeo() : invalidSearchSeo();
     return (
       <div className="mx-auto max-w-3xl px-6 py-16">
+        <PageMeta
+          title={meta.title}
+          description={meta.description}
+          canonicalPath={meta.canonicalPath}
+          robots={meta.robots}
+        />
         <SearchErrorState error={parsed.error} />
       </div>
     );
@@ -83,9 +93,15 @@ export function ResultsPage() {
   }
 
   const detailQuery = `zip=${encodeURIComponent(activeQuery.zip)}`;
+  const meta = searchSeo(activeQuery.zip);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
+      <PageMeta
+        title={meta.title}
+        description={meta.description}
+        canonicalPath={meta.canonicalPath}
+      />
       <div className="mb-6">
         <Link
           to="/"

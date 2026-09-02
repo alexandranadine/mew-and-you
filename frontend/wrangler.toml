@@ -1,0 +1,5 @@
+# Cloudflare Pages — staging frontend (static SPA + optional API proxy Function).
+# Used by `wrangler pages deploy` and mirrors dashboard build settings.
+name = "mew-and-you-staging"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "dist"

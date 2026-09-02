@@ -2,6 +2,9 @@
   "name": "api",
   "version": "0.0.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "description": "Mew & You backend — Express API that aggregates adoptable cats, currently from RescueGroups.",
   "main": "dist/server.js",
   "scripts": {
