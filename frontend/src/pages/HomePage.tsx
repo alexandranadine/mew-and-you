@@ -44,8 +44,28 @@ export function HomePage() {
           </p>
           <p className="mt-2 max-w-xl text-mauve-400">{brand.description}</p>
 
-          <div className="mt-10 w-full max-w-md">
-            <SearchForm />
+          <div className="relative mt-40 w-full max-w-md">
+            <img
+              src="/images/mew-and-you-cat-peek.png"
+              alt=""
+              aria-hidden="true"
+              className="
+      pointer-events-none
+      absolute
+      left-1/2
+      top-0
+      z-30
+      w-[320px]
+      -translate-x-1/2
+      -translate-y-[74.5%]
+      select-none
+      sm:w-[450px]
+    "
+            />
+
+            <div className="relative z-10">
+              <SearchForm />
+            </div>
           </div>
         </div>
       </section>
