@@ -2,6 +2,7 @@ import { filterCats } from "../lib/catFilters";
 import { sortCats } from "../lib/catSort";
 import type { Cat } from "../types/cat";
 import type {
+  CatFilters,
   CatSearchQuery,
   CatSearchResult,
   CatWithDistance,
@@ -39,6 +40,24 @@ interface ApiErrorResponseBody {
   error?: { code?: string; message?: string };
 }
 
+function normalizeFilters(filters: CatFilters): CatFilters {
+  return {
+    ageGroup: filters.ageGroup,
+    sex: filters.sex,
+    size: filters.size,
+    organizationId: filters.organizationId?.trim() || undefined,
+  };
+}
+
+function hasActiveClientFilters(filters: CatFilters): boolean {
+  return Boolean(
+    filters.ageGroup ||
+      filters.sex ||
+      filters.size ||
+      filters.organizationId,
+  );
+}
+
 async function parseErrorResponse(response: Response): Promise<never> {
   const body = (await response.json().catch(() => undefined)) as
     | ApiErrorResponseBody
@@ -64,7 +83,11 @@ export async function fetchCats(
   }
 
   const body = (await response.json()) as CatsSearchResponseBody;
-  const filtered = filterCats(body.cats, query.filters);
+  const cats = Array.isArray(body.cats) ? body.cats : [];
+  const filters = normalizeFilters(query.filters);
+  const filtered = hasActiveClientFilters(filters)
+    ? filterCats(cats, filters)
+    : cats;
   const sorted = sortCats(filtered, query.sort);
 
   return { cats: sorted, totalCount: sorted.length, query };

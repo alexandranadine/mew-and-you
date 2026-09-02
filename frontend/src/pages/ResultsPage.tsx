@@ -18,13 +18,14 @@ import { invalidSearchSeo, searchSeo } from "../config/seo";
 
 export function ResultsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const searchKey = searchParams.toString();
   const parsed = useMemo(
-    () => parseCatSearchParams(searchParams),
-    [searchParams],
+    () => parseCatSearchParams(new URLSearchParams(searchKey)),
+    [searchKey],
   );
   const query = parsed.ok ? parsed.query : undefined;
 
-  const { data, isLoading, isError, error, refetch, isFetching } =
+  const { data, isPending, isError, error, refetch, isFetching } =
     useCatsSearch(query);
 
   const organizationOptions = useMemo(() => {
@@ -113,7 +114,7 @@ export function ResultsPage() {
           Cats near {activeQuery.zip}
         </h1>
         <p className="mt-1 text-mauve-400" aria-live="polite">
-          {isLoading
+          {isPending
             ? `Searching within ${activeQuery.radiusMiles} miles\u2026`
             : data
               ? `${data.totalCount} potential roommate${data.totalCount === 1 ? "" : "s"} within ${activeQuery.radiusMiles} miles`
@@ -134,7 +135,7 @@ export function ResultsPage() {
 
       <h2 className="sr-only">Search results</h2>
 
-      {isLoading && (
+      {isPending && (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
             <CatCardSkeleton key={index} />
@@ -142,7 +143,7 @@ export function ResultsPage() {
         </div>
       )}
 
-      {!isLoading && isError && (
+      {!isPending && isError && (
         <SearchStateCard
           icon="⚠️"
           title="Something went wrong"
@@ -163,7 +164,7 @@ export function ResultsPage() {
         </SearchStateCard>
       )}
 
-      {!isLoading && !isError && data && data.cats.length === 0 && (
+      {!isPending && !isError && data && data.cats.length === 0 && (
         <SearchStateCard
           icon="🔍"
           title="No cats matched your search"
@@ -184,7 +185,7 @@ export function ResultsPage() {
         </SearchStateCard>
       )}
 
-      {!isLoading && !isError && data && data.cats.length > 0 && (
+      {!isPending && !isError && data && data.cats.length > 0 && (
         <div
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
           aria-live="polite"
