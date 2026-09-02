@@ -46,12 +46,7 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-5">
-        <h3 className="flex items-center gap-1.5 text-xl font-semibold text-mauve-700">
-          {cat.name}
-          {/* <span aria-hidden="true" className="text-sm">
-            ✨
-          </span> */}
-        </h3>
+        <h3 className="text-xl font-semibold text-mauve-700">{cat.name}</h3>
 
         <p className="text-sm text-mauve-500">{cat.breed}</p>
 

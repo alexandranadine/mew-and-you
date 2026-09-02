@@ -33,8 +33,8 @@ export function CatFilterBar({
   hasActiveFilters,
 }: CatFilterBarProps) {
   return (
-    <div className="card p-4 sm:p-5">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+    <div className="card rounded-[1.75rem] border-blush-50 p-3 sm:p-4">
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
         <div>
           <label htmlFor="filter-age" className="field-label">
             Age
@@ -149,7 +149,7 @@ export function CatFilterBar({
       </div>
 
       {hasActiveFilters && (
-        <div className="mt-4 flex justify-end">
+        <div className="mt-3 flex justify-end">
           <button
             type="button"
             onClick={onReset}

@@ -97,11 +97,10 @@ export function ResultsPage() {
           Cats near {activeQuery.zip}
         </h1>
         <p className="mt-1 text-mauve-400" aria-live="polite">
-          Within {activeQuery.radiusMiles} miles
           {isLoading
-            ? " — searching…"
+            ? `Searching within ${activeQuery.radiusMiles} miles\u2026`
             : data
-              ? ` — ${data.totalCount} cat${data.totalCount === 1 ? "" : "s"} found`
+              ? `${data.totalCount} potential roommate${data.totalCount === 1 ? "" : "s"} within ${activeQuery.radiusMiles} miles`
               : ""}
         </p>
       </div>

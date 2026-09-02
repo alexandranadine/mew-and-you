@@ -76,7 +76,7 @@ export function HomePage() {
         <section className="mx-auto max-w-6xl px-6 pb-20">
           <div className="mb-8 text-center">
             <h2 className="text-2xl font-semibold text-mauve-700">
-              Your puurrfect pal is waiting for you~{" "}
+              Go ahead, get attached.
             </h2>
             <p className="mt-2 text-mauve-400">
               Sample listings shown here — search above to see cats near you!

@@ -196,7 +196,10 @@ export function CatDetailPage() {
             <CatTraitBadges traits={cat.traits} />
           </div>
 
-          <p className="mt-5 leading-relaxed text-mauve-600">
+          <h2 className="mt-6 font-display text-lg font-semibold text-mauve-700">
+            About {cat.name}
+          </h2>
+          <p className="mt-2 leading-relaxed text-mauve-600">
             {cat.description}
           </p>
 
@@ -229,11 +232,26 @@ export function CatDetailPage() {
             href={cat.adoptionUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-primary mt-6 w-full sm:w-auto"
+            className="btn-primary mt-6 w-full justify-center px-8 py-4 text-base sm:w-auto"
           >
-            <span aria-hidden="true">🐾</span>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              className="h-4 w-4 -rotate-32 text-cream-50"
+              fill="currentColor"
+            >
+              <circle cx="12" cy="15" r="5" />
+              <circle cx="5" cy="8" r="2.4" />
+              <circle cx="10" cy="4" r="2.4" />
+              <circle cx="15" cy="4" r="2.4" />
+              <circle cx="19" cy="8" r="2.4" />
+            </svg>
             View Adoption Listing
+            <span aria-hidden="true">↗</span>
           </a>
+          <p className="mt-2 text-sm text-mauve-400">
+            Opens {cat.organization.name}'s listing in a new tab
+          </p>
         </div>
       </div>
     </div>
