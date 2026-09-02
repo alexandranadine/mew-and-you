@@ -1,0 +1,20 @@
+# Render Blueprint — API staging only (Free tier).
+# See DEPLOYMENT.md for env var details and frontend routing (not configured here).
+services:
+  - type: web
+    name: mew-and-you-api-staging
+    runtime: node
+    plan: free
+    rootDir: api
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_PROVIDER
+        value: mock
+      - key: TRUST_PROXY
+        value: "true"
+      - key: CORS_ORIGIN
+        sync: false
