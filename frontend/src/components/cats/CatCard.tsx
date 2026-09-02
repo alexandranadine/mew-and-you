@@ -22,7 +22,7 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
     <Link
       to={detailHref}
       state={typeof distanceMiles === "number" ? { distanceMiles } : undefined}
-      className="card focus-ring group flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-[var(--shadow-cozy)]"
+      className="card focus-ring group flex flex-col overflow-hidden rounded-[2rem] transition hover:-translate-y-1.5 hover:shadow-[0_22px_44px_-12px_rgba(95,58,77,0.38)]"
     >
       {/* Fixed aspect ratio reserves space up front so the layout doesn't shift once the image loads. */}
       <div className="aspect-[4/3] w-full overflow-hidden bg-blush-100">
@@ -45,13 +45,13 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-lg font-semibold text-mauve-700">{cat.name}</h3>
-          {typeof distanceMiles === "number" && (
-            <span className="pill shrink-0">{distanceMiles.toFixed(1)} mi</span>
-          )}
-        </div>
+      <div className="flex flex-1 flex-col gap-2 p-5">
+        <h3 className="flex items-center gap-1.5 text-xl font-semibold text-mauve-700">
+          {cat.name}
+          {/* <span aria-hidden="true" className="text-sm">
+            ✨
+          </span> */}
+        </h3>
 
         <p className="text-sm text-mauve-500">{cat.breed}</p>
 
@@ -59,10 +59,27 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
           {cat.age} &middot; {sexLabel(cat.sex)} &middot; {sizeLabel(cat.size)}
         </p>
 
-        <CatTraitBadges traits={cat.traits} compact />
+        <CatTraitBadges traits={cat.traits} onlyTrue />
 
-        <p className="mt-auto pt-2 text-sm font-medium text-mauve-600">
+        {typeof distanceMiles === "number" && (
+          <p className="text-sm font-semibold text-blush-600">
+            <span aria-hidden="true">🌸</span> {distanceMiles.toFixed(1)} miles
+            away
+          </p>
+        )}
+
+        <p className="text-sm font-medium text-mauve-600">
           {cat.organization.name}
+        </p>
+
+        <p className="mt-auto pt-2 text-sm font-semibold text-mauve-500 transition group-hover:text-mauve-700">
+          Meet {cat.name}{" "}
+          <span
+            aria-hidden="true"
+            className="inline-block transition group-hover:translate-x-0.5"
+          >
+            →
+          </span>
         </p>
       </div>
     </Link>

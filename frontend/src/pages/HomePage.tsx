@@ -21,7 +21,7 @@ export function HomePage() {
 
   return (
     <div>
-      <section className="relative overflow-hidden px-6 pt-16 pb-12 sm:pt-24 sm:pb-16">
+      <section className="relative overflow-hidden px-6 pt-16 pb-8 sm:pt-24 sm:pb-8">
         {/* soft decorative blobs to echo the cozy stationery-shop mood */}
         <div
           aria-hidden="true"
@@ -33,9 +33,9 @@ export function HomePage() {
         />
 
         <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
-          <span className="pill mb-4 px-4 py-2 text-[13px]">
+          {/* <span className="pill mb-4 px-4 py-2 text-[13px]">
             🌸 Serving {brand.serviceArea}
-          </span>
+          </span> */}
           <h1 className="text-4xl font-semibold text-mauve-700 sm:text-5xl">
             {brand.name}
           </h1>
@@ -50,17 +50,17 @@ export function HomePage() {
               alt=""
               aria-hidden="true"
               className="
-      pointer-events-none
-      absolute
-      left-1/2
-      top-0
-      z-30
-      w-[320px]
-      -translate-x-1/2
-      -translate-y-[74.5%]
-      select-none
-      sm:w-[450px]
-    "
+                          pointer-events-none
+                          absolute
+                          left-1/2
+                          top-0
+                          z-30
+                          w-[320px]
+                          -translate-x-1/2
+                          -translate-y-[74.5%]
+                          select-none
+                          sm:w-[450px]
+                      "
             />
 
             <div className="relative z-10">
@@ -70,7 +70,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <PawDivider className="pb-10" />
+      <PawDivider />
 
       {(isLoading || featuredCats.length > 0) && (
         <section className="mx-auto max-w-6xl px-6 pb-20">

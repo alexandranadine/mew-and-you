@@ -2,8 +2,8 @@ import type { CatTraits } from "../../types/cat";
 
 interface CatTraitBadgesProps {
   traits: CatTraits;
-  /** Icon-only, true traits only — for cards. Full mode (labels + known-false) is for the detail page. */
-  compact?: boolean;
+  /** Only show the true traits, hiding unknown/false ones — used on cards. Detail page shows everything. */
+  onlyTrue?: boolean;
 }
 
 const TRAIT_DEFS: { key: keyof CatTraits; icon: string; label: string }[] = [
@@ -16,10 +16,10 @@ const TRAIT_DEFS: { key: keyof CatTraits; icon: string; label: string }[] = [
 
 export function CatTraitBadges({
   traits,
-  compact = false,
+  onlyTrue = false,
 }: CatTraitBadgesProps) {
   const known = TRAIT_DEFS.filter((def) => traits[def.key] !== undefined);
-  const visible = compact ? known.filter((def) => traits[def.key]) : known;
+  const visible = onlyTrue ? known.filter((def) => traits[def.key]) : known;
 
   if (visible.length === 0) return null;
 
@@ -30,17 +30,14 @@ export function CatTraitBadges({
         return (
           <span
             key={def.key}
-            title={value ? def.label : `Not ${def.label.toLowerCase()}`}
-            className={`pill ${value ? "" : "text-mauve-300 line-through opacity-70"}`}
+            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
+              value
+                ? "bg-sage-100 text-mauve-700"
+                : "bg-blush-50 text-mauve-300 line-through opacity-70"
+            }`}
           >
             <span aria-hidden="true">{def.icon}</span>
-            {compact ? (
-              <span className="sr-only">{def.label}</span>
-            ) : (
-              <span className="ml-1">
-                {value ? def.label : `Not ${def.label.toLowerCase()}`}
-              </span>
-            )}
+            {value ? def.label : `Not ${def.label.toLowerCase()}`}
           </span>
         );
       })}

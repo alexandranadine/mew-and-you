@@ -103,7 +103,26 @@ export function SearchForm() {
       </div>
 
       <button type="submit" className="btn-primary mt-2 w-full sm:w-auto">
-        <span aria-hidden="true">🔍</span>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 20 20"
+          fill="none"
+          className="h-4 w-4 text-cream-50"
+        >
+          <circle
+            cx="8.5"
+            cy="8.5"
+            r="6"
+            stroke="currentColor"
+            strokeWidth="2"
+          />
+          <path
+            d="M13.5 13.5 18 18"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
         Find cats nearby
       </button>
     </form>
