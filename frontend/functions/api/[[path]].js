@@ -1,29 +1,60 @@
 /**
- * Same-origin /api/* proxy for Cloudflare Pages.
- *
- * Set API_ORIGIN in the Pages dashboard (e.g. https://your-api.example.com)
- * when the Express API is deployed. Until then, requests return 503.
+ * Same-origin /api/* reverse proxy for Cloudflare Pages.
+ * Forwards to the Render Express API; optional API_ORIGIN override in Pages env.
  */
-export async function onRequest(context) {
-  const apiOrigin = context.env.API_ORIGIN?.replace(/\/$/, "");
-  if (!apiOrigin) {
-    return new Response(
-      JSON.stringify({
-        error: "API proxy not configured",
-        message: "Set API_ORIGIN in Cloudflare Pages environment variables.",
-      }),
-      { status: 503, headers: { "Content-Type": "application/json" } },
-    );
+const DEFAULT_API_ORIGIN = "https://mew-and-you-api.onrender.com";
+
+const HOP_BY_HOP_HEADERS = new Set([
+  "connection",
+  "keep-alive",
+  "proxy-authenticate",
+  "proxy-authorization",
+  "te",
+  "trailers",
+  "transfer-encoding",
+  "upgrade",
+]);
+
+function proxyRequestHeaders(request, targetOrigin) {
+  const headers = new Headers();
+  const targetHost = new URL(targetOrigin).host;
+
+  for (const [name, value] of request.headers.entries()) {
+    const lower = name.toLowerCase();
+    if (HOP_BY_HOP_HEADERS.has(lower) || lower === "host") {
+      continue;
+    }
+    headers.append(name, value);
   }
+
+  headers.set("Host", targetHost);
+  headers.set("X-Forwarded-Host", request.headers.get("Host") ?? "");
+  headers.set("X-Forwarded-Proto", new URL(request.url).protocol.replace(":", ""));
+
+  const clientIp = request.headers.get("CF-Connecting-IP");
+  if (clientIp) {
+    headers.set("X-Forwarded-For", clientIp);
+  }
+
+  return headers;
+}
+
+export async function onRequest(context) {
+  const apiOrigin = (
+    context.env.API_ORIGIN ?? DEFAULT_API_ORIGIN
+  ).replace(/\/$/, "");
 
   const incoming = new URL(context.request.url);
   const target = new URL(incoming.pathname + incoming.search, apiOrigin);
 
+  const method = context.request.method;
+  const hasBody = method !== "GET" && method !== "HEAD";
+
   return fetch(
     new Request(target.toString(), {
-      method: context.request.method,
-      headers: context.request.headers,
-      body: context.request.body,
+      method,
+      headers: proxyRequestHeaders(context.request, apiOrigin),
+      body: hasBody ? context.request.body : undefined,
       redirect: "manual",
     }),
   );
