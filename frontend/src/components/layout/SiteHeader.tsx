@@ -5,7 +5,7 @@ export function SiteHeader() {
   return (
     <header className="border-b border-blush-100 bg-cream-50/80 backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to="/" className="focus-ring flex items-center gap-2">
           <span aria-hidden="true" className="text-2xl">
             🐾
           </span>
@@ -14,13 +14,16 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-6 font-display text-sm font-medium text-mauve-500">
-          <Link to="/" className="transition hover:text-mauve-700">
+        <nav
+          aria-label="Primary"
+          className="flex items-center gap-6 font-display text-sm font-medium text-mauve-500"
+        >
+          <Link to="/" className="focus-ring transition hover:text-mauve-700">
             Search
           </Link>
           <a
             href="#about"
-            className="hidden transition hover:text-mauve-700 sm:inline"
+            className="focus-ring hidden transition hover:text-mauve-700 sm:inline"
           >
             About
           </a>

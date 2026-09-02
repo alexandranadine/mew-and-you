@@ -24,7 +24,9 @@
   --color-mauve-100: #ecd9e0;
   --color-mauve-200: #d9b7c4;
   --color-mauve-300: #b98ca0;
-  --color-mauve-400: #96677e;
+  /* Darkened slightly from the original #96677e so body text using this
+     token clears WCAG AA contrast (4.5:1) against the cream background. */
+  --color-mauve-400: #8f5f76;
   --color-mauve-500: #7a4d64;
   --color-mauve-600: #5f3a4d;
   --color-mauve-700: #482c3b;
@@ -34,8 +36,23 @@
   --color-sage-300: #bccaa4;
   --color-sage-500: #8fa06f;
 
+  /* Darker error/danger red — the original blush-500 is ~3.5:1 on cream,
+     below AA for normal-size text; this passes comfortably. */
+  --color-blush-600: #a8425a;
+
   --shadow-cozy: 0 12px 30px -12px rgba(95, 58, 77, 0.28);
   --shadow-cozy-sm: 0 6px 16px -8px rgba(95, 58, 77, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 body {
@@ -87,5 +104,12 @@ h4 {
   .pill {
     @apply inline-flex items-center rounded-full bg-blush-50 px-3 py-1 text-xs font-medium
       text-mauve-600;
+  }
+
+  /* Visible keyboard focus ring for plain links/buttons that don't already
+     use .btn-primary/.btn-secondary/.field-input (which have their own). */
+  .focus-ring {
+    @apply rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+      focus-visible:outline-mauve-400;
   }
 }

@@ -14,8 +14,14 @@ export function SearchStateCard({
   message,
   children,
 }: SearchStateCardProps) {
+  const isError = icon === "⚠️" || icon === "🙀";
+
   return (
-    <div className="card mx-auto max-w-xl p-8 text-center sm:p-10">
+    <div
+      className="card mx-auto max-w-xl p-8 text-center sm:p-10"
+      role={isError ? "alert" : "status"}
+      aria-live={isError ? "assertive" : "polite"}
+    >
       <div aria-hidden="true" className="text-4xl">
         {icon}
       </div>

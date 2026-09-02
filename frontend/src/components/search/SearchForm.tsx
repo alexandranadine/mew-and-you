@@ -58,7 +58,11 @@ export function SearchForm() {
           aria-describedby={error ? "zip-error" : undefined}
         />
         {error && (
-          <p id="zip-error" className="mt-1.5 text-sm text-blush-500">
+          <p
+            id="zip-error"
+            role="alert"
+            className="mt-1.5 text-sm text-blush-600"
+          >
             {error}
           </p>
         )}

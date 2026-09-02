@@ -9,6 +9,11 @@ export default function RotatingTagline() {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // Users who've asked for reduced motion still get a tagline, it just
+    // doesn't auto-change or animate — avoids distracting/flashing content.
+    if (motionQuery.matches) return;
+
     let timeoutId: number;
 
     const intervalId = window.setInterval(() => {

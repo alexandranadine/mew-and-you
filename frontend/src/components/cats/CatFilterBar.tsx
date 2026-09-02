@@ -153,7 +153,7 @@ export function CatFilterBar({
           <button
             type="button"
             onClick={onReset}
-            className="text-sm font-medium text-mauve-500 underline-offset-2 hover:text-mauve-700 hover:underline"
+            className="focus-ring inline-block py-1 text-sm font-medium text-mauve-500 underline-offset-2 hover:text-mauve-700 hover:underline"
           >
             Reset filters
           </button>

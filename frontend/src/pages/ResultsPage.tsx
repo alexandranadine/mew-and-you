@@ -7,15 +7,12 @@ import {
   type CatFilterBarChange,
 } from "../components/cats/CatFilterBar";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
-import { getMockOrganizations } from "../data/mockCats";
 import { useCatsSearch } from "../hooks/useCatsSearch";
 import {
   parseCatSearchParams,
   patchSearchParams,
   type CatSearchParamsError,
 } from "../lib/searchParams";
-
-const ORGANIZATIONS = getMockOrganizations();
 
 export function ResultsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -27,6 +24,21 @@ export function ResultsPage() {
 
   const { data, isLoading, isError, error, refetch, isFetching } =
     useCatsSearch(query);
+
+  const organizationOptions = useMemo(() => {
+    const byId = new Map<string, { id: string; name: string }>();
+    for (const cat of data?.cats ?? []) {
+      if (!byId.has(cat.organization.id)) {
+        byId.set(cat.organization.id, {
+          id: cat.organization.id,
+          name: cat.organization.name,
+        });
+      }
+    }
+    return Array.from(byId.values()).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  }, [data]);
 
   function updateParams(patch: Record<string, string | undefined>) {
     setSearchParams((prev) => patchSearchParams(prev, patch), {
@@ -77,14 +89,14 @@ export function ResultsPage() {
       <div className="mb-6">
         <Link
           to="/"
-          className="text-sm font-medium text-mauve-500 hover:text-mauve-700"
+          className="focus-ring inline-block py-1 text-sm font-medium text-mauve-500 hover:text-mauve-700"
         >
           ← New search
         </Link>
         <h1 className="mt-2 text-3xl font-semibold text-mauve-700">
           Cats near {activeQuery.zip}
         </h1>
-        <p className="mt-1 text-mauve-400">
+        <p className="mt-1 text-mauve-400" aria-live="polite">
           Within {activeQuery.radiusMiles} miles
           {isLoading
             ? " — searching…"
@@ -98,12 +110,14 @@ export function ResultsPage() {
         <CatFilterBar
           filters={activeQuery.filters}
           sort={activeQuery.sort}
-          organizationOptions={ORGANIZATIONS}
+          organizationOptions={organizationOptions}
           onChange={handleFilterChange}
           onReset={handleResetFilters}
           hasActiveFilters={hasActiveFilters}
         />
       </div>
+
+      <h2 className="sr-only">Search results</h2>
 
       {isLoading && (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -156,7 +170,10 @@ export function ResultsPage() {
       )}
 
       {!isLoading && !isError && data && data.cats.length > 0 && (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          aria-live="polite"
+        >
           {data.cats.map((cat) => (
             <CatCard
               key={cat.id}

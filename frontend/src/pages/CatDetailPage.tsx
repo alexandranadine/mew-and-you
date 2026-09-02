@@ -20,6 +20,13 @@ export function CatDetailPage() {
   const location = useLocation();
   const { data: cat, isLoading } = useCatDetail(catId);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const [failedPhotoUrls, setFailedPhotoUrls] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  function markPhotoFailed(url: string) {
+    setFailedPhotoUrls((prev) => new Set(prev).add(url));
+  }
 
   // Distance is only known in the context of a search (passed along when
   // navigating from a results card); there's no way to recompute it here
@@ -57,53 +64,86 @@ export function CatDetailPage() {
   }
 
   const mainPhoto = cat.photos[selectedPhotoIndex] ?? cat.photos[0];
+  const mainPhotoFailed = mainPhoto ? failedPhotoUrls.has(mainPhoto.url) : true;
   const backHref = zip ? `/cats?zip=${encodeURIComponent(zip)}` : "/";
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
       <Link
         to={backHref}
-        className="text-sm font-medium text-mauve-500 hover:text-mauve-700"
+        className="focus-ring inline-block py-1 text-sm font-medium text-mauve-500 hover:text-mauve-700"
       >
         ← Back to results
       </Link>
 
       <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div>
+          {/* Fixed aspect ratio reserves space up front so the layout doesn't shift once the image loads. */}
           <div className="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-blush-100 shadow-[var(--shadow-cozy)]">
-            {mainPhoto ? (
+            {mainPhoto && !mainPhotoFailed ? (
               <img
                 src={mainPhoto.url}
                 alt={`Photo of ${cat.name}`}
                 className="h-full w-full object-cover"
+                decoding="async"
+                onError={() => markPhotoFailed(mainPhoto.url)}
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-6xl">
+              <div
+                aria-hidden="true"
+                className="flex h-full w-full items-center justify-center text-6xl"
+              >
                 🐱
               </div>
             )}
           </div>
 
           {cat.photos.length > 1 && (
-            <div className="mt-3 flex gap-3">
-              {cat.photos.map((photo, index) => (
-                <button
-                  key={photo.url}
-                  type="button"
-                  onClick={() => setSelectedPhotoIndex(index)}
-                  className={`h-16 w-20 overflow-hidden rounded-xl border-2 transition ${
-                    index === selectedPhotoIndex
-                      ? "border-mauve-500"
-                      : "border-transparent opacity-80 hover:opacity-100"
-                  }`}
-                >
-                  <img
-                    src={photo.thumbnailUrl ?? photo.url}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-              ))}
+            <div
+              className="mt-3 flex gap-3"
+              role="group"
+              aria-label={`${cat.name}'s photos`}
+            >
+              {cat.photos.map((photo, index) => {
+                const thumbFailed = failedPhotoUrls.has(
+                  photo.thumbnailUrl ?? photo.url,
+                );
+                const isSelected = index === selectedPhotoIndex;
+                return (
+                  <button
+                    key={photo.url}
+                    type="button"
+                    onClick={() => setSelectedPhotoIndex(index)}
+                    aria-label={`View photo ${index + 1} of ${cat.photos.length}`}
+                    aria-current={isSelected}
+                    className={`focus-ring h-16 w-20 overflow-hidden rounded-xl border-2 transition ${
+                      isSelected
+                        ? "border-mauve-500"
+                        : "border-transparent opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    {thumbFailed ? (
+                      <div
+                        aria-hidden="true"
+                        className="flex h-full w-full items-center justify-center bg-blush-100 text-xl"
+                      >
+                        🐱
+                      </div>
+                    ) : (
+                      <img
+                        src={photo.thumbnailUrl ?? photo.url}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                        onError={() =>
+                          markPhotoFailed(photo.thumbnailUrl ?? photo.url)
+                        }
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -178,7 +218,7 @@ export function CatDetailPage() {
                 href={cat.organization.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1 inline-block text-sm font-medium text-mauve-600 underline-offset-2 hover:underline"
+                className="focus-ring mt-1 inline-block text-sm font-medium text-mauve-600 underline-offset-2 hover:underline"
               >
                 Visit website
               </a>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Cat } from "../../types/cat";
 import { CatTraitBadges } from "./CatTraitBadges";
@@ -12,6 +13,7 @@ interface CatCardProps {
 
 export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
   const photo = cat.photos[0];
+  const [imgFailed, setImgFailed] = useState(false);
   const detailHref = detailQuery
     ? `/cats/${encodeURIComponent(cat.id)}?${detailQuery}`
     : `/cats/${encodeURIComponent(cat.id)}`;
@@ -20,18 +22,24 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
     <Link
       to={detailHref}
       state={typeof distanceMiles === "number" ? { distanceMiles } : undefined}
-      className="card group flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-[var(--shadow-cozy)]"
+      className="card focus-ring group flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-[var(--shadow-cozy)]"
     >
+      {/* Fixed aspect ratio reserves space up front so the layout doesn't shift once the image loads. */}
       <div className="aspect-[4/3] w-full overflow-hidden bg-blush-100">
-        {photo ? (
+        {photo && !imgFailed ? (
           <img
             src={photo.thumbnailUrl ?? photo.url}
             alt={`Photo of ${cat.name}`}
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
             loading="lazy"
+            decoding="async"
+            onError={() => setImgFailed(true)}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-4xl">
+          <div
+            aria-hidden="true"
+            className="flex h-full w-full items-center justify-center text-4xl"
+          >
             🐱
           </div>
         )}

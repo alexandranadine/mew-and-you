@@ -1,18 +1,61 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
-import { CatDetailPage } from "./pages/CatDetailPage";
 import { HomePage } from "./pages/HomePage";
-import { NotFoundPage } from "./pages/NotFoundPage";
-import { ResultsPage } from "./pages/ResultsPage";
+
+// Lazily loaded so the initial bundle for the landing page (the most common
+// entry point) doesn't include code only needed once a user searches.
+const ResultsPage = lazy(() =>
+  import("./pages/ResultsPage").then((m) => ({ default: m.ResultsPage })),
+);
+const CatDetailPage = lazy(() =>
+  import("./pages/CatDetailPage").then((m) => ({ default: m.CatDetailPage })),
+);
+const NotFoundPage = lazy(() =>
+  import("./pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
+);
+
+function RouteFallback() {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="mx-auto max-w-3xl px-6 py-16 text-center text-mauve-400"
+    >
+      Loading…
+    </div>
+  );
+}
 
 function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
-        <Route path="cats" element={<ResultsPage />} />
-        <Route path="cats/:catId" element={<CatDetailPage />} />
-        <Route path="*" element={<NotFoundPage />} />
+        <Route
+          path="cats"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <ResultsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="cats/:catId"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <CatDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <NotFoundPage />
+            </Suspense>
+          }
+        />
       </Route>
     </Routes>
   );
