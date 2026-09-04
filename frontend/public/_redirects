@@ -3,8 +3,9 @@
 #
 # Order matters: first match wins.
 #
-# /api/* is proxied by the Pages Function at functions/api/[[path]].js
-# (set API_ORIGIN=https://YOUR-RENDER-URL.onrender.com in the Pages dashboard).
+# /api/* is proxied by the Pages Function at functions/api/[[path]].ts
+# (set API_ORIGIN=https://YOUR-SERVICE.onrender.com in the Pages dashboard;
+#  do not hardcode the Render hostname in source).
 # _routes.json limits Function invocations to /api/*; Functions are not subject
 # to these redirect rules.
 

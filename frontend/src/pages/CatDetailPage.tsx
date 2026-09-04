@@ -185,7 +185,10 @@ export function CatDetailPage() {
               <img
                 src={mainPhoto.url}
                 alt={`Photo of ${cat.name}`}
+                width={800}
+                height={600}
                 className="h-full w-full object-cover"
+                fetchPriority="high"
                 decoding="async"
                 onError={() => markPhotoFailed(mainPhoto.url)}
               />
@@ -234,6 +237,8 @@ export function CatDetailPage() {
                       <img
                         src={photo.thumbnailUrl ?? photo.url}
                         alt=""
+                        width={80}
+                        height={64}
                         loading="lazy"
                         decoding="async"
                         className="h-full w-full object-cover"

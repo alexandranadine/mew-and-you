@@ -1,5 +1,8 @@
 # Render Blueprint — API staging only (Free tier).
 # See DEPLOYMENT.md for env var details and frontend routing (not configured here).
+# Set CORS_ORIGIN in the Render dashboard to the Cloudflare Pages SPA origin, e.g.
+#   CORS_ORIGIN=https://mew-and-you.pages.dev
+# (sync: false — value is not stored in this file.)
 services:
   - type: web
     name: mew-and-you-api-staging

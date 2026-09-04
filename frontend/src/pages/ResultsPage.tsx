@@ -82,13 +82,17 @@ export function ResultsPage() {
   );
 
   function handleFilterChange(patch: CatFilterBarChange) {
-    updateParams({
-      ageGroup: patch.ageGroup,
-      sex: patch.sex,
-      size: patch.size,
-      org: patch.organizationId,
-      sort: patch.sort === "distance" ? undefined : patch.sort,
-    });
+    // Only patch keys the bar actually changed — spreading every field as
+    // undefined would wipe the other active filters via patchSearchParams.
+    const next: Record<string, string | undefined> = {};
+    if ("ageGroup" in patch) next.ageGroup = patch.ageGroup;
+    if ("sex" in patch) next.sex = patch.sex;
+    if ("size" in patch) next.size = patch.size;
+    if ("organizationId" in patch) next.org = patch.organizationId;
+    if ("sort" in patch) {
+      next.sort = patch.sort === "distance" ? undefined : patch.sort;
+    }
+    updateParams(next);
   }
 
   function handleResetFilters() {

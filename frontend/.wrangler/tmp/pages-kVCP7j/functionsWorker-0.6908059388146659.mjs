@@ -2,7 +2,6 @@ var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
 // api/[[path]].ts
-var API_ORIGIN = "https://mew-and-you-api.onrender.com";
 var HOP_BY_HOP_HEADERS = /* @__PURE__ */ new Set([
   "connection",
   "keep-alive",
@@ -37,14 +36,26 @@ function proxyRequestHeaders(request, targetOrigin) {
 }
 __name(proxyRequestHeaders, "proxyRequestHeaders");
 async function onRequest(context) {
+  const apiOrigin = context.env.API_ORIGIN?.trim().replace(/\/$/, "");
+  if (!apiOrigin) {
+    return new Response(
+      JSON.stringify({
+        error: {
+          code: "api_proxy_not_configured",
+          message: "Set API_ORIGIN in Cloudflare Pages environment variables."
+        }
+      }),
+      { status: 503, headers: { "Content-Type": "application/json" } }
+    );
+  }
   const incoming = new URL(context.request.url);
-  const target = new URL(incoming.pathname + incoming.search, API_ORIGIN);
+  const target = new URL(incoming.pathname + incoming.search, apiOrigin);
   const method = context.request.method;
   const hasBody = method !== "GET" && method !== "HEAD";
   return fetch(
     new Request(target.toString(), {
       method,
-      headers: proxyRequestHeaders(context.request, API_ORIGIN),
+      headers: proxyRequestHeaders(context.request, apiOrigin),
       body: hasBody ? context.request.body : void 0,
       redirect: "manual"
     })
@@ -556,7 +567,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-x86oMB/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-yUFUij/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -588,7 +599,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-x86oMB/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-yUFUij/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

@@ -4,7 +4,6 @@ var __name = (target, value) => __defProp(target, "name", { value, configurable:
 // .wrangler/tmp/pages-kVCP7j/functionsWorker-0.6908059388146659.mjs
 var __defProp2 = Object.defineProperty;
 var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
-var API_ORIGIN = "https://mew-and-you-api.onrender.com";
 var HOP_BY_HOP_HEADERS = /* @__PURE__ */ new Set([
   "connection",
   "keep-alive",
@@ -40,14 +39,26 @@ function proxyRequestHeaders(request, targetOrigin) {
 __name(proxyRequestHeaders, "proxyRequestHeaders");
 __name2(proxyRequestHeaders, "proxyRequestHeaders");
 async function onRequest(context) {
+  const apiOrigin = context.env.API_ORIGIN?.trim().replace(/\/$/, "");
+  if (!apiOrigin) {
+    return new Response(
+      JSON.stringify({
+        error: {
+          code: "api_proxy_not_configured",
+          message: "Set API_ORIGIN in Cloudflare Pages environment variables."
+        }
+      }),
+      { status: 503, headers: { "Content-Type": "application/json" } }
+    );
+  }
   const incoming = new URL(context.request.url);
-  const target = new URL(incoming.pathname + incoming.search, API_ORIGIN);
+  const target = new URL(incoming.pathname + incoming.search, apiOrigin);
   const method = context.request.method;
   const hasBody = method !== "GET" && method !== "HEAD";
   return fetch(
     new Request(target.toString(), {
       method,
-      headers: proxyRequestHeaders(context.request, API_ORIGIN),
+      headers: proxyRequestHeaders(context.request, apiOrigin),
       body: hasBody ? context.request.body : void 0,
       redirect: "manual"
     })

@@ -1,4 +1,14 @@
-const API_ORIGIN = "https://mew-and-you-api.onrender.com";
+/**
+ * Same-origin /api/* reverse proxy for Cloudflare Pages.
+ *
+ * Set API_ORIGIN in the Pages dashboard (e.g. https://your-api.onrender.com,
+ * no trailing slash). Requests return 503 until it is configured — do not
+ * hardcode a Render hostname here (service names differ per environment).
+ */
+
+interface ApiProxyEnv {
+  API_ORIGIN?: string;
+}
 
 const HOP_BY_HOP_HEADERS = new Set([
   "connection",
@@ -38,9 +48,25 @@ function proxyRequestHeaders(request: Request, targetOrigin: string): Headers {
   return headers;
 }
 
-export async function onRequest(context: EventContext): Promise<Response> {
+export async function onRequest(
+  context: EventContext<ApiProxyEnv, string, unknown>,
+): Promise<Response> {
+  const apiOrigin = context.env.API_ORIGIN?.trim().replace(/\/$/, "");
+  if (!apiOrigin) {
+    return new Response(
+      JSON.stringify({
+        error: {
+          code: "api_proxy_not_configured",
+          message:
+            "Set API_ORIGIN in Cloudflare Pages environment variables.",
+        },
+      }),
+      { status: 503, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
   const incoming = new URL(context.request.url);
-  const target = new URL(incoming.pathname + incoming.search, API_ORIGIN);
+  const target = new URL(incoming.pathname + incoming.search, apiOrigin);
 
   const method = context.request.method;
   const hasBody = method !== "GET" && method !== "HEAD";
@@ -48,7 +74,7 @@ export async function onRequest(context: EventContext): Promise<Response> {
   return fetch(
     new Request(target.toString(), {
       method,
-      headers: proxyRequestHeaders(context.request, API_ORIGIN),
+      headers: proxyRequestHeaders(context.request, apiOrigin),
       body: hasBody ? context.request.body : undefined,
       redirect: "manual",
     }),

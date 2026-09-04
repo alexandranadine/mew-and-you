@@ -12,6 +12,10 @@ export function PawDivider({ className = "" }: PawDividerProps) {
         <img
           src={pawDivider}
           alt=""
+          width={680}
+          height={453}
+          loading="lazy"
+          decoding="async"
           className="pointer-events-none h-auto w-[280px] select-none sm:w-[340px]"
         />
       </div>

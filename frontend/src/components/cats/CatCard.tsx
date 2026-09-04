@@ -53,6 +53,8 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
           <img
             src={imgSrc}
             alt={`Photo of ${cat.name}`}
+            width={800}
+            height={600}
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
             loading="lazy"
             decoding="async"

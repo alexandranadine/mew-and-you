@@ -18,6 +18,13 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
     <link rel="manifest" href="/site.webmanifest" />
+    <!-- Hero peek art is above-the-fold on the landing route; preload for LCP. -->
+    <link
+      rel="preload"
+      as="image"
+      href="/images/mew-and-you-cat-peek.png"
+      fetchpriority="high"
+    />
 
     <meta property="og:site_name" content="Mew & You" />
     <meta property="og:locale" content="en_US" />

@@ -61,6 +61,10 @@ export function HomePage() {
               src="/images/mew-and-you-cat-peek.png"
               alt=""
               aria-hidden="true"
+              width={1200}
+              height={600}
+              decoding="async"
+              fetchPriority="high"
               className="
                           pointer-events-none
                           absolute
