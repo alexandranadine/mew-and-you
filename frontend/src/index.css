@@ -112,4 +112,22 @@ h4 {
     @apply rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
       focus-visible:outline-mauve-400;
   }
+
+  /* Brief scale pop when toggling the favorites heart. Global
+     prefers-reduced-motion rules collapse this to a near-instant flash. */
+  .favorite-heart-pop {
+    animation: favorite-heart-pop 280ms ease-out;
+  }
+}
+
+@keyframes favorite-heart-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
 }

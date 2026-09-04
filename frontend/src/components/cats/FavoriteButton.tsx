@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useFavorites } from "../../hooks/useFavorites";
 
 interface FavoriteButtonProps {
@@ -8,6 +9,13 @@ interface FavoriteButtonProps {
   size?: "sm" | "md";
 }
 
+/**
+ * Feather-style heart: circular arcs for the lobes so the stroke
+ * stays even at the cleft and tip (fill paths look ragged when stroked).
+ */
+const HEART_PATH =
+  "M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z";
+
 export function FavoriteButton({
   catId,
   catName,
@@ -16,6 +24,7 @@ export function FavoriteButton({
 }: FavoriteButtonProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const saved = isFavorite(catId);
+  const [popping, setPopping] = useState(false);
 
   const dim = size === "md" ? "h-11 w-11" : "h-10 w-10";
   const icon = size === "md" ? "h-5 w-5" : "h-4 w-4";
@@ -33,27 +42,47 @@ export function FavoriteButton({
         event.preventDefault();
         event.stopPropagation();
         toggleFavorite(catId);
+        setPopping(true);
       }}
-      className={`focus-ring inline-flex ${dim} items-center justify-center rounded-full border transition ${
+      className={`focus-ring inline-flex ${dim} items-center justify-center rounded-full border transition-[color,background-color,border-color,box-shadow] duration-200 ease-out ${
         saved
-          ? "border-blush-300 bg-blush-50 text-blush-600 shadow-[var(--shadow-cozy-sm)]"
+          ? "border-blush-300 bg-blush-50 text-blush-500 shadow-[var(--shadow-cozy-sm)]"
           : "border-blush-100 bg-white/90 text-mauve-400 hover:border-blush-200 hover:text-mauve-600"
       } ${className}`}
     >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        className={icon}
-        fill={saved ? "currentColor" : "none"}
-        stroke="currentColor"
-        strokeWidth={saved ? 0 : 1.75}
+      <span
+        className={`inline-flex ${popping ? "favorite-heart-pop" : ""}`}
+        onAnimationEnd={() => setPopping(false)}
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 21s-6.7-4.35-9.33-8.48C.8 9.5 2.05 5.75 5.6 4.6c1.9-.62 3.95-.1 5.4 1.32 1.45-1.42 3.5-1.94 5.4-1.32 3.55 1.15 4.8 4.9 2.93 7.92C18.7 16.65 12 21 12 21z"
-        />
-      </svg>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          className={icon}
+        >
+          {/* Filled heart — fades/scales in when saved */}
+          <path
+            d={HEART_PATH}
+            fill="currentColor"
+            stroke="none"
+            className={`origin-center transition-[opacity,transform] duration-200 ease-out ${
+              saved ? "scale-100 opacity-100" : "scale-[0.72] opacity-0"
+            }`}
+          />
+          {/* Outline heart — visible when unsaved */}
+          <path
+            d={HEART_PATH}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={`transition-opacity duration-200 ease-out ${
+              saved ? "opacity-0" : "opacity-100"
+            }`}
+          />
+        </svg>
+      </span>
     </button>
   );
 }
