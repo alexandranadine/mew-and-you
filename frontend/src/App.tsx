@@ -17,6 +17,11 @@ const AboutPage = lazy(() =>
 const FavoritesPage = lazy(() =>
   import("./pages/FavoritesPage").then((m) => ({ default: m.FavoritesPage })),
 );
+const SavedSearchesPage = lazy(() =>
+  import("./pages/SavedSearchesPage").then((m) => ({
+    default: m.SavedSearchesPage,
+  })),
+);
 const NotFoundPage = lazy(() =>
   import("./pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
 );
@@ -67,6 +72,14 @@ function App() {
           element={
             <Suspense fallback={<RouteFallback />}>
               <FavoritesPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="saved-searches"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <SavedSearchesPage />
             </Suspense>
           }
         />

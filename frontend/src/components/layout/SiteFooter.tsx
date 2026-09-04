@@ -19,6 +19,12 @@ export function SiteFooter() {
             Favorites
           </Link>
           <Link
+            to="/saved-searches"
+            className="focus-ring font-medium text-mauve-500 hover:text-mauve-700"
+          >
+            Saved searches
+          </Link>
+          <Link
             to="/about"
             className="focus-ring font-medium text-mauve-500 hover:text-mauve-700"
           >

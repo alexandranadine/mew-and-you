@@ -7,6 +7,7 @@ import {
   type CatFilterBarChange,
 } from "../components/cats/CatFilterBar";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
+import { SaveSearchPanel } from "../components/search/SaveSearchPanel";
 import { PageMeta } from "../components/seo/PageMeta";
 import { useCatsSearch } from "../hooks/useCatsSearch";
 import { filterCats } from "../lib/catFilters";
@@ -132,6 +133,7 @@ export function ResultsPage() {
               ? `${visibleCats.length} potential roommate${visibleCats.length === 1 ? "" : "s"} within ${activeQuery.radiusMiles} miles`
               : ""}
         </p>
+        <SaveSearchPanel query={activeQuery} />
       </div>
 
       <div className="mb-8">

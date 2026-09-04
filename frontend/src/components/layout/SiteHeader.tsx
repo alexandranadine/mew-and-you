@@ -28,6 +28,12 @@ export function SiteHeader() {
             Favorites
           </Link>
           <Link
+            to="/saved-searches"
+            className="focus-ring transition hover:text-mauve-700"
+          >
+            Saved
+          </Link>
+          <Link
             to="/about"
             className="focus-ring hidden transition hover:text-mauve-700 sm:inline"
           >
