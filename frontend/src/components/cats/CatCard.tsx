@@ -13,10 +13,33 @@ interface CatCardProps {
 
 export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
   const photo = cat.photos[0];
-  const [imgFailed, setImgFailed] = useState(false);
+  const preferredSrc = photo?.thumbnailUrl ?? photo?.url;
+  const [imgCatId, setImgCatId] = useState(cat.id);
+  const [failedSrcs, setFailedSrcs] = useState<Set<string>>(() => new Set());
+
+  // Reset image failure tracking when the card is reused for a different cat.
+  if (imgCatId !== cat.id) {
+    setImgCatId(cat.id);
+    setFailedSrcs(new Set());
+  }
+
+  const imgSrc =
+    preferredSrc && !failedSrcs.has(preferredSrc)
+      ? preferredSrc
+      : photo?.url &&
+          photo.url !== preferredSrc &&
+          !failedSrcs.has(photo.url)
+        ? photo.url
+        : undefined;
+
   const detailHref = detailQuery
     ? `/cats/${encodeURIComponent(cat.id)}?${detailQuery}`
     : `/cats/${encodeURIComponent(cat.id)}`;
+
+  function handleImgError() {
+    if (!imgSrc) return;
+    setFailedSrcs((prev) => new Set(prev).add(imgSrc));
+  }
 
   return (
     <Link
@@ -26,14 +49,14 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
     >
       {/* Fixed aspect ratio reserves space up front so the layout doesn't shift once the image loads. */}
       <div className="aspect-[4/3] w-full overflow-hidden bg-blush-100">
-        {photo && !imgFailed ? (
+        {imgSrc ? (
           <img
-            src={photo.thumbnailUrl ?? photo.url}
+            src={imgSrc}
             alt={`Photo of ${cat.name}`}
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
             loading="lazy"
             decoding="async"
-            onError={() => setImgFailed(true)}
+            onError={handleImgError}
           />
         ) : (
           <div

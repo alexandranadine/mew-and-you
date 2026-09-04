@@ -9,6 +9,8 @@ import {
 import { SearchStateCard } from "../components/cats/SearchStateCard";
 import { PageMeta } from "../components/seo/PageMeta";
 import { useCatsSearch } from "../hooks/useCatsSearch";
+import { filterCats } from "../lib/catFilters";
+import { sortCats } from "../lib/catSort";
 import {
   parseCatSearchParams,
   patchSearchParams,
@@ -43,6 +45,12 @@ export function ResultsPage() {
     );
   }, [data]);
 
+  const visibleCats = useMemo(() => {
+    if (!data || !query) return [];
+    const filtered = filterCats(data.cats, query.filters);
+    return sortCats(filtered, query.sort);
+  }, [data, query]);
+
   function updateParams(patch: Record<string, string | undefined>) {
     setSearchParams((prev) => patchSearchParams(prev, patch), {
       replace: true,
@@ -68,9 +76,9 @@ export function ResultsPage() {
   const { query: activeQuery } = parsed;
   const hasActiveFilters = Boolean(
     activeQuery.filters.ageGroup ||
-    activeQuery.filters.sex ||
-    activeQuery.filters.size ||
-    activeQuery.filters.organizationId,
+      activeQuery.filters.sex ||
+      activeQuery.filters.size ||
+      activeQuery.filters.organizationId,
   );
 
   function handleFilterChange(patch: CatFilterBarChange) {
@@ -117,7 +125,7 @@ export function ResultsPage() {
           {isPending
             ? `Searching within ${activeQuery.radiusMiles} miles\u2026`
             : data
-              ? `${data.totalCount} potential roommate${data.totalCount === 1 ? "" : "s"} within ${activeQuery.radiusMiles} miles`
+              ? `${visibleCats.length} potential roommate${visibleCats.length === 1 ? "" : "s"} within ${activeQuery.radiusMiles} miles`
               : ""}
         </p>
       </div>
@@ -164,7 +172,7 @@ export function ResultsPage() {
         </SearchStateCard>
       )}
 
-      {!isPending && !isError && data && data.cats.length === 0 && (
+      {!isPending && !isError && data && visibleCats.length === 0 && (
         <SearchStateCard
           icon="🔍"
           title="No cats matched your search"
@@ -185,12 +193,12 @@ export function ResultsPage() {
         </SearchStateCard>
       )}
 
-      {!isPending && !isError && data && data.cats.length > 0 && (
+      {!isPending && !isError && data && visibleCats.length > 0 && (
         <div
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
           aria-live="polite"
         >
-          {data.cats.map((cat) => (
+          {visibleCats.map((cat) => (
             <CatCard
               key={cat.id}
               cat={cat}

@@ -35,7 +35,7 @@ export function CatFilterBar({
   return (
     <div className="card rounded-[1.75rem] border-blush-50 p-3 sm:p-4">
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-        <div>
+        <div className="min-w-0">
           <label htmlFor="filter-age" className="field-label">
             Age
           </label>
@@ -60,7 +60,7 @@ export function CatFilterBar({
           </select>
         </div>
 
-        <div>
+        <div className="min-w-0">
           <label htmlFor="filter-sex" className="field-label">
             Sex
           </label>
@@ -83,7 +83,7 @@ export function CatFilterBar({
           </select>
         </div>
 
-        <div>
+        <div className="min-w-0">
           <label htmlFor="filter-size" className="field-label">
             Size
           </label>
@@ -106,7 +106,7 @@ export function CatFilterBar({
           </select>
         </div>
 
-        <div>
+        <div className="min-w-0">
           <label htmlFor="filter-org" className="field-label">
             Organization
           </label>
@@ -127,7 +127,7 @@ export function CatFilterBar({
           </select>
         </div>
 
-        <div>
+        <div className="min-w-0">
           <label htmlFor="filter-sort" className="field-label">
             Sort by
           </label>
