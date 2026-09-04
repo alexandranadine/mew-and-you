@@ -22,6 +22,12 @@ export function SiteHeader() {
             Search
           </Link>
           <Link
+            to="/favorites"
+            className="focus-ring transition hover:text-mauve-700"
+          >
+            Favorites
+          </Link>
+          <Link
             to="/about"
             className="focus-ring hidden transition hover:text-mauve-700 sm:inline"
           >

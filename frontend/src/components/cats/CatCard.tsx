@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Cat } from "../../types/cat";
 import { CatTraitBadges } from "./CatTraitBadges";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface CatCardProps {
   cat: Cat;
@@ -42,67 +43,74 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
   }
 
   return (
-    <Link
-      to={detailHref}
-      state={typeof distanceMiles === "number" ? { distanceMiles } : undefined}
-      className="card focus-ring group flex flex-col overflow-hidden rounded-[2rem] transition hover:-translate-y-1.5 hover:shadow-[0_22px_44px_-12px_rgba(95,58,77,0.38)]"
-    >
-      {/* Fixed aspect ratio reserves space up front so the layout doesn't shift once the image loads. */}
-      <div className="aspect-[4/3] w-full overflow-hidden bg-blush-100">
-        {imgSrc ? (
-          <img
-            src={imgSrc}
-            alt={`Photo of ${cat.name}`}
-            width={800}
-            height={600}
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-            loading="lazy"
-            decoding="async"
-            onError={handleImgError}
-          />
-        ) : (
-          <div
-            aria-hidden="true"
-            className="flex h-full w-full items-center justify-center text-4xl"
-          >
-            🐱
-          </div>
-        )}
-      </div>
+    <div className="card group relative flex flex-col overflow-hidden rounded-[2rem] transition hover:-translate-y-1.5 hover:shadow-[0_22px_44px_-12px_rgba(95,58,77,0.38)]">
+      <FavoriteButton
+        catId={cat.id}
+        catName={cat.name}
+        className="absolute top-3 right-3 z-10"
+      />
+      <Link
+        to={detailHref}
+        state={typeof distanceMiles === "number" ? { distanceMiles } : undefined}
+        className="focus-ring flex flex-1 flex-col overflow-hidden rounded-[2rem]"
+      >
+        {/* Fixed aspect ratio reserves space up front so the layout doesn't shift once the image loads. */}
+        <div className="aspect-[4/3] w-full overflow-hidden bg-blush-100">
+          {imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={`Photo of ${cat.name}`}
+              width={800}
+              height={600}
+              className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+              onError={handleImgError}
+            />
+          ) : (
+            <div
+              aria-hidden="true"
+              className="flex h-full w-full items-center justify-center text-4xl"
+            >
+              🐱
+            </div>
+          )}
+        </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-5">
-        <h3 className="text-xl font-semibold text-mauve-700">{cat.name}</h3>
+        <div className="flex flex-1 flex-col gap-2 p-5">
+          <h3 className="text-xl font-semibold text-mauve-700">{cat.name}</h3>
 
-        <p className="text-sm text-mauve-500">{cat.breed}</p>
+          <p className="text-sm text-mauve-500">{cat.breed}</p>
 
-        <p className="text-sm text-mauve-400">
-          {cat.age} &middot; {sexLabel(cat.sex)} &middot; {sizeLabel(cat.size)}
-        </p>
-
-        <CatTraitBadges traits={cat.traits} onlyTrue />
-
-        {typeof distanceMiles === "number" && (
-          <p className="text-sm font-semibold text-blush-600">
-            <span aria-hidden="true">🌸</span> {distanceMiles.toFixed(1)} miles
-            away
+          <p className="text-sm text-mauve-400">
+            {cat.age} &middot; {sexLabel(cat.sex)} &middot; {sizeLabel(cat.size)}
           </p>
-        )}
 
-        <p className="text-sm font-medium text-mauve-600">
-          {cat.organization.name}
-        </p>
+          <CatTraitBadges traits={cat.traits} onlyTrue />
 
-        <p className="mt-auto pt-2 text-sm font-semibold text-mauve-500 transition group-hover:text-mauve-700">
-          Meet {cat.name}{" "}
-          <span
-            aria-hidden="true"
-            className="inline-block transition group-hover:translate-x-0.5"
-          >
-            →
-          </span>
-        </p>
-      </div>
-    </Link>
+          {typeof distanceMiles === "number" && (
+            <p className="text-sm font-semibold text-blush-600">
+              <span aria-hidden="true">🌸</span> {distanceMiles.toFixed(1)} miles
+              away
+            </p>
+          )}
+
+          <p className="text-sm font-medium text-mauve-600">
+            {cat.organization.name}
+          </p>
+
+          <p className="mt-auto pt-2 text-sm font-semibold text-mauve-500 transition group-hover:text-mauve-700">
+            Meet {cat.name}{" "}
+            <span
+              aria-hidden="true"
+              className="inline-block transition group-hover:translate-x-0.5"
+            >
+              →
+            </span>
+          </p>
+        </div>
+      </Link>
+    </div>
   );
 }
 

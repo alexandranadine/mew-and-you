@@ -6,6 +6,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { CatTraitBadges } from "../components/cats/CatTraitBadges";
+import { FavoriteButton } from "../components/cats/FavoriteButton";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
 import { PageMeta } from "../components/seo/PageMeta";
 import { useCatDetail } from "../hooks/useCatDetail";
@@ -259,11 +260,18 @@ export function CatDetailPage() {
             <h1 className="min-w-0 break-words text-3xl font-semibold text-mauve-700">
               {cat.name}
             </h1>
-            {typeof distanceMiles === "number" && (
-              <span className="pill shrink-0">
-                {distanceMiles.toFixed(1)} mi away
-              </span>
-            )}
+            <div className="flex shrink-0 items-center gap-2">
+              {typeof distanceMiles === "number" && (
+                <span className="pill">
+                  {distanceMiles.toFixed(1)} mi away
+                </span>
+              )}
+              <FavoriteButton
+                catId={cat.id}
+                catName={cat.name}
+                size="md"
+              />
+            </div>
           </div>
 
           <p className="mt-1 text-lg text-mauve-500">{cat.breed}</p>

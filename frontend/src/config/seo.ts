@@ -44,6 +44,13 @@ export const aboutSeo = {
   canonicalPath: "/about",
 } as const;
 
+export const favoritesSeo = {
+  title: `Favorites — ${brand.name}`,
+  description: `Cats you've saved on this device while browsing adoptable listings on ${brand.name}.`,
+  canonicalPath: "/favorites",
+  robots: "noindex, follow",
+} as const;
+
 export const notFoundSeo = {
   title: `Page not found — ${brand.name}`,
   description: `That page doesn't exist. Head back to search for adoptable cats in ${brand.serviceArea}.`,
