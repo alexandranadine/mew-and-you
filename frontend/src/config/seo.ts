@@ -52,13 +52,6 @@ export const favoritesSeo = {
   robots: "noindex, follow",
 } as const;
 
-export const savedSearchesSeo = {
-  title: `Saved searches — ${brand.name}`,
-  description: `Search presets you've saved on this device for adoptable cats on ${brand.name}.`,
-  canonicalPath: "/saved-searches",
-  robots: "noindex, follow",
-} as const;
-
 export const notFoundSeo = {
   title: `Page not found — ${brand.name}`,
   description: `That page doesn't exist. Head back to search for adoptable cats in ${brand.serviceArea}.`,
