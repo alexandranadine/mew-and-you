@@ -20,10 +20,11 @@ export class RescueGroupsApiError extends Error {
   }
 }
 
-interface SearchAvailableCatsParams {
+export interface SearchAvailableCatsParams {
   postalcode: string;
   miles: number;
   limit?: number;
+  page?: number;
 }
 
 function assertApiKeyConfigured(): string {
@@ -134,13 +135,18 @@ export async function searchAvailableCats({
   postalcode,
   miles,
   limit = 100,
+  page,
 }: SearchAvailableCatsParams): Promise<RgSearchResponse> {
   // Build the query manually so commas in `include` stay literal (matches
   // RescueGroups' own examples and avoids over-encoding).
-  const query = [
+  const queryParts = [
     "include=breeds,orgs,pictures,locations",
     `limit=${encodeURIComponent(String(limit))}`,
-  ].join("&");
+  ];
+  if (typeof page === "number" && page > 1) {
+    queryParts.push(`page=${encodeURIComponent(String(page))}`);
+  }
+  const query = queryParts.join("&");
 
   return rescueGroupsFetch<RgSearchResponse>(
     `/public/animals/search/available/cats/?${query}`,

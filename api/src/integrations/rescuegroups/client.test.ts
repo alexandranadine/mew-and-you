@@ -76,6 +76,25 @@ describe("RescueGroups client", () => {
     });
   });
 
+  it("includes page query parameter when page > 1", async () => {
+    mockFetchResponse({
+      json: { data: [], meta: { count: 0 } },
+    });
+
+    await searchAvailableCats({
+      postalcode: "90210",
+      miles: 25,
+      limit: 100,
+      page: 2,
+    });
+
+    expect(fetch).toHaveBeenCalledOnce();
+    const [url] = vi.mocked(fetch).mock.calls[0];
+    expect(String(url)).toBe(
+      "https://api.rescuegroups.org/v5/public/animals/search/available/cats/?include=breeds,orgs,pictures,locations&limit=100&page=2",
+    );
+  });
+
   it("maps RescueGroups' empty 200 (invalid key) to a clear 502", async () => {
     mockFetchResponse({ status: 200, body: "" });
 
