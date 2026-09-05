@@ -373,6 +373,32 @@ describe("mapRescueGroupsAnimal", () => {
     ]);
   });
 
+  it("uses animal attributes.url for adoptionUrl even when org adoptionUrl and website exist", () => {
+    const cat = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: {
+          url: "https://example.org/sunset-paws/cats/mochi",
+        },
+      }),
+      [
+        {
+          ...orgIncluded,
+          attributes: {
+            ...orgIncluded.attributes,
+            adoptionUrl: "https://example.org/sunset-paws/adopt",
+            url: "https://example.org/sunset-paws",
+          },
+        },
+        locationIncluded,
+        pictureIncluded,
+      ],
+    );
+
+    expect(cat.adoptionUrl).toBe("https://example.org/sunset-paws/cats/mochi");
+    expect(cat.adoptionUrl).not.toBe("https://example.org/sunset-paws/adopt");
+    expect(cat.adoptionUrl).not.toBe("https://example.org/sunset-paws");
+  });
+
   it("prefers the animal listing URL, then org adoptionUrl, then org website", () => {
     const animalUrl = mapRescueGroupsAnimal(
       makeAnimal({

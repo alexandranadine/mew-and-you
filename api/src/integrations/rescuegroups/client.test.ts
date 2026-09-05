@@ -97,7 +97,7 @@ describe("RescueGroups client", () => {
       });
   });
 
-  it("GETs /public/animals/{id} with literal include commas", async () => {
+  it("GETs /public/animals/{id} with include commas and explicit animal url field", async () => {
     mockFetchResponse({
       json: {
         data: { type: "animals", id: "123", attributes: { name: "Mochi" } },
@@ -108,9 +108,15 @@ describe("RescueGroups client", () => {
 
     expect(fetch).toHaveBeenCalledOnce();
     const [url, init] = vi.mocked(fetch).mock.calls[0];
-    expect(String(url)).toBe(
-      "https://api.rescuegroups.org/v5/public/animals/123?include=breeds,orgs,pictures,locations",
+    const requested = String(url);
+    expect(requested).toContain(
+      "https://api.rescuegroups.org/v5/public/animals/123?",
     );
+    expect(requested).toContain("include=breeds,orgs,pictures,locations");
+    // Webpage (`url`) must be requested so a default fieldset cannot omit it.
+    expect(requested).toMatch(/fields\[animals]=[^&]*\burl\b/);
+    expect(requested).toMatch(/fields\[orgs]=[^&]*\badoptionUrl\b/);
+    expect(requested).toMatch(/fields\[orgs]=[^&]*\burl\b/);
     expect(init).toMatchObject({ method: "GET" });
   });
 

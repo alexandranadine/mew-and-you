@@ -169,12 +169,58 @@ export function unwrapSingleAnimal(
   return data ?? undefined;
 }
 
+/**
+ * Attribute sparse-fieldset for GET /public/animals/{id}.
+ *
+ * Docs say omitting `fields[]` returns either "default fields" or "all
+ * attributes" (changelog). The animal Webpage (`url`) is easy to miss if a
+ * default fieldset is in effect, so we request it explicitly along with every
+ * attribute the mapper reads. Do not drop `url` from this list.
+ */
+const ANIMAL_DETAIL_FIELDS = [
+  "name",
+  "ageGroup",
+  "ageString",
+  "breedPrimary",
+  "isBreedMixed",
+  "breedString",
+  "sex",
+  "sizeGroup",
+  "descriptionText",
+  "descriptionHtml",
+  "pictureThumbnailUrl",
+  "url",
+  "slug",
+  "isDogsOk",
+  "isCatsOk",
+  "isKidsOk",
+  "isHousetrained",
+].join(",");
+
+/** Org fields the mapper needs for location + adoption CTA fallbacks. */
+const ORG_DETAIL_FIELDS = [
+  "name",
+  "city",
+  "state",
+  "postalcode",
+  "phone",
+  "email",
+  "url",
+  "adoptionUrl",
+  "lat",
+  "lon",
+].join(",");
+
 /** Fetches a single animal by its RescueGroups id (without the "rescuegroups:" prefix). */
 export async function getAnimalById(
   animalId: string,
 ): Promise<RgSingleAnimalResponse> {
-  // Keep commas literal, matching search and RescueGroups' own examples.
-  const query = "include=breeds,orgs,pictures,locations";
+  // Keep commas / brackets literal, matching search and RescueGroups' examples.
+  const query = [
+    "include=breeds,orgs,pictures,locations",
+    `fields[animals]=${ANIMAL_DETAIL_FIELDS}`,
+    `fields[orgs]=${ORG_DETAIL_FIELDS}`,
+  ].join("&");
   const response = await rescueGroupsFetch<RgSingleAnimalResponse>(
     `/public/animals/${encodeURIComponent(animalId)}?${query}`,
     { method: "GET" },

@@ -26,6 +26,7 @@ export interface RgAnimalAttributes {
   descriptionHtml?: string | null;
   distance?: number | null;
   pictureThumbnailUrl?: string | null;
+  /** Animal Webpage (docs label). Prefer for Cat.adoptionUrl when present. */
   url?: string | null;
   slug?: string | null;
   isDogsOk?: boolean | null;

@@ -140,6 +140,10 @@ function pictureUrl(value: unknown): string | undefined {
   return undefined;
 }
 
+/**
+ * Prefer the animal Webpage (`attributes.url`) when RescueGroups provides one.
+ * Only then fall back to the org adoption page, then the org website.
+ */
 function buildAdoptionUrl(
   animalUrl: string | null | undefined,
   orgAttrs: RgOrgAttributes,
