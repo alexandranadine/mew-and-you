@@ -1,3 +1,4 @@
+import he from "he";
 import type {
   AdoptionUrlSource,
   Cat,
@@ -40,13 +41,16 @@ function toRefArray(
   return Array.isArray(data) ? data : [data];
 }
 
+/**
+ * Strip tags → decode entities → collapse whitespace.
+ * Presentation cleanup only — does not rewrite semantic content.
+ */
 function cleanText(value: string | null | undefined): string {
   if (!value) return "";
-  return value
-    .replace(/&nbsp;/gi, " ")
-    .replace(/<[^>]*>/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  const withoutTags = value.replace(/<[^>]*>/g, "");
+  // Single decode pass: named + numeric entities, without corrupting ordinary text.
+  const decoded = he.decode(withoutTags);
+  return decoded.replace(/\s+/g, " ").trim();
 }
 
 function numberOrUndefined(value: unknown): number | undefined {
@@ -116,12 +120,57 @@ function buildBreedLabel(attrs: RgAnimalResource["attributes"]): string {
   return "Breed unknown";
 }
 
+/**
+ * Normalize a candidate into a safe http(s) URL for adoption CTAs.
+ * - Preserves valid http:// and https:// URLs
+ * - Prefixes clearly valid schemeless hostnames with https://
+ * - Rejects empty, malformed, or unsafe schemes (javascript:, data:, etc.)
+ */
+function normalizeHttpUrl(
+  value: string | null | undefined,
+): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+
+  const hasScheme = /^[a-z][a-z0-9+.-]*:/i.test(trimmed);
+  const protocolRelative = trimmed.startsWith("//");
+
+  let candidate = trimmed;
+  if (protocolRelative) {
+    candidate = `https:${trimmed}`;
+  } else if (!hasScheme) {
+    candidate = `https://${trimmed}`;
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(candidate);
+  } catch {
+    return undefined;
+  }
+
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    return undefined;
+  }
+
+  // Require a real hostname with a dot (rejects bare words and junk URL() accepts).
+  if (!parsed.hostname.includes(".")) {
+    return undefined;
+  }
+
+  // Keep already-valid http(s) strings intact; only rewrite schemeless forms.
+  if (hasScheme) {
+    return trimmed;
+  }
+  return protocolRelative ? `https:${trimmed}` : `https://${trimmed}`;
+}
+
 function firstHttpUrl(
   ...candidates: Array<string | null | undefined>
 ): string | undefined {
   for (const candidate of candidates) {
-    const value = candidate?.trim();
-    if (value) return value;
+    const normalized = normalizeHttpUrl(candidate);
+    if (normalized) return normalized;
   }
   return undefined;
 }
@@ -242,7 +291,7 @@ export function mapRescueGroupsAnimal(
     zip,
     phone: orgAttrs.phone?.trim() || undefined,
     email: orgAttrs.email?.trim() || undefined,
-    website: orgAttrs.url?.trim() || undefined,
+    website: normalizeHttpUrl(orgAttrs.url),
   };
 
   const adoption = buildAdoptionUrl(attrs.url, orgAttrs);

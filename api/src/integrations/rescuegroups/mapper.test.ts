@@ -215,6 +215,67 @@ describe("mapRescueGroupsAnimal", () => {
     expect(nullDescription.description).toBe("No description provided yet.");
   });
 
+  it("decodes HTML entities in description text after stripping tags", () => {
+    const cat = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: {
+          descriptionText:
+            "He&#39;s sweet. Hansel &amp; Gretel. you&rsquo;re home &mdash; forever.&nbsp;End.",
+        },
+      }),
+      fullIncluded,
+    );
+
+    expect(cat.description).toBe(
+      "He's sweet. Hansel & Gretel. you’re home — forever. End.",
+    );
+  });
+
+  it("does not rewrite semantic content when cleaning descriptions", () => {
+    // Upstream bios sometimes name the wrong animal; we only fix encoding.
+    const cat = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: {
+          name: "Willy",
+          descriptionText: "Johnny&rsquo;s a sweet orange tabby.",
+        },
+      }),
+      fullIncluded,
+    );
+
+    expect(cat.name).toBe("Willy");
+    expect(cat.description).toBe("Johnny’s a sweet orange tabby.");
+  });
+
+  it("does not double-decode ordinary ampersands or already-decoded text", () => {
+    const cat = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: {
+          descriptionText: "Tom & Jerry — He's already fine.",
+        },
+      }),
+      fullIncluded,
+    );
+
+    expect(cat.description).toBe("Tom & Jerry — He's already fine.");
+  });
+
+  it("strips HTML tags before decoding entities (no HTML rendering)", () => {
+    const cat = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: {
+          descriptionText: null,
+          descriptionHtml:
+            "<p>He&#39;s <strong>brave</strong> &amp; soft.</p><script>alert(1)</script>",
+        },
+      }),
+      fullIncluded,
+    );
+
+    expect(cat.description).toBe("He's brave & soft.alert(1)");
+    expect(cat.description).not.toContain("<");
+  });
+
   it('falls back to an "Age unknown" label only when both ageString and ageGroup are missing', () => {
     const cat = mapRescueGroupsAnimal(
       makeAnimal({ attributes: { ageString: null, ageGroup: null } }),
@@ -450,5 +511,119 @@ describe("mapRescueGroupsAnimal", () => {
     expect(orgWebsite.adoptionUrlSource).toBe("organizationWebsite");
     expect(homepage.adoptionUrl).toBe("https://www.rescuegroups.org/");
     expect(homepage.adoptionUrlSource).toBe("fallback");
+  });
+
+  it("normalizes schemeless organization hostnames to https URLs", () => {
+    const pawparent = mapRescueGroupsAnimal(makeAnimal(), [
+      {
+        ...orgIncluded,
+        attributes: {
+          ...orgIncluded.attributes,
+          url: "pawparent.org",
+          adoptionUrl: null,
+        },
+      },
+      locationIncluded,
+      pictureIncluded,
+    ]);
+    const lbsn = mapRescueGroupsAnimal(makeAnimal(), [
+      {
+        ...orgIncluded,
+        attributes: {
+          ...orgIncluded.attributes,
+          url: "lbsn.org",
+          adoptionUrl: undefined,
+        },
+      },
+      locationIncluded,
+      pictureIncluded,
+    ]);
+
+    expect(pawparent.adoptionUrl).toBe("https://pawparent.org");
+    expect(pawparent.adoptionUrlSource).toBe("organizationWebsite");
+    expect(pawparent.organization.website).toBe("https://pawparent.org");
+    expect(lbsn.adoptionUrl).toBe("https://lbsn.org");
+    expect(lbsn.organization.website).toBe("https://lbsn.org");
+  });
+
+  it("preserves http and https adoption URLs and rejects unsafe or malformed ones", () => {
+    const httpsUrl = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: { url: "https://example.org/cats/mochi" },
+      }),
+      fullIncluded,
+    );
+    const httpUrl = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: { url: "http://example.org/cats/mochi" },
+      }),
+      fullIncluded,
+    );
+    const rejectsJavascript = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: { url: "javascript:alert(1)" },
+      }),
+      [
+        {
+          ...orgIncluded,
+          attributes: {
+            ...orgIncluded.attributes,
+            adoptionUrl: "javascript:void(0)",
+            url: "data:text/html,hi",
+          },
+        },
+        locationIncluded,
+        pictureIncluded,
+      ],
+    );
+    const rejectsMalformed = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: { url: "not a url" },
+      }),
+      [
+        {
+          ...orgIncluded,
+          attributes: {
+            ...orgIncluded.attributes,
+            adoptionUrl: "://broken",
+            url: "",
+          },
+        },
+        locationIncluded,
+        pictureIncluded,
+      ],
+    );
+    const skipsInvalidAnimalUrl = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: { url: "javascript:evil()" },
+      }),
+      [
+        {
+          ...orgIncluded,
+          attributes: {
+            ...orgIncluded.attributes,
+            adoptionUrl: "https://example.org/sunset-paws/adopt",
+            url: "pawparent.org",
+          },
+        },
+        locationIncluded,
+        pictureIncluded,
+      ],
+    );
+
+    expect(httpsUrl.adoptionUrl).toBe("https://example.org/cats/mochi");
+    expect(httpUrl.adoptionUrl).toBe("http://example.org/cats/mochi");
+    expect(rejectsJavascript.adoptionUrl).toBe("https://www.rescuegroups.org/");
+    expect(rejectsJavascript.adoptionUrlSource).toBe("fallback");
+    expect(rejectsJavascript.organization.website).toBeUndefined();
+    expect(rejectsMalformed.adoptionUrl).toBe("https://www.rescuegroups.org/");
+    expect(rejectsMalformed.adoptionUrlSource).toBe("fallback");
+    // Invalid animal URL is skipped; hierarchy continues to org adoptionUrl.
+    expect(skipsInvalidAnimalUrl.adoptionUrl).toBe(
+      "https://example.org/sunset-paws/adopt",
+    );
+    expect(skipsInvalidAnimalUrl.adoptionUrlSource).toBe(
+      "organizationAdoption",
+    );
   });
 });
