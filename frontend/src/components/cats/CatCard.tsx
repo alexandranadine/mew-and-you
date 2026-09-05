@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Cat } from "../../types/cat";
+import { formatCatCardMetadata } from "../../lib/catDisplay";
 import { CatTraitBadges } from "./CatTraitBadges";
 import { FavoriteButton } from "./FavoriteButton";
 
@@ -36,6 +37,8 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
   const detailHref = detailQuery
     ? `/cats/${encodeURIComponent(cat.id)}?${detailQuery}`
     : `/cats/${encodeURIComponent(cat.id)}`;
+
+  const metadata = formatCatCardMetadata(cat);
 
   function handleImgError() {
     if (!imgSrc) return;
@@ -82,9 +85,9 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
 
           <p className="text-sm text-mauve-500">{cat.breed}</p>
 
-          <p className="text-sm text-mauve-400">
-            {cat.age} &middot; {sexLabel(cat.sex)} &middot; {sizeLabel(cat.size)}
-          </p>
+          {metadata ? (
+            <p className="text-sm text-mauve-400">{metadata}</p>
+          ) : null}
 
           <CatTraitBadges traits={cat.traits} onlyTrue />
 
@@ -112,14 +115,4 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
       </Link>
     </div>
   );
-}
-
-function sexLabel(sex: Cat["sex"]): string {
-  if (sex === "male") return "Male";
-  if (sex === "female") return "Female";
-  return "Unknown sex";
-}
-
-function sizeLabel(size: Cat["size"]): string {
-  return size.charAt(0).toUpperCase() + size.slice(1);
 }

@@ -1,4 +1,5 @@
 import { brand } from "./brand";
+import { hasRealDescription } from "../lib/catDisplay";
 import type { Cat } from "../types/cat";
 
 /** Default share image — the existing brand illustration in `public/`. */
@@ -144,7 +145,10 @@ export function catDetailSeo(cat: Cat): {
     .filter(Boolean)
     .join(" ");
 
-  const descriptionSource = cat.description.trim() || fallbackDescription;
+  // Prefer a real bio; never use the presentation-only missing-bio UI copy.
+  const descriptionSource = hasRealDescription(cat.description)
+    ? cat.description.trim()
+    : fallbackDescription;
 
   return {
     title: `${cat.name} — Adoptable cat${locationLabel ? ` in ${locationLabel}` : ""} | ${brand.name}`,
@@ -177,8 +181,9 @@ export function catJsonLd(cat: Cat, pageUrl: string) {
     url: pageUrl,
   };
 
-  const description = cat.description.trim();
-  if (description) data.description = description;
+  if (hasRealDescription(cat.description)) {
+    data.description = cat.description.trim();
+  }
 
   const image = cat.photos[0]?.url;
   if (image) data.image = image;

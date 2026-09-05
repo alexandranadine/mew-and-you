@@ -10,7 +10,11 @@ import { FavoriteButton } from "../components/cats/FavoriteButton";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
 import { PageMeta } from "../components/seo/PageMeta";
 import { useCatDetail } from "../hooks/useCatDetail";
-import { ageGroupLabel } from "../lib/searchOptions";
+import {
+  getCatDetailAttributes,
+  hasRealDescription,
+  missingBioMessage,
+} from "../lib/catDisplay";
 import {
   catDetailLoadingSeo,
   catDetailMissingSeo,
@@ -158,7 +162,14 @@ export function CatDetailPage() {
 
   const mainPhoto = cat.photos[selectedPhotoIndex] ?? cat.photos[0];
   const mainPhotoFailed = mainPhoto ? failedPhotoUrls.has(mainPhoto.url) : true;
-  const description = cat.description.trim();
+  const hasBio = hasRealDescription(cat.description);
+  const detailAttributes = getCatDetailAttributes(cat);
+  const attributeGridClass =
+    detailAttributes.length <= 1
+      ? "grid-cols-1"
+      : detailAttributes.length === 2
+        ? "grid-cols-2"
+        : "grid-cols-3";
   const adoptionCta = adoptionCtaCopy(cat);
 
   const meta = catDetailSeo(cat);
@@ -278,35 +289,30 @@ export function CatDetailPage() {
 
           <p className="mt-1 text-lg text-mauve-500">{cat.breed}</p>
 
-          <dl className="mt-4 grid grid-cols-3 gap-2 text-center sm:gap-3">
-            <div className="min-w-0 rounded-2xl bg-blush-50 px-1.5 py-3 sm:px-2">
-              <dt className="text-xs uppercase tracking-wide text-mauve-400">
-                Age
-              </dt>
-              <dd className="mt-1 break-words font-medium text-mauve-700">
-                {cat.age}
-                <span className="block text-xs text-mauve-400">
-                  {ageGroupLabel(cat.ageGroup)}
-                </span>
-              </dd>
-            </div>
-            <div className="min-w-0 rounded-2xl bg-blush-50 px-1.5 py-3 sm:px-2">
-              <dt className="text-xs uppercase tracking-wide text-mauve-400">
-                Sex
-              </dt>
-              <dd className="mt-1 font-medium capitalize text-mauve-700">
-                {cat.sex}
-              </dd>
-            </div>
-            <div className="min-w-0 rounded-2xl bg-blush-50 px-1.5 py-3 sm:px-2">
-              <dt className="text-xs uppercase tracking-wide text-mauve-400">
-                Size
-              </dt>
-              <dd className="mt-1 font-medium capitalize text-mauve-700">
-                {cat.size}
-              </dd>
-            </div>
-          </dl>
+          {detailAttributes.length > 0 && (
+            <dl
+              className={`mt-4 grid gap-2 text-center sm:gap-3 ${attributeGridClass}`}
+            >
+              {detailAttributes.map((attr) => (
+                <div
+                  key={attr.key}
+                  className="min-w-0 rounded-2xl bg-blush-50 px-1.5 py-3 sm:px-2"
+                >
+                  <dt className="text-xs uppercase tracking-wide text-mauve-400">
+                    {attr.label}
+                  </dt>
+                  <dd className="mt-1 break-words font-medium text-mauve-700">
+                    {attr.value}
+                    {attr.subvalue ? (
+                      <span className="block text-xs text-mauve-400">
+                        {attr.subvalue}
+                      </span>
+                    ) : null}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
 
           <div className="mt-5">
             <CatTraitBadges traits={cat.traits} />
@@ -315,10 +321,15 @@ export function CatDetailPage() {
           <h2 className="mt-6 font-display text-lg font-semibold text-mauve-700">
             About {cat.name}
           </h2>
-          <p className="mt-2 leading-relaxed text-mauve-600">
-            {description ||
-              "No description provided yet — check the adoption listing for more details."}
-          </p>
+          {hasBio ? (
+            <p className="mt-2 leading-relaxed text-mauve-600">
+              {cat.description.trim()}
+            </p>
+          ) : (
+            <p className="mt-2 text-sm leading-relaxed text-mauve-400">
+              {missingBioMessage(cat.name)}
+            </p>
+          )}
 
           <div className="card mt-6 p-5">
             <h2 className="font-display text-lg font-semibold break-words text-mauve-700">

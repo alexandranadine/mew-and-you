@@ -1,6 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, type Plugin } from "vitest/config";
 
 function siteOrigin(): string {
   return (process.env.VITE_SITE_URL ?? "http://localhost:5173").replace(
@@ -115,5 +115,9 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+  },
+  test: {
+    environment: "happy-dom",
+    setupFiles: ["./src/test/setup.ts"],
   },
 });
