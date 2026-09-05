@@ -38,6 +38,8 @@ export function errorHandler(
       path: req.path,
       status: err.status,
       code,
+      message: err.message,
+      details: err.details,
     });
     res.status(err.status).json({ error: { code, message: err.message } });
     return;

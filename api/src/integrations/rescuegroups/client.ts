@@ -31,6 +31,22 @@ function assertApiKeyConfigured(): string {
   return env.rescueGroupsApiKey;
 }
 
+/** Pull a short, non-sensitive title/detail from a JSON:API error body when present. */
+function formatUpstreamErrorMessage(status: number, body: unknown): string {
+  const base = `RescueGroups API returned an error (${status}).`;
+  if (!body || typeof body !== "object") return base;
+  const errors = (body as { errors?: unknown }).errors;
+  if (!Array.isArray(errors) || errors.length === 0) return base;
+  const first = errors[0];
+  if (!first || typeof first !== "object") return base;
+  const title = (first as { title?: unknown }).title;
+  const detail = (first as { detail?: unknown }).detail;
+  const parts = [title, detail].filter(
+    (value): value is string => typeof value === "string" && value.trim() !== "",
+  );
+  return parts.length > 0 ? `${base} ${parts.join(" — ")}` : base;
+}
+
 async function rescueGroupsFetch<T>(
   path: string,
   init: RequestInit,
@@ -46,6 +62,7 @@ async function rescueGroupsFetch<T>(
     response = await fetch(url, {
       ...init,
       headers: {
+        Accept: "application/vnd.api+json",
         "Content-Type": "application/vnd.api+json",
         Authorization: apiKey,
         ...init.headers,
@@ -74,7 +91,7 @@ async function rescueGroupsFetch<T>(
   if (!response.ok) {
     const body = await response.json().catch(() => undefined);
     throw new RescueGroupsApiError(
-      `RescueGroups API returned an error (${response.status}).`,
+      formatUpstreamErrorMessage(response.status, body),
       502,
       body,
     );
@@ -102,27 +119,34 @@ async function rescueGroupsFetch<T>(
   }
 }
 
-/** Searches available cats within a radius of a US ZIP code, sorted closest-first. */
+/**
+ * Searches available cats within a radius of a US ZIP code.
+ * Distance sorting is done by RescueGroupsProvider — upstream `sort=distance`
+ * (and `animals.distance`) has been observed to 400 on the live API even
+ * though docs mention it, so we omit it here.
+ */
 export async function searchAvailableCats({
   postalcode,
   miles,
   limit = 100,
 }: SearchAvailableCatsParams): Promise<RgSearchResponse> {
-  const params = new URLSearchParams({
-    include: "breeds,orgs,pictures,locations",
-    // Official docs use `sort=distance` on radius searches (distance is a
-    // meta attribute added when filterRadius is present).
-    sort: "distance",
-    limit: String(limit),
-  });
+  // Build the query manually so commas in `include` stay literal (matches
+  // RescueGroups' own examples and avoids over-encoding).
+  const query = [
+    "include=breeds,orgs,pictures,locations",
+    `limit=${encodeURIComponent(String(limit))}`,
+  ].join("&");
 
   return rescueGroupsFetch<RgSearchResponse>(
-    `/public/animals/search/available/cats/?${params.toString()}`,
+    `/public/animals/search/available/cats/?${query}`,
     {
       method: "POST",
       body: JSON.stringify({
         data: {
-          filterRadius: { miles, postalcode },
+          filterRadius: {
+            miles: Math.round(miles),
+            postalcode,
+          },
         },
       }),
     },

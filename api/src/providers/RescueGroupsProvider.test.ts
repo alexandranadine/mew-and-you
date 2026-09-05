@@ -50,7 +50,16 @@ describe("RescueGroupsProvider", () => {
   it("searches via the RescueGroups client and maps the results, using RescueGroups' own distance", async () => {
     const response: RgSearchResponse = {
       meta: { count: 42 },
-      data: [makeAnimal()],
+      data: [
+        makeAnimal({
+          id: "2",
+          attributes: { name: "Farther Cat", distance: 8 },
+        }),
+        makeAnimal({
+          id: "1",
+          attributes: { name: "Closer Cat", distance: 1.5 },
+        }),
+      ],
       included: [],
     };
     vi.mocked(searchAvailableCats).mockResolvedValue(response);
@@ -63,9 +72,12 @@ describe("RescueGroupsProvider", () => {
       limit: 100,
     });
     expect(result.totalCount).toBe(42);
-    expect(result.cats).toHaveLength(1);
-    expect(result.cats[0].name).toBe("Test Cat");
-    expect(result.cats[0].distanceMiles).toBe(3.5);
+    expect(result.cats).toHaveLength(2);
+    expect(result.cats.map((cat) => cat.name)).toEqual([
+      "Closer Cat",
+      "Farther Cat",
+    ]);
+    expect(result.cats[0].distanceMiles).toBe(1.5);
   });
 
   it("falls back to the search radius when RescueGroups omits a distance", async () => {

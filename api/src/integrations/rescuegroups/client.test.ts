@@ -50,22 +50,24 @@ describe("RescueGroups client", () => {
     vi.restoreAllMocks();
   });
 
-  it("searches with filterRadius, distance sort, and Authorization header", async () => {
+  it("searches with filterRadius and Authorization header, without upstream sort", async () => {
     mockFetchResponse({
       json: { data: [], meta: { count: 0 } },
     });
 
-    await searchAvailableCats({ postalcode: "90210", miles: 25, limit: 100 });
+    await searchAvailableCats({ postalcode: "90210", miles: 25.4, limit: 100 });
 
     expect(fetch).toHaveBeenCalledOnce();
     const [url, init] = vi.mocked(fetch).mock.calls[0];
-    expect(String(url)).toContain(
-      "/public/animals/search/available/cats/?include=breeds%2Corgs%2Cpictures%2Clocations&sort=distance&limit=100",
+    expect(String(url)).toBe(
+      "https://api.rescuegroups.org/v5/public/animals/search/available/cats/?include=breeds,orgs,pictures,locations&limit=100",
     );
+    expect(String(url)).not.toContain("sort=");
     expect(init).toMatchObject({
       method: "POST",
       headers: expect.objectContaining({
         Authorization: "test-key",
+        Accept: "application/vnd.api+json",
         "Content-Type": "application/vnd.api+json",
       }),
     });
@@ -95,17 +97,24 @@ describe("RescueGroups client", () => {
       });
   });
 
-  it("maps HTTP 401 to a 502 without leaking the upstream body to the message", async () => {
+  it("includes RescueGroups error title/detail in the message for non-OK responses", async () => {
     mockFetchResponse({
-      status: 401,
+      status: 400,
       json: {
-        errors: [{ detail: "secret upstream detail" }],
+        errors: [
+          {
+            status: 400,
+            title: "Invalid parameter",
+            detail: "sort value is not valid",
+          },
+        ],
       },
     });
 
     await expect(getAnimalById("123")).rejects.toMatchObject({
       status: 502,
-      message: "RescueGroups API returned an error (401).",
+      message:
+        "RescueGroups API returned an error (400). Invalid parameter — sort value is not valid",
     });
   });
 });
