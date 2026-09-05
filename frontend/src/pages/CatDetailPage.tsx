@@ -159,6 +159,7 @@ export function CatDetailPage() {
   const mainPhoto = cat.photos[selectedPhotoIndex] ?? cat.photos[0];
   const mainPhotoFailed = mainPhoto ? failedPhotoUrls.has(mainPhoto.url) : true;
   const description = cat.description.trim();
+  const adoptionCta = adoptionCtaCopy(cat);
 
   const meta = catDetailSeo(cat);
 
@@ -362,28 +363,40 @@ export function CatDetailPage() {
               <circle cx="15" cy="4" r="2.4" />
               <circle cx="19" cy="8" r="2.4" />
             </svg>
-            {adoptionCtaLabel(cat)}
+            {adoptionCta.label}
             <span aria-hidden="true">↗</span>
           </a>
-          <p className="mt-2 text-sm text-mauve-400">
-            Opens {cat.organization.name}'s listing in a new tab
-          </p>
+          <p className="mt-2 text-sm text-mauve-400">{adoptionCta.helper}</p>
         </div>
       </div>
     </div>
   );
 }
 
-function adoptionCtaLabel(cat: Cat): string {
+function adoptionCtaCopy(cat: Cat): { label: string; helper: string } {
   const organizationName = cat.organization.name;
   switch (cat.adoptionUrlSource) {
     case "organizationAdoption":
-      return `Adopt through ${organizationName}`;
+      return {
+        label: `Adopt through ${organizationName}`,
+        helper: `We couldn't grab a direct link for this cat, but you can visit ${organizationName}'s adoption page to learn more.`,
+      };
     case "organizationWebsite":
-      return `Visit ${organizationName}`;
-    case "animal":
+      return {
+        label: `Visit ${organizationName}`,
+        helper: `We couldn't grab a direct link for this cat, but you can visit ${organizationName} to learn more.`,
+      };
     case "fallback":
+      return {
+        label: "View adoption listing",
+        helper:
+          "We couldn't grab a direct listing for this cat. This link will take you to RescueGroups instead.",
+      };
+    case "animal":
     default:
-      return "View adoption listing";
+      return {
+        label: "View adoption listing",
+        helper: `Opens ${organizationName}'s listing in a new tab.`,
+      };
   }
 }
