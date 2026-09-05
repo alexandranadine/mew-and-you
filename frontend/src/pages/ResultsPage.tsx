@@ -169,17 +169,20 @@ export function ResultsPage() {
         >
           ← New search
         </Link>
-        <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-2">
           <h1 className="text-3xl font-semibold text-mauve-700">
             Cats near {activeQuery.zip}
           </h1>
-          <div className="shrink-0">
-            <label htmlFor="results-radius" className="field-label">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-mauve-400" aria-hidden="true">
+              within
+            </span>
+            <label htmlFor="results-radius" className="sr-only">
               Search radius
             </label>
             <select
               id="results-radius"
-              className="field-input w-auto min-w-[9.5rem] py-2"
+              className="field-input w-auto min-w-0 py-1.5 pl-3 pr-8 text-sm"
               value={activeQuery.radiusMiles}
               onChange={(event) =>
                 handleRadiusChange(Number(event.target.value))
@@ -193,7 +196,7 @@ export function ResultsPage() {
             </select>
           </div>
         </div>
-        <p className="mt-1 text-mauve-400" aria-live="polite">
+        <p className="mt-1.5 text-mauve-400" aria-live="polite">
           {showInitialLoading
             ? `Searching within ${activeQuery.radiusMiles} miles\u2026`
             : showUpdating

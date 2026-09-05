@@ -43,7 +43,7 @@ function FilterChipGroup<T extends string>({
   return (
     <fieldset className="min-w-0">
       <legend className="field-label mb-1.5 px-0">{legend}</legend>
-      <div className="flex flex-wrap gap-1.5" role="group" aria-label={legend}>
+      <div className="flex flex-wrap gap-2" role="group" aria-label={legend}>
         {options.map((option) => {
           const isActive = selected.has(option.value);
           return (
@@ -54,8 +54,8 @@ function FilterChipGroup<T extends string>({
               onClick={() => onToggle(option.value)}
               className={
                 isActive
-                  ? "focus-ring rounded-full border-2 border-blush-400 bg-blush-100 px-2.5 py-1 text-xs font-medium text-mauve-700"
-                  : "focus-ring rounded-full border-2 border-blush-200 bg-white/80 px-2.5 py-1 text-xs font-medium text-mauve-500 hover:border-blush-300 hover:text-mauve-700"
+                  ? "focus-ring rounded-full border-2 border-blush-400 bg-blush-100 px-3.5 py-1.5 text-sm font-medium text-mauve-700"
+                  : "focus-ring rounded-full border-2 border-blush-200 bg-white/80 px-3.5 py-1.5 text-sm font-medium text-mauve-500 hover:border-blush-300 hover:text-mauve-700"
               }
             >
               {option.label}
@@ -76,9 +76,9 @@ export function CatFilterBar({
   hasActiveFilters,
 }: CatFilterBarProps) {
   return (
-    <div className="card rounded-[1.75rem] border-blush-50 p-3 sm:p-4">
+    <div className="card rounded-[1.75rem] border-blush-50 px-3 py-3 sm:px-4 sm:py-3.5">
       <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="flex flex-wrap gap-x-6 gap-y-3">
           <FilterChipGroup
             legend="Age"
             options={AGE_GROUP_OPTIONS}
@@ -123,14 +123,14 @@ export function CatFilterBar({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-          <div className="min-w-0 sm:col-span-1 lg:col-span-2">
+        <div className="flex flex-wrap items-end gap-x-3 gap-y-2.5 border-t border-blush-100/80 pt-3">
+          <div className="min-w-0">
             <label htmlFor="filter-org" className="field-label">
               Organization
             </label>
             <select
               id="filter-org"
-              className="field-input"
+              className="field-input w-auto max-w-[14rem] py-2 text-sm"
               value={filters.organizationId ?? ""}
               onChange={(event) =>
                 onChange({ organizationId: event.target.value || undefined })
@@ -145,13 +145,13 @@ export function CatFilterBar({
             </select>
           </div>
 
-          <div className="min-w-0 sm:col-span-1 lg:col-span-2">
+          <div className="min-w-0">
             <label htmlFor="filter-sort" className="field-label">
               Sort by
             </label>
             <select
               id="filter-sort"
-              className="field-input"
+              className="field-input w-auto max-w-[11rem] py-2 text-sm"
               value={sort}
               onChange={(event) =>
                 onChange({ sort: event.target.value as CatSortOption })
@@ -164,20 +164,18 @@ export function CatFilterBar({
               ))}
             </select>
           </div>
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="focus-ring mb-0.5 inline-block py-1.5 text-sm font-medium text-mauve-500 underline-offset-2 hover:text-mauve-700 hover:underline"
+            >
+              Reset filters
+            </button>
+          )}
         </div>
       </div>
-
-      {hasActiveFilters && (
-        <div className="mt-3 flex justify-end">
-          <button
-            type="button"
-            onClick={onReset}
-            className="focus-ring inline-block py-1 text-sm font-medium text-mauve-500 underline-offset-2 hover:text-mauve-700 hover:underline"
-          >
-            Reset filters
-          </button>
-        </div>
-      )}
     </div>
   );
 }
