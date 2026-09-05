@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, type SyntheticEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Cat } from "../../types/cat";
 import {
   formatCatCardMetadata,
   formatCatDisplayName,
 } from "../../lib/catDisplay";
+import { selectCatCardImage } from "../../lib/catPhoto";
 import { CatTraitBadges } from "./CatTraitBadges";
 import { FavoriteButton } from "./FavoriteButton";
 
@@ -18,7 +19,6 @@ interface CatCardProps {
 
 export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
   const photo = cat.photos[0];
-  const preferredSrc = photo?.thumbnailUrl ?? photo?.url;
   const [imgCatId, setImgCatId] = useState(cat.id);
   const [failedSrcs, setFailedSrcs] = useState<Set<string>>(() => new Set());
 
@@ -28,14 +28,7 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
     setFailedSrcs(new Set());
   }
 
-  const imgSrc =
-    preferredSrc && !failedSrcs.has(preferredSrc)
-      ? preferredSrc
-      : photo?.url &&
-          photo.url !== preferredSrc &&
-          !failedSrcs.has(photo.url)
-        ? photo.url
-        : undefined;
+  const image = selectCatCardImage(photo, failedSrcs);
 
   const detailHref = detailQuery
     ? `/cats/${encodeURIComponent(cat.id)}?${detailQuery}`
@@ -44,9 +37,11 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
   const metadata = formatCatCardMetadata(cat);
   const displayName = formatCatDisplayName(cat.name);
 
-  function handleImgError() {
-    if (!imgSrc) return;
-    setFailedSrcs((prev) => new Set(prev).add(imgSrc));
+  function handleImgError(event: SyntheticEvent<HTMLImageElement>) {
+    const failed =
+      event.currentTarget.currentSrc || event.currentTarget.src || image?.src;
+    if (!failed) return;
+    setFailedSrcs((prev) => new Set(prev).add(failed));
   }
 
   return (
@@ -63,9 +58,11 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
       >
         {/* Fixed aspect ratio reserves space up front so the layout doesn't shift once the image loads. */}
         <div className="aspect-[4/3] w-full overflow-hidden bg-blush-100">
-          {imgSrc ? (
+          {image ? (
             <img
-              src={imgSrc}
+              src={image.src}
+              srcSet={image.srcSet}
+              sizes={image.sizes}
               alt={`Photo of ${displayName}`}
               width={800}
               height={600}

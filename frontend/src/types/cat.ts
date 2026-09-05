@@ -11,9 +11,9 @@ export type CatAgeGroup = "baby" | "young" | "adult" | "senior" | "unknown";
 export type CatSize = "small" | "medium" | "large" | "unknown";
 
 export interface CatPhoto {
-  /** Full-size image URL. */
+  /** Larger image URL (RescueGroups `large`, ~500px). Used for detail and as a card srcSet candidate. */
   url: string;
-  /** Smaller image URL for cards/lists, falls back to `url` if absent. */
+  /** Smaller image URL (RescueGroups `small`, ~100px) for responsive card srcSet; falls back to `url`. */
   thumbnailUrl?: string;
 }
 
