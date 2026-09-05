@@ -11,6 +11,7 @@ import { SearchStateCard } from "../components/cats/SearchStateCard";
 import { PageMeta } from "../components/seo/PageMeta";
 import { useCatDetail } from "../hooks/useCatDetail";
 import {
+  formatCatDisplayName,
   getCatDetailAttributes,
   hasRealDescription,
   missingBioMessage,
@@ -164,6 +165,7 @@ export function CatDetailPage() {
   const mainPhotoFailed = mainPhoto ? failedPhotoUrls.has(mainPhoto.url) : true;
   const hasBio = hasRealDescription(cat.description);
   const detailAttributes = getCatDetailAttributes(cat);
+  const displayName = formatCatDisplayName(cat.name);
   const attributeGridClass =
     detailAttributes.length <= 1
       ? "grid-cols-1"
@@ -198,7 +200,7 @@ export function CatDetailPage() {
             {mainPhoto && !mainPhotoFailed ? (
               <img
                 src={mainPhoto.url}
-                alt={`Photo of ${cat.name}`}
+                alt={`Photo of ${displayName}`}
                 width={800}
                 height={600}
                 className="h-full w-full object-cover"
@@ -220,7 +222,7 @@ export function CatDetailPage() {
             <div
               className="-mx-1 mt-3 flex gap-3 overflow-x-auto px-1 pb-1"
               role="group"
-              aria-label={`${cat.name}'s photos`}
+              aria-label={`${displayName}'s photos`}
             >
               {cat.photos.map((photo, index) => {
                 const thumbFailed = failedPhotoUrls.has(
@@ -271,7 +273,7 @@ export function CatDetailPage() {
         <div className="min-w-0">
           <div className="flex items-start justify-between gap-3">
             <h1 className="min-w-0 break-words text-3xl font-semibold text-mauve-700">
-              {cat.name}
+              {displayName}
             </h1>
             <div className="flex shrink-0 items-center gap-2">
               {typeof distanceMiles === "number" && (
@@ -281,7 +283,7 @@ export function CatDetailPage() {
               )}
               <FavoriteButton
                 catId={cat.id}
-                catName={cat.name}
+                catName={displayName}
                 size="md"
               />
             </div>
@@ -319,7 +321,7 @@ export function CatDetailPage() {
           </div>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-mauve-700">
-            About {cat.name}
+            About {displayName}
           </h2>
           {hasBio ? (
             <p className="mt-2 leading-relaxed text-mauve-600">

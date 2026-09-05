@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Cat } from "../../types/cat";
-import { formatCatCardMetadata } from "../../lib/catDisplay";
+import {
+  formatCatCardMetadata,
+  formatCatDisplayName,
+} from "../../lib/catDisplay";
 import { CatTraitBadges } from "./CatTraitBadges";
 import { FavoriteButton } from "./FavoriteButton";
 
@@ -39,6 +42,7 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
     : `/cats/${encodeURIComponent(cat.id)}`;
 
   const metadata = formatCatCardMetadata(cat);
+  const displayName = formatCatDisplayName(cat.name);
 
   function handleImgError() {
     if (!imgSrc) return;
@@ -49,7 +53,7 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
     <div className="card group relative flex flex-col overflow-hidden rounded-[2rem] transition hover:-translate-y-1.5 hover:shadow-[0_22px_44px_-12px_rgba(95,58,77,0.38)]">
       <FavoriteButton
         catId={cat.id}
-        catName={cat.name}
+        catName={displayName}
         className="absolute top-3 right-3 z-10"
       />
       <Link
@@ -62,7 +66,7 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
           {imgSrc ? (
             <img
               src={imgSrc}
-              alt={`Photo of ${cat.name}`}
+              alt={`Photo of ${displayName}`}
               width={800}
               height={600}
               className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
@@ -81,7 +85,7 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
         </div>
 
         <div className="flex flex-1 flex-col gap-2 p-5">
-          <h3 className="text-xl font-semibold text-mauve-700">{cat.name}</h3>
+          <h3 className="text-xl font-semibold text-mauve-700">{displayName}</h3>
 
           <p className="text-sm text-mauve-500">{cat.breed}</p>
 
@@ -103,7 +107,7 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
           </p>
 
           <p className="mt-auto pt-2 text-sm font-semibold text-mauve-500 transition group-hover:text-mauve-700">
-            Meet {cat.name}{" "}
+            Meet {displayName}{" "}
             <span
               aria-hidden="true"
               className="inline-block transition group-hover:translate-x-0.5"

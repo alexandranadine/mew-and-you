@@ -26,6 +26,13 @@ describe("catDetailSeo", () => {
     );
     expect(meta.description).toContain("Loves cardboard boxes");
   });
+
+  it("uses a friendly display name for ALL-CAPS cats in title copy", () => {
+    const meta = catDetailSeo(makeCat({ name: "TRAVIE", description: "" }));
+    expect(meta.title).toMatch(/^Travie —/);
+    expect(meta.description).toContain("Travie is an adoptable cat");
+    expect(meta.title).not.toMatch(/^TRAVIE/);
+  });
 });
 
 describe("catJsonLd", () => {
@@ -39,5 +46,13 @@ describe("catJsonLd", () => {
         "https://example.com/cats/1",
       ),
     ).not.toHaveProperty("description");
+  });
+
+  it("keeps the raw source name in structured data", () => {
+    const ld = catJsonLd(
+      makeCat({ name: "ROOTY TOOTY" }),
+      "https://example.com/cats/1",
+    );
+    expect(ld.name).toBe("ROOTY TOOTY");
   });
 });

@@ -1,5 +1,5 @@
 import { brand } from "./brand";
-import { hasRealDescription } from "../lib/catDisplay";
+import { formatCatDisplayName, hasRealDescription } from "../lib/catDisplay";
 import type { Cat } from "../types/cat";
 
 /** Default share image — the existing brand illustration in `public/`. */
@@ -134,11 +134,12 @@ export function catDetailSeo(cat: Cat): {
   image?: string;
   imageAlt: string;
 } {
+  const displayName = formatCatDisplayName(cat.name);
   const locationLabel = [cat.organization.city, cat.organization.state]
     .filter(Boolean)
     .join(", ");
   const fallbackDescription = [
-    `${cat.name} is an adoptable cat`,
+    `${displayName} is an adoptable cat`,
     locationLabel ? `in ${locationLabel}` : `in ${brand.serviceArea}`,
     cat.organization.name ? `listed by ${cat.organization.name}` : "",
   ]
@@ -151,11 +152,11 @@ export function catDetailSeo(cat: Cat): {
     : fallbackDescription;
 
   return {
-    title: `${cat.name} — Adoptable cat${locationLabel ? ` in ${locationLabel}` : ""} | ${brand.name}`,
+    title: `${displayName} — Adoptable cat${locationLabel ? ` in ${locationLabel}` : ""} | ${brand.name}`,
     description: truncateMetaDescription(descriptionSource),
     canonicalPath: `/cats/${encodeURIComponent(cat.id)}`,
     image: cat.photos[0]?.url,
-    imageAlt: cat.photos[0] ? `Photo of ${cat.name}` : DEFAULT_SHARE_IMAGE_ALT,
+    imageAlt: cat.photos[0] ? `Photo of ${displayName}` : DEFAULT_SHARE_IMAGE_ALT,
   };
 }
 
@@ -174,6 +175,7 @@ export function websiteJsonLd(origin: string) {
  * using only existing fields that are valid on Thing/WebPage.
  */
 export function catJsonLd(cat: Cat, pageUrl: string) {
+  // Keep raw source name in structured data; visible title/meta use display form.
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "WebPage",

@@ -58,4 +58,12 @@ describe("CatCard missing-data display", () => {
     expect(screen.getByRole("heading", { name: "Miso" })).toBeInTheDocument();
     expect(container.textContent).toContain("🐱");
   });
+
+  it("displays a friendly title-cased name for ALL-CAPS shelter names", () => {
+    renderCard(makeCat({ name: "ROOTY TOOTY" }));
+    expect(
+      screen.getByRole("heading", { name: "Rooty Tooty" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Meet Rooty Tooty/)).toBeInTheDocument();
+  });
 });

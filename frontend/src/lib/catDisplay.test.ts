@@ -1,11 +1,46 @@
 import { describe, expect, it } from "vitest";
 import {
   formatCatCardMetadata,
+  formatCatDisplayName,
   getCatDetailAttributes,
   hasRealDescription,
   missingBioMessage,
 } from "./catDisplay";
 import { makeCat } from "../test/catFixture";
+
+describe("formatCatDisplayName", () => {
+  it("title-cases ordinary ALL-CAPS names", () => {
+    expect(formatCatDisplayName("ROOTY TOOTY")).toBe("Rooty Tooty");
+    expect(formatCatDisplayName("TRAVIE")).toBe("Travie");
+    expect(formatCatDisplayName("TOMMY")).toBe("Tommy");
+  });
+
+  it("preserves short whole-name initialisms", () => {
+    expect(formatCatDisplayName("JJ")).toBe("JJ");
+    expect(formatCatDisplayName("RJ")).toBe("RJ");
+    expect(formatCatDisplayName("ED")).toBe("ED");
+  });
+
+  it("preserves kennel-ID-like values", () => {
+    expect(formatCatDisplayName("A1928701")).toBe("A1928701");
+  });
+
+  it("preserves parenthetical acronyms while title-casing the rest", () => {
+    expect(formatCatDisplayName("CHEESE BALL (CB)")).toBe("Cheese Ball (CB)");
+  });
+
+  it("leaves mixed-case names unchanged", () => {
+    expect(formatCatDisplayName("Mary-Kate")).toBe("Mary-Kate");
+    expect(formatCatDisplayName("KitKat")).toBe("KitKat");
+    expect(formatCatDisplayName("Miso")).toBe("Miso");
+  });
+
+  it("does not mutate the input string object identity concerns via return", () => {
+    const raw = "ROOTY TOOTY";
+    expect(formatCatDisplayName(raw)).toBe("Rooty Tooty");
+    expect(raw).toBe("ROOTY TOOTY");
+  });
+});
 
 describe("hasRealDescription", () => {
   it("treats empty and whitespace-only descriptions as missing", () => {
@@ -27,6 +62,12 @@ describe("missingBioMessage", () => {
   it("names the cat in the soft fallback copy", () => {
     expect(missingBioMessage("Willow")).toBe(
       "This shelter hasn’t added a bio for Willow yet.",
+    );
+  });
+
+  it("formats ALL-CAPS names in the fallback copy", () => {
+    expect(missingBioMessage("TOMMY")).toBe(
+      "This shelter hasn’t added a bio for Tommy yet.",
     );
   });
 });

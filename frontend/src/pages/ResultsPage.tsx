@@ -13,6 +13,10 @@ import { useCatsSearch } from "../hooks/useCatsSearch";
 import { filterCats } from "../lib/catFilters";
 import { sortCats } from "../lib/catSort";
 import {
+  formatResultsHeadline,
+  formatRevealFooter,
+} from "../lib/searchResultsCopy";
+import {
   parseCatSearchParams,
   patchSearchParams,
   type CatSearchParamsError,
@@ -161,7 +165,13 @@ export function ResultsPage() {
           {isPending
             ? `Searching within ${activeQuery.radiusMiles} miles\u2026`
             : data
-              ? `${matchedCats.length} potential roommate${matchedCats.length === 1 ? "" : "s"} within ${activeQuery.radiusMiles} miles`
+              ? formatResultsHeadline({
+                  matchedCount: matchedCats.length,
+                  fetchedCount: data.cats.length,
+                  totalCount: data.totalCount,
+                  radiusMiles: activeQuery.radiusMiles,
+                  hasActiveFilters,
+                })
               : ""}
         </p>
         <SaveSearchPanel query={activeQuery} />
@@ -249,7 +259,7 @@ export function ResultsPage() {
           {hasMoreToReveal && (
             <div className="mt-10 flex flex-col items-center gap-3">
               <p className="text-sm text-mauve-400">
-                Showing {revealedCount} of {matchedCats.length} cats
+                {formatRevealFooter(revealedCount, matchedCats.length)}
               </p>
               <button
                 type="button"

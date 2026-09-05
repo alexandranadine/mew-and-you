@@ -84,13 +84,18 @@ export async function fetchCats(
 
   const body = (await response.json()) as CatsSearchResponseBody;
   const cats = Array.isArray(body.cats) ? body.cats : [];
+  // Preserve upstream total (may exceed cats.length when RescueGroups is capped).
+  const totalCount =
+    typeof body.totalCount === "number" && Number.isFinite(body.totalCount)
+      ? body.totalCount
+      : cats.length;
   const filters = normalizeFilters(query.filters);
   const filtered = hasActiveClientFilters(filters)
     ? filterCats(cats, filters)
     : cats;
   const sorted = sortCats(filtered, query.sort);
 
-  return { cats: sorted, totalCount: sorted.length, query };
+  return { cats: sorted, totalCount, query };
 }
 
 export async function fetchCatById(id: string): Promise<Cat | undefined> {
