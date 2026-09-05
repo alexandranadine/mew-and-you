@@ -111,6 +111,7 @@ describe("mapRescueGroupsAnimal", () => {
       goodWithChildren: true,
       houseTrained: true,
     });
+    expect(cat.adoptionUrl).toBe("https://example.org/sunset-paws");
   });
 
   it("falls back to a placeholder icon-friendly empty array when photos are missing", () => {
@@ -220,5 +221,201 @@ describe("mapRescueGroupsAnimal", () => {
     );
     expect(cat.age).toBe("Age unknown");
     expect(cat.ageGroup).toBe("unknown");
+  });
+
+  it("maps a live GET /public/animals/{id} record plus included org, location, and pictures", () => {
+    const animal: RgAnimalResource = {
+      type: "animals",
+      id: "18134969",
+      attributes: {
+        name: "Willy",
+        ageGroup: "Adult",
+        ageString: "6 Years 1 Month",
+        breedPrimary: "Tabby",
+        sex: "Male",
+        sizeGroup: "Large",
+        descriptionText: "A sweet orange tabby.",
+        url: "https://www.rescuesontherunway.org/animals/willy",
+        pictureThumbnailUrl:
+          "https://cdn.rescuegroups.org/5586/pictures/thumb.jpg",
+      },
+      relationships: {
+        orgs: { data: { type: "orgs", id: "5586" } },
+        pictures: { data: [{ type: "pictures", id: "94051916" }] },
+        locations: { data: { type: "locations", id: "1" } },
+      },
+    };
+    const included: RgIncludedResource[] = [
+      {
+        type: "orgs",
+        id: "5586",
+        attributes: {
+          name: "Rescues On The Runway",
+          city: "Santa Clarita",
+          state: "CA",
+          postalcode: "91387",
+          phone: "(661) 305-5700",
+          email: "hello@example.org",
+          url: "http://www.rescuesontherunway.org",
+          adoptionUrl: "http://www.rescuesontherunway.org/adopt",
+          lat: 34.4247,
+          lon: -118.41,
+        },
+      },
+      {
+        type: "locations",
+        id: "1",
+        attributes: {
+          city: "Santa Clarita",
+          state: "CA",
+          postalcode: "91387",
+          lat: 34.4247,
+          lon: -118.41,
+        },
+      },
+      {
+        type: "pictures",
+        id: "94051916",
+        attributes: {
+          large: {
+            url: "https://cdn.rescuegroups.org/5586/pictures/large.jpg",
+          },
+          small: {
+            url: "https://cdn.rescuegroups.org/5586/pictures/small.jpg",
+          },
+        },
+      },
+    ];
+
+    const cat = mapRescueGroupsAnimal(animal, included);
+
+    expect(cat).toMatchObject({
+      id: "rescuegroups:18134969",
+      name: "Willy",
+      breed: "Tabby",
+      age: "6 Years 1 Month",
+      ageGroup: "adult",
+      sex: "male",
+      size: "large",
+      description: "A sweet orange tabby.",
+      adoptionUrl: "https://www.rescuesontherunway.org/animals/willy",
+      organization: {
+        id: "rescuegroups:5586",
+        name: "Rescues On The Runway",
+        city: "Santa Clarita",
+        state: "CA",
+        zip: "91387",
+      },
+      location: {
+        zip: "91387",
+        city: "Santa Clarita",
+        state: "CA",
+        lat: 34.4247,
+        lng: -118.41,
+      },
+    });
+    expect(cat.photos).toEqual([
+      {
+        url: "https://cdn.rescuegroups.org/5586/pictures/large.jpg",
+        thumbnailUrl: "https://cdn.rescuegroups.org/5586/pictures/small.jpg",
+      },
+    ]);
+  });
+
+  it("maps documented Young Adult / X-Large values used on single-animal records", () => {
+    const cat = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: { ageGroup: "Young Adult", sizeGroup: "X-Large" },
+      }),
+      fullIncluded,
+    );
+
+    expect(cat.ageGroup).toBe("young");
+    expect(cat.size).toBe("large");
+  });
+
+  it("uses descriptionHtml when descriptionText is missing", () => {
+    const cat = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: {
+          descriptionText: null,
+          descriptionHtml: "<p>Sweet&nbsp;girl.</p>",
+        },
+      }),
+      fullIncluded,
+    );
+
+    expect(cat.description).toBe("Sweet girl.");
+  });
+
+  it("reads picture URLs whether RescueGroups returns strings or { url } objects", () => {
+    const included: RgIncludedResource[] = [
+      orgIncluded,
+      locationIncluded,
+      {
+        type: "pictures",
+        id: "200",
+        attributes: {
+          original: "https://example.org/photo-original.jpg",
+          large: "https://example.org/photo-large.jpg",
+          small: "https://example.org/photo-small.jpg",
+        },
+      },
+    ];
+
+    const cat = mapRescueGroupsAnimal(makeAnimal(), included);
+
+    expect(cat.photos).toEqual([
+      {
+        url: "https://example.org/photo-large.jpg",
+        thumbnailUrl: "https://example.org/photo-small.jpg",
+      },
+    ]);
+  });
+
+  it("prefers the animal listing URL, then org adoptionUrl, then org website", () => {
+    const animalUrl = mapRescueGroupsAnimal(
+      makeAnimal({
+        attributes: { url: "https://example.org/sunset-paws/cats/mochi" },
+      }),
+      [
+        {
+          ...orgIncluded,
+          attributes: {
+            ...orgIncluded.attributes,
+            adoptionUrl: "https://example.org/sunset-paws/adopt",
+            url: "https://example.org/sunset-paws",
+          },
+        },
+        locationIncluded,
+        pictureIncluded,
+      ],
+    );
+    const orgAdoptionUrl = mapRescueGroupsAnimal(makeAnimal(), [
+      {
+        ...orgIncluded,
+        attributes: {
+          ...orgIncluded.attributes,
+          adoptionUrl: "https://example.org/sunset-paws/adopt",
+          url: "https://example.org/sunset-paws",
+        },
+      },
+      locationIncluded,
+      pictureIncluded,
+    ]);
+    const orgWebsite = mapRescueGroupsAnimal(makeAnimal(), fullIncluded);
+    const homepage = mapRescueGroupsAnimal(
+      makeAnimal({ relationships: { orgs: undefined } }),
+      [],
+    );
+
+    expect(animalUrl.adoptionUrl).toBe(
+      "https://example.org/sunset-paws/cats/mochi",
+    );
+    expect(orgAdoptionUrl.adoptionUrl).toBe(
+      "https://example.org/sunset-paws/adopt",
+    );
+    expect(orgWebsite.adoptionUrl).toBe("https://example.org/sunset-paws");
+    expect(homepage.adoptionUrl).toBe("https://www.rescuegroups.org/");
   });
 });

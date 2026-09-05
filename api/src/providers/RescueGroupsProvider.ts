@@ -2,6 +2,7 @@ import {
   getAnimalById,
   RescueGroupsApiError,
   searchAvailableCats,
+  unwrapSingleAnimal,
 } from "../integrations/rescuegroups/client";
 import { mapRescueGroupsAnimal } from "../integrations/rescuegroups/mapper";
 import { ApiError } from "../lib/errors";
@@ -56,8 +57,9 @@ export class RescueGroupsProvider implements CatProvider {
     const animalId = parseAnimalId(id);
     try {
       const response = await getAnimalById(animalId);
-      if (!response.data) return undefined;
-      return mapRescueGroupsAnimal(response.data, response.included ?? []);
+      const animal = unwrapSingleAnimal(response.data);
+      if (!animal) return undefined;
+      return mapRescueGroupsAnimal(animal, response.included ?? []);
     } catch (error) {
       if (error instanceof RescueGroupsApiError && error.status === 404)
         return undefined;

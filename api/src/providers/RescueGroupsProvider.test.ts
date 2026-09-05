@@ -17,6 +17,8 @@ vi.mock("../integrations/rescuegroups/client", () => {
     RescueGroupsApiError,
     searchAvailableCats: vi.fn(),
     getAnimalById: vi.fn(),
+    unwrapSingleAnimal: (data: unknown) =>
+      Array.isArray(data) ? data[0] : (data ?? undefined),
   };
 });
 
@@ -117,6 +119,54 @@ describe("RescueGroupsProvider", () => {
 
     expect(getAnimalById).toHaveBeenCalledWith("12345");
     expect(cat?.id).toBe("rescuegroups:12345");
+  });
+
+  it("unwraps the live GET /public/animals/{id} one-element data array", async () => {
+    const response: RgSingleAnimalResponse = {
+      data: [
+        makeAnimal({
+          id: "18134969",
+          attributes: { name: "Willy", breedPrimary: "Tabby", sex: "Male" },
+          relationships: { orgs: { data: { type: "orgs", id: "5586" } } },
+        }),
+      ],
+      included: [
+        {
+          type: "orgs",
+          id: "5586",
+          attributes: {
+            name: "Rescues On The Runway",
+            city: "Santa Clarita",
+            state: "CA",
+            postalcode: "91387",
+            url: "http://www.rescuesontherunway.org",
+            adoptionUrl: "http://www.rescuesontherunway.org/adopt",
+          },
+        },
+      ],
+    };
+    vi.mocked(getAnimalById).mockResolvedValue(response);
+
+    const cat = await provider.getCatById("rescuegroups:18134969");
+
+    expect(cat?.id).toBe("rescuegroups:18134969");
+    expect(cat?.name).toBe("Willy");
+    expect(cat?.breed).toBe("Tabby");
+    expect(cat?.sex).toBe("male");
+    expect(cat?.organization.name).toBe("Rescues On The Runway");
+    expect(cat?.location.city).toBe("Santa Clarita");
+    expect(cat?.adoptionUrl).toBe("http://www.rescuesontherunway.org/adopt");
+  });
+
+  it("returns undefined when GET /public/animals/{id} has an empty data array", async () => {
+    vi.mocked(getAnimalById).mockResolvedValue({
+      data: [],
+      included: [],
+    });
+
+    const cat = await provider.getCatById("rescuegroups:1");
+
+    expect(cat).toBeUndefined();
   });
 
   it("returns undefined when RescueGroups responds 404", async () => {

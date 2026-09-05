@@ -66,8 +66,17 @@ export interface RgSearchResponse {
   included?: RgIncludedResource[];
 }
 
+/**
+ * Live GET /public/animals/{id} returns `data` as a one-element array
+ * (same JSON:API envelope as list/search), not a bare resource object.
+ */
+export type RgSingleAnimalData =
+  | RgAnimalResource
+  | RgAnimalResource[]
+  | null;
+
 export interface RgSingleAnimalResponse {
-  data: RgAnimalResource;
+  data: RgSingleAnimalData;
   included?: RgIncludedResource[];
 }
 
@@ -79,6 +88,7 @@ export interface RgOrgAttributes {
   phone?: string | null;
   email?: string | null;
   url?: string | null;
+  adoptionUrl?: string | null;
   lat?: number | null;
   lon?: number | null;
 }
@@ -91,8 +101,11 @@ export interface RgLocationAttributes {
   lon?: number | null;
 }
 
+/** Docs list these as strings; live responses often nest `{ url }`. */
+export type RgPictureUrl = string | { url?: string | null } | null;
+
 export interface RgPictureAttributes {
-  original?: { url: string } | null;
-  large?: { url: string } | null;
-  small?: { url: string } | null;
+  original?: RgPictureUrl;
+  large?: RgPictureUrl;
+  small?: RgPictureUrl;
 }

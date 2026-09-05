@@ -1,5 +1,10 @@
 import { env } from "../../config/env";
-import type { RgSearchResponse, RgSingleAnimalResponse } from "./types";
+import type {
+  RgAnimalResource,
+  RgSearchResponse,
+  RgSingleAnimalData,
+  RgSingleAnimalResponse,
+} from "./types";
 
 const REQUEST_TIMEOUT_MS = 10_000;
 
@@ -153,15 +158,29 @@ export async function searchAvailableCats({
   );
 }
 
+/**
+ * Live GET /public/animals/{id} puts the animal in `data: [animal]`.
+ * Search already returns an array; this unwraps the single-resource case.
+ */
+export function unwrapSingleAnimal(
+  data: RgSingleAnimalData,
+): RgAnimalResource | undefined {
+  if (Array.isArray(data)) return data[0];
+  return data ?? undefined;
+}
+
 /** Fetches a single animal by its RescueGroups id (without the "rescuegroups:" prefix). */
 export async function getAnimalById(
   animalId: string,
 ): Promise<RgSingleAnimalResponse> {
-  const params = new URLSearchParams({
-    include: "breeds,orgs,pictures,locations",
-  });
-  return rescueGroupsFetch<RgSingleAnimalResponse>(
-    `/public/animals/${animalId}?${params.toString()}`,
+  // Keep commas literal, matching search and RescueGroups' own examples.
+  const query = "include=breeds,orgs,pictures,locations";
+  const response = await rescueGroupsFetch<RgSingleAnimalResponse>(
+    `/public/animals/${encodeURIComponent(animalId)}?${query}`,
     { method: "GET" },
   );
+  return {
+    ...response,
+    data: unwrapSingleAnimal(response.data) ?? null,
+  };
 }

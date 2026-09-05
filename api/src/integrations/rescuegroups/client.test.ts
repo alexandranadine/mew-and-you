@@ -97,6 +97,47 @@ describe("RescueGroups client", () => {
       });
   });
 
+  it("GETs /public/animals/{id} with literal include commas", async () => {
+    mockFetchResponse({
+      json: {
+        data: { type: "animals", id: "123", attributes: { name: "Mochi" } },
+      },
+    });
+
+    await getAnimalById("123");
+
+    expect(fetch).toHaveBeenCalledOnce();
+    const [url, init] = vi.mocked(fetch).mock.calls[0];
+    expect(String(url)).toBe(
+      "https://api.rescuegroups.org/v5/public/animals/123?include=breeds,orgs,pictures,locations",
+    );
+    expect(init).toMatchObject({ method: "GET" });
+  });
+
+  it("unwraps the live GET /public/animals/{id} data array into a single animal", async () => {
+    mockFetchResponse({
+      json: {
+        data: [
+          {
+            type: "animals",
+            id: "18134969",
+            attributes: { name: "Willy" },
+          },
+        ],
+        included: [{ type: "orgs", id: "5586", attributes: { name: "Rescue" } }],
+      },
+    });
+
+    const response = await getAnimalById("18134969");
+
+    expect(response.data).toEqual({
+      type: "animals",
+      id: "18134969",
+      attributes: { name: "Willy" },
+    });
+    expect(response.included).toHaveLength(1);
+  });
+
   it("includes RescueGroups error title/detail in the message for non-OK responses", async () => {
     mockFetchResponse({
       status: 400,

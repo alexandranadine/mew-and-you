@@ -63,6 +63,7 @@ function mapAgeGroup(value: string | null | undefined): CatAgeGroup {
     case "baby":
       return "baby";
     case "young":
+    case "young adult":
       return "young";
     case "adult":
       return "adult";
@@ -91,6 +92,9 @@ function mapSize(value: string | null | undefined): CatSize {
     case "medium":
       return "medium";
     case "large":
+    case "x-large":
+    case "xlarge":
+    case "extra large":
       return "large";
     default:
       return "unknown";
@@ -111,12 +115,39 @@ function buildBreedLabel(attrs: RgAnimalResource["attributes"]): string {
   return "Breed unknown";
 }
 
-function buildFallbackAdoptionUrl(
+function firstHttpUrl(
+  ...candidates: Array<string | null | undefined>
+): string | undefined {
+  for (const candidate of candidates) {
+    const value = candidate?.trim();
+    if (value) return value;
+  }
+  return undefined;
+}
+
+function pictureUrl(value: unknown): string | undefined {
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed || undefined;
+  }
+  if (value && typeof value === "object" && "url" in value) {
+    const url = (value as { url?: unknown }).url;
+    if (typeof url === "string") {
+      const trimmed = url.trim();
+      return trimmed || undefined;
+    }
+  }
+  return undefined;
+}
+
+function buildAdoptionUrl(
+  animalUrl: string | null | undefined,
   orgAttrs: RgOrgAttributes,
-  animalId: string,
 ): string {
-  if (orgAttrs.url) return orgAttrs.url;
-  return `https://www.rescuegroups.org/`; // last-resort link if nothing more specific is available
+  return (
+    firstHttpUrl(animalUrl, orgAttrs.adoptionUrl, orgAttrs.url) ??
+    "https://www.rescuegroups.org/"
+  );
 }
 
 /**
@@ -150,8 +181,11 @@ export function mapRescueGroupsAnimal(
     .filter((resource): resource is RgIncludedResource => Boolean(resource))
     .map((resource): CatPhoto | undefined => {
       const pic = resource.attributes as RgPictureAttributes;
-      const full = pic.large?.url ?? pic.original?.url ?? pic.small?.url;
-      const thumb = pic.small?.url ?? full;
+      const full =
+        pictureUrl(pic.large) ??
+        pictureUrl(pic.original) ??
+        pictureUrl(pic.small);
+      const thumb = pictureUrl(pic.small) ?? full;
       return full ? { url: full, thumbnailUrl: thumb } : undefined;
     })
     .filter((photo): photo is CatPhoto => Boolean(photo));
@@ -205,7 +239,9 @@ export function mapRescueGroupsAnimal(
     sex: mapSex(attrs.sex),
     size: mapSize(attrs.sizeGroup),
     description:
-      cleanText(attrs.descriptionText) || "No description provided yet.",
+      cleanText(attrs.descriptionText) ||
+      cleanText(attrs.descriptionHtml) ||
+      "No description provided yet.",
     photos,
     organization,
     location: { zip, city, state, lat, lng },
@@ -215,7 +251,6 @@ export function mapRescueGroupsAnimal(
       goodWithChildren: boolOrUndefined(attrs.isKidsOk),
       houseTrained: boolOrUndefined(attrs.isHousetrained),
     },
-    adoptionUrl:
-      attrs.url?.trim() || buildFallbackAdoptionUrl(orgAttrs, animal.id),
+    adoptionUrl: buildAdoptionUrl(attrs.url, orgAttrs),
   };
 }
