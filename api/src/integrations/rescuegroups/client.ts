@@ -80,7 +80,26 @@ async function rescueGroupsFetch<T>(
     );
   }
 
-  return (await response.json()) as T;
+  // RescueGroups returns HTTP 200 with an empty body for some auth failures
+  // (e.g. an invalid API key). Treat that as an upstream error instead of
+  // letting response.json() throw a SyntaxError into the generic 500 path.
+  const rawBody = await response.text();
+  if (!rawBody.trim()) {
+    throw new RescueGroupsApiError(
+      "RescueGroups returned an empty response. Check that RESCUEGROUPS_API_KEY is valid.",
+      502,
+    );
+  }
+
+  try {
+    return JSON.parse(rawBody) as T;
+  } catch (error) {
+    throw new RescueGroupsApiError(
+      "RescueGroups returned an unexpected response.",
+      502,
+      error instanceof Error ? error.message : error,
+    );
+  }
 }
 
 /** Searches available cats within a radius of a US ZIP code, sorted closest-first. */
@@ -91,7 +110,9 @@ export async function searchAvailableCats({
 }: SearchAvailableCatsParams): Promise<RgSearchResponse> {
   const params = new URLSearchParams({
     include: "breeds,orgs,pictures,locations",
-    sort: "animals.distance",
+    // Official docs use `sort=distance` on radius searches (distance is a
+    // meta attribute added when filterRadius is present).
+    sort: "distance",
     limit: String(limit),
   });
 

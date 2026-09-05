@@ -37,11 +37,12 @@ export class RescueGroupsProvider implements CatProvider {
       limit: 100,
     });
     const included = response.included ?? [];
+    const animals = Array.isArray(response.data) ? response.data : [];
 
-    const cats = response.data.map((animal) => ({
+    const cats = animals.map((animal) => ({
       ...mapRescueGroupsAnimal(animal, included),
       distanceMiles:
-        typeof animal.attributes.distance === "number"
+        typeof animal.attributes?.distance === "number"
           ? animal.attributes.distance
           : radiusMiles,
     }));

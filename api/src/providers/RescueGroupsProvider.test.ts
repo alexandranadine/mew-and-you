@@ -83,6 +83,17 @@ describe("RescueGroupsProvider", () => {
     expect(result.cats[0].distanceMiles).toBe(25);
   });
 
+  it("treats a missing data array as an empty result set", async () => {
+    vi.mocked(searchAvailableCats).mockResolvedValue({
+      meta: { count: 0 },
+    } as RgSearchResponse);
+
+    const result = await provider.searchCats({ zip: "91350", radiusMiles: 25 });
+
+    expect(result.cats).toEqual([]);
+    expect(result.totalCount).toBe(0);
+  });
+
   it("returns a mapped cat by id", async () => {
     const response: RgSingleAnimalResponse = {
       data: makeAnimal({ id: "12345" }),
