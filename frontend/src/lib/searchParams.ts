@@ -8,7 +8,7 @@ import { DEFAULT_RADIUS_MILES, RADIUS_OPTIONS_MILES } from "./searchOptions";
 import { isValidZipFormat } from "./zipLookup";
 
 const AGE_GROUPS: readonly CatAgeGroup[] = ["baby", "young", "adult", "senior"];
-const SEXES: readonly CatSex[] = ["male", "female"];
+const SEXES: readonly CatSex[] = ["female", "male"];
 const SIZES: readonly CatSize[] = ["small", "medium", "large"];
 const SORT_VALUES: readonly CatSortOption[] = ["distance", "name"];
 
@@ -28,6 +28,33 @@ function parseEnumParam<T extends string>(
   if (value && (allowed as readonly string[]).includes(value))
     return value as T;
   return undefined;
+}
+
+/**
+ * Parses comma-separated multi-select values (e.g. `sex=female,male`).
+ * Order follows `allowed` for stable round-trips; unknown tokens are dropped.
+ */
+export function parseMultiEnumParam<T extends string>(
+  value: string | null,
+  allowed: readonly T[],
+): T[] | undefined {
+  if (!value?.trim()) return undefined;
+  const selected = new Set(
+    value
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean),
+  );
+  const parsed = allowed.filter((item) => selected.has(item));
+  return parsed.length > 0 ? parsed : undefined;
+}
+
+/** Serializes a multi-select list for URL params; undefined when empty. */
+export function serializeMultiEnumParam(
+  values: readonly string[] | undefined,
+): string | undefined {
+  if (!values?.length) return undefined;
+  return values.join(",");
 }
 
 /** Parses and validates `/cats?zip=...&radius=...` (plus filters/sort) into a typed query, or a specific error. */
@@ -53,9 +80,9 @@ export function parseCatSearchParams(
   }
 
   const filters: CatFilters = {
-    ageGroup: parseEnumParam(searchParams.get("ageGroup"), AGE_GROUPS),
-    sex: parseEnumParam(searchParams.get("sex"), SEXES),
-    size: parseEnumParam(searchParams.get("size"), SIZES),
+    ageGroup: parseMultiEnumParam(searchParams.get("ageGroup"), AGE_GROUPS),
+    sex: parseMultiEnumParam(searchParams.get("sex"), SEXES),
+    size: parseMultiEnumParam(searchParams.get("size"), SIZES),
     organizationId: searchParams.get("org") ?? undefined,
   };
 
@@ -75,9 +102,12 @@ export function catSearchQueryToParams(query: CatSearchQuery): URLSearchParams {
   const params = new URLSearchParams();
   params.set("zip", query.zip);
   params.set("radius", String(query.radiusMiles));
-  if (query.filters.ageGroup) params.set("ageGroup", query.filters.ageGroup);
-  if (query.filters.sex) params.set("sex", query.filters.sex);
-  if (query.filters.size) params.set("size", query.filters.size);
+  const ageGroup = serializeMultiEnumParam(query.filters.ageGroup);
+  if (ageGroup) params.set("ageGroup", ageGroup);
+  const sex = serializeMultiEnumParam(query.filters.sex);
+  if (sex) params.set("sex", sex);
+  const size = serializeMultiEnumParam(query.filters.size);
+  if (size) params.set("size", size);
   if (query.filters.organizationId)
     params.set("org", query.filters.organizationId);
   if (query.sort !== "distance") params.set("sort", query.sort);

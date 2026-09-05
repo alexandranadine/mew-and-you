@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchCats } from "../api/catsApi";
 import type { CatSearchQuery } from "../types/search";
 
@@ -22,5 +22,7 @@ export function useCatsSearch(query: CatSearchQuery | undefined) {
         sort: "distance",
       }),
     enabled: query !== undefined,
+    // Keep prior ZIP+radius results visible while a new radius fetch settles.
+    placeholderData: keepPreviousData,
   });
 }

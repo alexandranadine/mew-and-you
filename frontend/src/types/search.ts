@@ -2,10 +2,14 @@ import type { Cat, CatAgeGroup, CatSex, CatSize } from "./cat";
 
 export type CatSortOption = "distance" | "name";
 
+/**
+ * Client-side attribute filters. Age/sex/size are multi-select lists:
+ * empty/undefined means “all”; multiple values within a category use OR.
+ */
 export interface CatFilters {
-  ageGroup?: CatAgeGroup;
-  sex?: CatSex;
-  size?: CatSize;
+  ageGroup?: CatAgeGroup[];
+  sex?: CatSex[];
+  size?: CatSize[];
   organizationId?: string;
 }
 

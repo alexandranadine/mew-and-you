@@ -9,15 +9,17 @@ import {
 import { SearchStateCard } from "../components/cats/SearchStateCard";
 import { PageMeta } from "../components/seo/PageMeta";
 import { useCatsSearch } from "../hooks/useCatsSearch";
-import { filterCats } from "../lib/catFilters";
+import { filterCats, hasActiveFilters } from "../lib/catFilters";
 import { sortCats } from "../lib/catSort";
 import {
   formatResultsHeadline,
   formatRevealFooter,
 } from "../lib/searchResultsCopy";
+import { RADIUS_OPTIONS_MILES } from "../lib/searchOptions";
 import {
   parseCatSearchParams,
   patchSearchParams,
+  serializeMultiEnumParam,
   type CatSearchParamsError,
 } from "../lib/searchParams";
 import { invalidSearchSeo, searchSeo } from "../config/seo";
@@ -27,14 +29,14 @@ import type { CatSearchQuery } from "../types/search";
 const REVEAL_PAGE_SIZE = 24;
 
 /** Identity for ZIP / radius / filters — sort changes do not reset reveal. */
-function revealResetKeyForQuery(query: CatSearchQuery | undefined): string {
+export function revealResetKeyForQuery(query: CatSearchQuery | undefined): string {
   if (!query) return "";
   return [
     query.zip,
     query.radiusMiles,
-    query.filters.ageGroup ?? "",
-    query.filters.sex ?? "",
-    query.filters.size ?? "",
+    serializeMultiEnumParam(query.filters.ageGroup) ?? "",
+    serializeMultiEnumParam(query.filters.sex) ?? "",
+    serializeMultiEnumParam(query.filters.size) ?? "",
     query.filters.organizationId ?? "",
   ].join("|");
 }
@@ -48,8 +50,15 @@ export function ResultsPage() {
   );
   const query = parsed.ok ? parsed.query : undefined;
 
-  const { data, isPending, isError, error, refetch, isFetching } =
-    useCatsSearch(query);
+  const {
+    data,
+    isPending,
+    isError,
+    error,
+    refetch,
+    isFetching,
+    isPlaceholderData,
+  } = useCatsSearch(query);
 
   const organizationOptions = useMemo(() => {
     const byId = new Map<string, { id: string; name: string }>();
@@ -109,20 +118,17 @@ export function ResultsPage() {
   }
 
   const { query: activeQuery } = parsed;
-  const hasActiveFilters = Boolean(
-    activeQuery.filters.ageGroup ||
-      activeQuery.filters.sex ||
-      activeQuery.filters.size ||
-      activeQuery.filters.organizationId,
-  );
+  const filtersActive = hasActiveFilters(activeQuery.filters);
 
   function handleFilterChange(patch: CatFilterBarChange) {
     // Only patch keys the bar actually changed — spreading every field as
     // undefined would wipe the other active filters via patchSearchParams.
     const next: Record<string, string | undefined> = {};
-    if ("ageGroup" in patch) next.ageGroup = patch.ageGroup;
-    if ("sex" in patch) next.sex = patch.sex;
-    if ("size" in patch) next.size = patch.size;
+    if ("ageGroup" in patch) {
+      next.ageGroup = serializeMultiEnumParam(patch.ageGroup);
+    }
+    if ("sex" in patch) next.sex = serializeMultiEnumParam(patch.sex);
+    if ("size" in patch) next.size = serializeMultiEnumParam(patch.size);
     if ("organizationId" in patch) next.org = patch.organizationId;
     if ("sort" in patch) {
       next.sort = patch.sort === "distance" ? undefined : patch.sort;
@@ -140,8 +146,14 @@ export function ResultsPage() {
     });
   }
 
+  function handleRadiusChange(radiusMiles: number) {
+    updateParams({ radius: String(radiusMiles) });
+  }
+
   const detailQuery = `zip=${encodeURIComponent(activeQuery.zip)}`;
   const meta = searchSeo(activeQuery.zip);
+  const showInitialLoading = isPending && !data;
+  const showUpdating = isFetching && isPlaceholderData;
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
@@ -157,21 +169,44 @@ export function ResultsPage() {
         >
           ← New search
         </Link>
-        <h1 className="mt-2 text-3xl font-semibold text-mauve-700">
-          Cats near {activeQuery.zip}
-        </h1>
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <h1 className="text-3xl font-semibold text-mauve-700">
+            Cats near {activeQuery.zip}
+          </h1>
+          <div className="shrink-0">
+            <label htmlFor="results-radius" className="field-label">
+              Search radius
+            </label>
+            <select
+              id="results-radius"
+              className="field-input w-auto min-w-[9.5rem] py-2"
+              value={activeQuery.radiusMiles}
+              onChange={(event) =>
+                handleRadiusChange(Number(event.target.value))
+              }
+            >
+              {RADIUS_OPTIONS_MILES.map((miles) => (
+                <option key={miles} value={miles}>
+                  {miles} miles
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
         <p className="mt-1 text-mauve-400" aria-live="polite">
-          {isPending
+          {showInitialLoading
             ? `Searching within ${activeQuery.radiusMiles} miles\u2026`
-            : data
-              ? formatResultsHeadline({
-                  matchedCount: matchedCats.length,
-                  fetchedCount: data.cats.length,
-                  totalCount: data.totalCount,
-                  radiusMiles: activeQuery.radiusMiles,
-                  hasActiveFilters,
-                })
-              : ""}
+            : showUpdating
+              ? `Updating results within ${activeQuery.radiusMiles} miles\u2026`
+              : data
+                ? formatResultsHeadline({
+                    matchedCount: matchedCats.length,
+                    fetchedCount: data.cats.length,
+                    totalCount: data.totalCount,
+                    radiusMiles: activeQuery.radiusMiles,
+                    hasActiveFilters: filtersActive,
+                  })
+                : ""}
         </p>
       </div>
 
@@ -182,13 +217,13 @@ export function ResultsPage() {
           organizationOptions={organizationOptions}
           onChange={handleFilterChange}
           onReset={handleResetFilters}
-          hasActiveFilters={hasActiveFilters}
+          hasActiveFilters={filtersActive}
         />
       </div>
 
       <h2 className="sr-only">Search results</h2>
 
-      {isPending && (
+      {showInitialLoading && (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
             <CatCardSkeleton key={index} />
@@ -196,7 +231,7 @@ export function ResultsPage() {
         </div>
       )}
 
-      {!isPending && isError && (
+      {!showInitialLoading && isError && !data && (
         <SearchStateCard
           icon="⚠️"
           title="Something went wrong"
@@ -217,13 +252,13 @@ export function ResultsPage() {
         </SearchStateCard>
       )}
 
-      {!isPending && !isError && data && matchedCats.length === 0 && (
+      {!showInitialLoading && !isError && data && matchedCats.length === 0 && (
         <SearchStateCard
           icon="🔍"
           title="No cats matched your search"
           message="Try a larger radius or fewer filters — new cats are added often."
         >
-          {hasActiveFilters && (
+          {filtersActive && (
             <button
               type="button"
               onClick={handleResetFilters}
@@ -238,7 +273,7 @@ export function ResultsPage() {
         </SearchStateCard>
       )}
 
-      {!isPending && !isError && data && matchedCats.length > 0 && (
+      {!showInitialLoading && data && matchedCats.length > 0 && (
         <>
           <div
             className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"

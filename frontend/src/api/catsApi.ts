@@ -1,4 +1,4 @@
-import { filterCats } from "../lib/catFilters";
+import { filterCats, hasActiveFilters } from "../lib/catFilters";
 import { sortCats } from "../lib/catSort";
 import type { Cat } from "../types/cat";
 import type {
@@ -42,20 +42,11 @@ interface ApiErrorResponseBody {
 
 function normalizeFilters(filters: CatFilters): CatFilters {
   return {
-    ageGroup: filters.ageGroup,
-    sex: filters.sex,
-    size: filters.size,
+    ageGroup: filters.ageGroup?.length ? filters.ageGroup : undefined,
+    sex: filters.sex?.length ? filters.sex : undefined,
+    size: filters.size?.length ? filters.size : undefined,
     organizationId: filters.organizationId?.trim() || undefined,
   };
-}
-
-function hasActiveClientFilters(filters: CatFilters): boolean {
-  return Boolean(
-    filters.ageGroup ||
-      filters.sex ||
-      filters.size ||
-      filters.organizationId,
-  );
 }
 
 async function parseErrorResponse(response: Response): Promise<never> {
@@ -90,7 +81,7 @@ export async function fetchCats(
       ? body.totalCount
       : cats.length;
   const filters = normalizeFilters(query.filters);
-  const filtered = hasActiveClientFilters(filters)
+  const filtered = hasActiveFilters(filters)
     ? filterCats(cats, filters)
     : cats;
   const sorted = sortCats(filtered, query.sort);
