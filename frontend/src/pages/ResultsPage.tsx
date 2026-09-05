@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { CatCard } from "../components/cats/CatCard";
 import { CatCardSkeleton } from "../components/cats/CatCardSkeleton";
@@ -18,6 +18,23 @@ import {
   type CatSearchParamsError,
 } from "../lib/searchParams";
 import { invalidSearchSeo, searchSeo } from "../config/seo";
+import type { CatSearchQuery } from "../types/search";
+
+/** How many result cards to mount at once (client-side reveal only). */
+const REVEAL_PAGE_SIZE = 24;
+
+/** Identity for ZIP / radius / filters — sort changes do not reset reveal. */
+function revealResetKeyForQuery(query: CatSearchQuery | undefined): string {
+  if (!query) return "";
+  return [
+    query.zip,
+    query.radiusMiles,
+    query.filters.ageGroup ?? "",
+    query.filters.sex ?? "",
+    query.filters.size ?? "",
+    query.filters.organizationId ?? "",
+  ].join("|");
+}
 
 export function ResultsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,11 +63,25 @@ export function ResultsPage() {
     );
   }, [data]);
 
-  const visibleCats = useMemo(() => {
+  const matchedCats = useMemo(() => {
     if (!data || !query) return [];
     const filtered = filterCats(data.cats, query.filters);
     return sortCats(filtered, query.sort);
   }, [data, query]);
+
+  const revealResetKey = revealResetKeyForQuery(query);
+  const [visibleCount, setVisibleCount] = useState(REVEAL_PAGE_SIZE);
+  const [prevRevealResetKey, setPrevRevealResetKey] = useState(revealResetKey);
+
+  // Reset progressive reveal when ZIP, radius, or filters change (not sort).
+  if (revealResetKey !== prevRevealResetKey) {
+    setPrevRevealResetKey(revealResetKey);
+    setVisibleCount(REVEAL_PAGE_SIZE);
+  }
+
+  const revealedCount = Math.min(visibleCount, matchedCats.length);
+  const revealedCats = matchedCats.slice(0, revealedCount);
+  const hasMoreToReveal = revealedCount < matchedCats.length;
 
   function updateParams(patch: Record<string, string | undefined>) {
     setSearchParams((prev) => patchSearchParams(prev, patch), {
@@ -130,7 +161,7 @@ export function ResultsPage() {
           {isPending
             ? `Searching within ${activeQuery.radiusMiles} miles\u2026`
             : data
-              ? `${visibleCats.length} potential roommate${visibleCats.length === 1 ? "" : "s"} within ${activeQuery.radiusMiles} miles`
+              ? `${matchedCats.length} potential roommate${matchedCats.length === 1 ? "" : "s"} within ${activeQuery.radiusMiles} miles`
               : ""}
         </p>
         <SaveSearchPanel query={activeQuery} />
@@ -178,7 +209,7 @@ export function ResultsPage() {
         </SearchStateCard>
       )}
 
-      {!isPending && !isError && data && visibleCats.length === 0 && (
+      {!isPending && !isError && data && matchedCats.length === 0 && (
         <SearchStateCard
           icon="🔍"
           title="No cats matched your search"
@@ -199,20 +230,39 @@ export function ResultsPage() {
         </SearchStateCard>
       )}
 
-      {!isPending && !isError && data && visibleCats.length > 0 && (
-        <div
-          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          aria-live="polite"
-        >
-          {visibleCats.map((cat) => (
-            <CatCard
-              key={cat.id}
-              cat={cat}
-              distanceMiles={cat.distanceMiles}
-              detailQuery={detailQuery}
-            />
-          ))}
-        </div>
+      {!isPending && !isError && data && matchedCats.length > 0 && (
+        <>
+          <div
+            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            aria-live="polite"
+          >
+            {revealedCats.map((cat) => (
+              <CatCard
+                key={cat.id}
+                cat={cat}
+                distanceMiles={cat.distanceMiles}
+                detailQuery={detailQuery}
+              />
+            ))}
+          </div>
+
+          {hasMoreToReveal && (
+            <div className="mt-10 flex flex-col items-center gap-3">
+              <p className="text-sm text-mauve-400">
+                Showing {revealedCount} of {matchedCats.length} cats
+              </p>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() =>
+                  setVisibleCount((count) => count + REVEAL_PAGE_SIZE)
+                }
+              >
+                Show more cats
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
