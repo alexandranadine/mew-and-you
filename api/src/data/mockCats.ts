@@ -128,6 +128,7 @@ export const mockCats: Cat[] = [
       houseTrained: true,
     },
     adoptionUrl: "https://example.org/sunset-paws/cats/mochi",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:clementine",
@@ -150,6 +151,7 @@ export const mockCats: Cat[] = [
       houseTrained: true,
     },
     adoptionUrl: "https://example.org/sunset-paws/cats/clementine",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:tobias",
@@ -167,6 +169,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.sunsetPaws),
     traits: { goodWithCats: true, spayedNeutered: true, houseTrained: true },
     adoptionUrl: "https://example.org/sunset-paws/cats/tobias",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:biscuit",
@@ -189,6 +192,7 @@ export const mockCats: Cat[] = [
       houseTrained: true,
     },
     adoptionUrl: "https://example.org/eastside-kittens/cats/biscuit",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:gus",
@@ -206,6 +210,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.eastsideKittens),
     traits: { spayedNeutered: true, houseTrained: true },
     adoptionUrl: "https://example.org/eastside-kittens/cats/gus",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:plum",
@@ -223,6 +228,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.angeleno),
     traits: { goodWithCats: true, houseTrained: true },
     adoptionUrl: "https://example.org/angeleno-cat-rescue/cats/plum",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:juniper",
@@ -245,6 +251,7 @@ export const mockCats: Cat[] = [
       houseTrained: true,
     },
     adoptionUrl: "https://example.org/angeleno-cat-rescue/cats/juniper",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:static",
@@ -262,6 +269,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.angeleno),
     traits: { goodWithDogs: false, spayedNeutered: true, houseTrained: true },
     adoptionUrl: "https://example.org/angeleno-cat-rescue/cats/static",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:sir-reginald",
@@ -283,6 +291,7 @@ export const mockCats: Cat[] = [
       houseTrained: true,
     },
     adoptionUrl: "https://example.org/valley-whiskers/cats/sir-reginald",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:pepper",
@@ -300,6 +309,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.valleyWhiskers),
     traits: { goodWithCats: true, spayedNeutered: true, houseTrained: true },
     adoptionUrl: "https://example.org/valley-whiskers/cats/pepper",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:nori",
@@ -317,6 +327,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.harborCats),
     traits: { spayedNeutered: true, houseTrained: true },
     adoptionUrl: "https://example.org/harbor-cats/cats/nori",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:salty",
@@ -339,6 +350,7 @@ export const mockCats: Cat[] = [
       houseTrained: true,
     },
     adoptionUrl: "https://example.org/harbor-cats/cats/salty",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:waffles",
@@ -361,6 +373,7 @@ export const mockCats: Cat[] = [
       houseTrained: true,
     },
     adoptionUrl: "https://example.org/san-gabriel-cats/cats/waffles",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:marmalade",
@@ -378,6 +391,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.sanGabriel),
     traits: { goodWithChildren: true, houseTrained: true },
     adoptionUrl: "https://example.org/san-gabriel-cats/cats/marmalade",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:comet",
@@ -395,6 +409,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.foothillFelines),
     traits: { goodWithDogs: true, spayedNeutered: true, houseTrained: true },
     adoptionUrl: "https://example.org/foothill-felines/cats/comet",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:willow",
@@ -417,6 +432,7 @@ export const mockCats: Cat[] = [
       houseTrained: true,
     },
     adoptionUrl: "https://example.org/foothill-felines/cats/willow",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:basil",
@@ -434,6 +450,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.foothillFelines),
     traits: { goodWithDogs: true, goodWithCats: true },
     adoptionUrl: "https://example.org/foothill-felines/cats/basil",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:olive",
@@ -456,6 +473,7 @@ export const mockCats: Cat[] = [
       houseTrained: true,
     },
     adoptionUrl: "https://example.org/south-bay-second-chance/cats/olive",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:ziggy",
@@ -473,6 +491,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.southBay),
     traits: { goodWithCats: true, spayedNeutered: true, houseTrained: true },
     adoptionUrl: "https://example.org/south-bay-second-chance/cats/ziggy",
+    adoptionUrlSource: "animal",
   },
   {
     id: "mock:fig",
@@ -490,6 +509,7 @@ export const mockCats: Cat[] = [
     location: orgLocation(ORGS.southBay),
     traits: { spayedNeutered: true, houseTrained: true },
     adoptionUrl: "https://example.org/south-bay-second-chance/cats/fig",
+    adoptionUrlSource: "animal",
   },
 ];
 

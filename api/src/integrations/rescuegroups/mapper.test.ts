@@ -112,6 +112,7 @@ describe("mapRescueGroupsAnimal", () => {
       houseTrained: true,
     });
     expect(cat.adoptionUrl).toBe("https://example.org/sunset-paws");
+    expect(cat.adoptionUrlSource).toBe("organizationWebsite");
   });
 
   it("falls back to a placeholder icon-friendly empty array when photos are missing", () => {
@@ -299,6 +300,7 @@ describe("mapRescueGroupsAnimal", () => {
       size: "large",
       description: "A sweet orange tabby.",
       adoptionUrl: "https://www.rescuesontherunway.org/animals/willy",
+      adoptionUrlSource: "animal",
       organization: {
         id: "rescuegroups:5586",
         name: "Rescues On The Runway",
@@ -395,6 +397,7 @@ describe("mapRescueGroupsAnimal", () => {
     );
 
     expect(cat.adoptionUrl).toBe("https://example.org/sunset-paws/cats/mochi");
+    expect(cat.adoptionUrlSource).toBe("animal");
     expect(cat.adoptionUrl).not.toBe("https://example.org/sunset-paws/adopt");
     expect(cat.adoptionUrl).not.toBe("https://example.org/sunset-paws");
   });
@@ -438,10 +441,14 @@ describe("mapRescueGroupsAnimal", () => {
     expect(animalUrl.adoptionUrl).toBe(
       "https://example.org/sunset-paws/cats/mochi",
     );
+    expect(animalUrl.adoptionUrlSource).toBe("animal");
     expect(orgAdoptionUrl.adoptionUrl).toBe(
       "https://example.org/sunset-paws/adopt",
     );
+    expect(orgAdoptionUrl.adoptionUrlSource).toBe("organizationAdoption");
     expect(orgWebsite.adoptionUrl).toBe("https://example.org/sunset-paws");
+    expect(orgWebsite.adoptionUrlSource).toBe("organizationWebsite");
     expect(homepage.adoptionUrl).toBe("https://www.rescuegroups.org/");
+    expect(homepage.adoptionUrlSource).toBe("fallback");
   });
 });

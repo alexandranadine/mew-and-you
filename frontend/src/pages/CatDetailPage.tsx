@@ -19,6 +19,7 @@ import {
   getSiteOrigin,
   toAbsoluteUrl,
 } from "../config/seo";
+import type { Cat } from "../types/cat";
 
 interface CatDetailLocationState {
   distanceMiles?: number;
@@ -361,7 +362,7 @@ export function CatDetailPage() {
               <circle cx="15" cy="4" r="2.4" />
               <circle cx="19" cy="8" r="2.4" />
             </svg>
-            View Adoption Listing
+            {adoptionCtaLabel(cat)}
             <span aria-hidden="true">↗</span>
           </a>
           <p className="mt-2 text-sm text-mauve-400">
@@ -371,4 +372,18 @@ export function CatDetailPage() {
       </div>
     </div>
   );
+}
+
+function adoptionCtaLabel(cat: Cat): string {
+  const organizationName = cat.organization.name;
+  switch (cat.adoptionUrlSource) {
+    case "organizationAdoption":
+      return `Adopt through ${organizationName}`;
+    case "organizationWebsite":
+      return `Visit ${organizationName}`;
+    case "animal":
+    case "fallback":
+    default:
+      return "View adoption listing";
+  }
 }

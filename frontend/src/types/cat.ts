@@ -50,6 +50,16 @@ export interface CatTraits {
 /** Identifies which adapter produced a `Cat` record. Extend as sources are added. */
 export type CatSource = "rescuegroups";
 
+/**
+ * Which URL won the adoption CTA fallback chain (animal listing → org
+ * adoption page → org website → hard-coded fallback).
+ */
+export type AdoptionUrlSource =
+  | "animal"
+  | "organizationAdoption"
+  | "organizationWebsite"
+  | "fallback";
+
 export interface Cat {
   /** Normalized id, namespaced by source, e.g. `rescuegroups:98765`. */
   id: string;
@@ -68,4 +78,6 @@ export interface Cat {
   traits: CatTraits;
   /** Link back to the source listing where a user can start an adoption inquiry. */
   adoptionUrl: string;
+  /** Which fallback step produced `adoptionUrl`, for CTA labeling. */
+  adoptionUrlSource: AdoptionUrlSource;
 }

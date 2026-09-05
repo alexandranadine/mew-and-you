@@ -1,4 +1,5 @@
 import type {
+  AdoptionUrlSource,
   Cat,
   CatAgeGroup,
   CatOrganization,
@@ -143,15 +144,26 @@ function pictureUrl(value: unknown): string | undefined {
 /**
  * Prefer the animal Webpage (`attributes.url`) when RescueGroups provides one.
  * Only then fall back to the org adoption page, then the org website.
+ * Also reports which step produced the URL so the UI can label the CTA.
  */
 function buildAdoptionUrl(
   animalUrl: string | null | undefined,
   orgAttrs: RgOrgAttributes,
-): string {
-  return (
-    firstHttpUrl(animalUrl, orgAttrs.adoptionUrl, orgAttrs.url) ??
-    "https://www.rescuegroups.org/"
-  );
+): { url: string; source: AdoptionUrlSource } {
+  const animal = firstHttpUrl(animalUrl);
+  if (animal) return { url: animal, source: "animal" };
+
+  const organizationAdoption = firstHttpUrl(orgAttrs.adoptionUrl);
+  if (organizationAdoption) {
+    return { url: organizationAdoption, source: "organizationAdoption" };
+  }
+
+  const organizationWebsite = firstHttpUrl(orgAttrs.url);
+  if (organizationWebsite) {
+    return { url: organizationWebsite, source: "organizationWebsite" };
+  }
+
+  return { url: "https://www.rescuegroups.org/", source: "fallback" };
 }
 
 /**
@@ -233,6 +245,8 @@ export function mapRescueGroupsAnimal(
     website: orgAttrs.url?.trim() || undefined,
   };
 
+  const adoption = buildAdoptionUrl(attrs.url, orgAttrs);
+
   return {
     id: `rescuegroups:${animal.id}`,
     source: "rescuegroups",
@@ -255,6 +269,7 @@ export function mapRescueGroupsAnimal(
       goodWithChildren: boolOrUndefined(attrs.isKidsOk),
       houseTrained: boolOrUndefined(attrs.isHousetrained),
     },
-    adoptionUrl: buildAdoptionUrl(attrs.url, orgAttrs),
+    adoptionUrl: adoption.url,
+    adoptionUrlSource: adoption.source,
   };
 }

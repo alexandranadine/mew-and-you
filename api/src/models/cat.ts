@@ -43,6 +43,16 @@ export interface CatTraits {
 
 export type CatSource = "rescuegroups" | "mock";
 
+/**
+ * Which URL won the adoption CTA fallback chain (animal listing → org
+ * adoption page → org website → hard-coded fallback).
+ */
+export type AdoptionUrlSource =
+  | "animal"
+  | "organizationAdoption"
+  | "organizationWebsite"
+  | "fallback";
+
 export interface Cat {
   id: string;
   source: CatSource;
@@ -58,6 +68,7 @@ export interface Cat {
   location: CatLocation;
   traits: CatTraits;
   adoptionUrl: string;
+  adoptionUrlSource: AdoptionUrlSource;
 }
 
 export interface CatWithDistance extends Cat {
