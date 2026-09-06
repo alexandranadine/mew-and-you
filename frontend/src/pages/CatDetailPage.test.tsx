@@ -242,7 +242,7 @@ describe("CatDetailPage adoption CTA", () => {
     await loadedHeading("Miso");
 
     expect(
-      screen.getByRole("link", { name: /Visit Sunset Paws/i }),
+      screen.getByRole("link", { name: /Visit shelter website/i }),
     ).toHaveAttribute("href", "https://example.com/sunset-paws");
     expect(
       screen.getByText(

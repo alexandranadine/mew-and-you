@@ -445,7 +445,7 @@ function adoptionCtaCopy(cat: Cat): {
       };
     case "organizationWebsite":
       return {
-        label: `Visit ${organizationName}`,
+        label: "Visit shelter website",
         helper: `We couldn't grab a direct link for this cat, but you can visit ${organizationName} to learn more.`,
         mentionsNewTab: false,
       };
