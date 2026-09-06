@@ -36,7 +36,7 @@ export function SearchForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="card flex flex-col gap-3 p-4 text-left sm:gap-4 sm:p-8"
+      className="card flex flex-col px-4 pt-5 pb-4 text-left sm:px-8 sm:pt-10 sm:pb-8"
       noValidate
     >
       <div>
@@ -61,7 +61,7 @@ export function SearchForm() {
         <p
           id="zip-error"
           role={error ? "alert" : undefined}
-          className={`mt-1 min-h-5 text-sm text-blush-600 sm:mt-1.5 ${
+          className={`mt-0.5 min-h-5 text-sm text-blush-600 sm:mt-1 ${
             error ? "" : "invisible"
           }`}
           aria-hidden={error ? undefined : true}
@@ -91,7 +91,7 @@ export function SearchForm() {
 
       <button
         type="submit"
-        className="btn-primary min-h-12 w-full sm:mt-1 sm:w-auto"
+        className="btn-primary mt-3 min-h-12 w-full sm:mt-5 sm:w-auto"
       >
         <svg
           aria-hidden="true"
