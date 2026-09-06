@@ -10,6 +10,19 @@ const KENNEL_ID_PATTERN = /^[A-Z]{1,3}\d{3,}[A-Z0-9]*$/i;
 /** Whole-name short initialisms (JJ, RJ, ED). */
 const SHORT_INITIALISM_PATTERN = /^[A-Z]{2}$/;
 
+/**
+ * Conservative display-only check for obvious kennel/shelter ID names.
+ * Extends the formatting pattern with a longer digit run (e.g. A2291008)
+ * so unusual names like Bo123 are not flagged. Does not rename the cat or
+ * affect IDs, URLs, favorites, or JSON-LD.
+ */
+export function isKennelIdName(name: string): boolean {
+  const trimmed = name.trim();
+  if (!trimmed || !KENNEL_ID_PATTERN.test(trimmed)) return false;
+  const digitRun = trimmed.match(/\d+/);
+  return digitRun != null && digitRun[0].length >= 5;
+}
+
 export function hasRealDescription(description: string): boolean {
   const trimmed = description.replace(/\s+/g, " ").trim();
   if (!trimmed) return false;
@@ -117,21 +130,54 @@ export type CatDetailAttribute = {
   subvalue?: string;
 };
 
+function isMissingExactAge(age: string): boolean {
+  const trimmed = age.trim();
+  return !trimmed || /^age unknown$/i.test(trimmed);
+}
+
+function ageGroupDisplayLabel(
+  ageGroup: Cat["ageGroup"],
+): string | null {
+  if (ageGroup === "unknown") return null;
+  return ageGroupLabel(ageGroup);
+}
+
+function isAgeGroupEcho(age: string, groupLabel: string): boolean {
+  return age.trim().toLowerCase() === groupLabel.toLowerCase();
+}
+
+/**
+ * Exact age string when it adds information beyond the age group.
+ * Returns null when the value is missing, a placeholder, or just the group
+ * name (e.g. mapper fallback "Adult" when ageGroup is adult).
+ */
+function exactAgeValue(cat: Pick<Cat, "age" | "ageGroup">): string | null {
+  const age = cat.age.trim();
+  if (isMissingExactAge(age)) return null;
+  const groupLabel = ageGroupDisplayLabel(cat.ageGroup);
+  if (groupLabel && isAgeGroupEcho(age, groupLabel)) return null;
+  return age;
+}
+
 /** Detail-page attribute cells; unknown age/sex/size are omitted entirely. */
 export function getCatDetailAttributes(
   cat: Pick<Cat, "age" | "ageGroup" | "sex" | "size">,
 ): CatDetailAttribute[] {
   const attrs: CatDetailAttribute[] = [];
 
-  const age = ageDisplayLabel(cat);
-  if (age) {
+  const exactAge = exactAgeValue(cat);
+  const groupLabel = ageGroupDisplayLabel(cat.ageGroup);
+  if (exactAge && groupLabel) {
     attrs.push({
       key: "age",
       label: "Age",
-      value: age,
-      subvalue:
-        cat.ageGroup !== "unknown" ? ageGroupLabel(cat.ageGroup) : undefined,
+      value: exactAge,
+      subvalue: groupLabel,
     });
+  } else if (exactAge) {
+    attrs.push({ key: "age", label: "Age", value: exactAge });
+  } else if (groupLabel) {
+    attrs.push({ key: "age", label: "Age", value: groupLabel });
   }
 
   const sex = sexDisplayLabel(cat.sex);

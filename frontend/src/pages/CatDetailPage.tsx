@@ -14,6 +14,7 @@ import {
   formatCatDisplayName,
   getCatDetailAttributes,
   hasRealDescription,
+  isKennelIdName,
   missingBioMessage,
 } from "../lib/catDisplay";
 import {
@@ -166,13 +167,9 @@ export function CatDetailPage() {
   const hasBio = hasRealDescription(cat.description);
   const detailAttributes = getCatDetailAttributes(cat);
   const displayName = formatCatDisplayName(cat.name);
-  const attributeGridClass =
-    detailAttributes.length <= 1
-      ? "grid-cols-1"
-      : detailAttributes.length === 2
-        ? "grid-cols-2"
-        : "grid-cols-3";
+  const kennelIdName = isKennelIdName(cat.name);
   const adoptionCta = adoptionCtaCopy(cat);
+  const showOrganizationWebsite = shouldShowOrganizationWebsite(cat);
 
   const meta = catDetailSeo(cat);
 
@@ -272,33 +269,38 @@ export function CatDetailPage() {
 
         <div className="min-w-0">
           <div className="flex items-start justify-between gap-3">
-            <h1 className="min-w-0 break-words text-3xl font-semibold text-mauve-700">
-              {displayName}
-            </h1>
-            <div className="flex shrink-0 items-center gap-2">
-              {typeof distanceMiles === "number" && (
-                <span className="pill">
+            <div className="min-w-0">
+              <h1 className="break-words text-3xl font-semibold text-mauve-700">
+                {displayName}
+              </h1>
+              {kennelIdName ? (
+                <p className="mt-1 text-xs font-medium uppercase tracking-wide text-mauve-400">
+                  Shelter ID
+                </p>
+              ) : null}
+              <p className="mt-1 text-lg text-mauve-500">{cat.breed}</p>
+              {typeof distanceMiles === "number" ? (
+                <p className="mt-1 text-sm text-mauve-400">
                   {distanceMiles.toFixed(1)} mi away
-                </span>
-              )}
-              <FavoriteButton
-                catId={cat.id}
-                catName={displayName}
-                size="md"
-              />
+                </p>
+              ) : null}
             </div>
+            <FavoriteButton
+              catId={cat.id}
+              catName={displayName}
+              size="md"
+              className="shrink-0"
+            />
           </div>
 
-          <p className="mt-1 text-lg text-mauve-500">{cat.breed}</p>
-
-          {detailAttributes.length > 0 && (
+          {detailAttributes.length > 0 ? (
             <dl
-              className={`mt-4 grid gap-2 text-center sm:gap-3 ${attributeGridClass}`}
+              className={`mt-4 text-center ${attributeListClass(detailAttributes.length)}`}
             >
               {detailAttributes.map((attr) => (
                 <div
                   key={attr.key}
-                  className="min-w-0 rounded-2xl bg-blush-50 px-1.5 py-3 sm:px-2"
+                  className={attributeTileClass(detailAttributes.length)}
                 >
                   <dt className="text-xs uppercase tracking-wide text-mauve-400">
                     {attr.label}
@@ -306,7 +308,7 @@ export function CatDetailPage() {
                   <dd className="mt-1 break-words font-medium text-mauve-700">
                     {attr.value}
                     {attr.subvalue ? (
-                      <span className="block text-xs text-mauve-400">
+                      <span className="block text-xs font-normal text-mauve-400">
                         {attr.subvalue}
                       </span>
                     ) : null}
@@ -314,9 +316,9 @@ export function CatDetailPage() {
                 </div>
               ))}
             </dl>
-          )}
+          ) : null}
 
-          <div className="mt-5">
+          <div className="mt-5 empty:mt-0 empty:hidden">
             <CatTraitBadges traits={cat.traits} />
           </div>
 
@@ -333,57 +335,77 @@ export function CatDetailPage() {
             </p>
           )}
 
-          <div className="card mt-6 p-5">
-            <h2 className="font-display text-lg font-semibold break-words text-mauve-700">
-              {cat.organization.name}
+          <section className="mt-8">
+            <h2 className="font-display text-lg font-semibold text-mauve-700">
+              Interested in {displayName}?
             </h2>
-            <p className="mt-1 text-sm text-mauve-500">
+            <a
+              href={cat.adoptionUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary mt-3 w-full justify-center px-8 py-4 text-base"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="h-4 w-4 -rotate-32 text-cream-50"
+                fill="currentColor"
+              >
+                <circle cx="12" cy="15" r="5" />
+                <circle cx="5" cy="8" r="2.4" />
+                <circle cx="10" cy="4" r="2.4" />
+                <circle cx="15" cy="4" r="2.4" />
+                <circle cx="19" cy="8" r="2.4" />
+              </svg>
+              {adoptionCta.label}
+              <span aria-hidden="true">↗</span>
+            </a>
+            <p className="mt-2 text-sm text-mauve-400">{adoptionCta.helper}</p>
+          </section>
+
+          <section className="mt-8 border-t border-blush-100 pt-5">
+            <h2 className="text-xs font-medium uppercase tracking-wide text-mauve-400">
+              Shelter information
+            </h2>
+            <p className="mt-2 break-words font-medium text-mauve-600">
+              {cat.organization.name}
+            </p>
+            <p className="mt-0.5 text-sm text-mauve-400">
               {cat.organization.city}, {cat.organization.state}{" "}
               {cat.organization.zip}
             </p>
-            {cat.organization.phone && (
-              <p className="mt-1 text-sm text-mauve-500">
+            {cat.organization.phone ? (
+              <p className="mt-0.5 text-sm text-mauve-400">
                 {cat.organization.phone}
               </p>
-            )}
-            {cat.organization.website && (
+            ) : null}
+            {showOrganizationWebsite && cat.organization.website ? (
               <a
                 href={cat.organization.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="focus-ring mt-1 inline-block text-sm font-medium text-mauve-600 underline-offset-2 hover:underline"
+                className="focus-ring mt-1 inline-block text-sm text-mauve-500 underline-offset-2 hover:underline"
               >
                 Visit website
               </a>
-            )}
-          </div>
-
-          <a
-            href={cat.adoptionUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary mt-6 w-full justify-center px-8 py-4 text-base sm:w-auto"
-          >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              className="h-4 w-4 -rotate-32 text-cream-50"
-              fill="currentColor"
-            >
-              <circle cx="12" cy="15" r="5" />
-              <circle cx="5" cy="8" r="2.4" />
-              <circle cx="10" cy="4" r="2.4" />
-              <circle cx="15" cy="4" r="2.4" />
-              <circle cx="19" cy="8" r="2.4" />
-            </svg>
-            {adoptionCta.label}
-            <span aria-hidden="true">↗</span>
-          </a>
-          <p className="mt-2 text-sm text-mauve-400">{adoptionCta.helper}</p>
+            ) : null}
+          </section>
         </div>
       </div>
     </div>
   );
+}
+
+function attributeListClass(count: number): string {
+  if (count >= 3) return "grid grid-cols-3 gap-2 sm:gap-3";
+  return "flex flex-wrap gap-2 sm:gap-3";
+}
+
+function attributeTileClass(count: number): string {
+  if (count >= 3) {
+    return "min-w-0 rounded-2xl bg-blush-50 px-1.5 py-3 sm:px-2";
+  }
+  return "w-max min-w-[7.5rem] max-w-[11rem] flex-none rounded-2xl bg-blush-50 px-3 py-3";
 }
 
 function adoptionCtaCopy(cat: Cat): { label: string; helper: string } {
@@ -411,5 +433,25 @@ function adoptionCtaCopy(cat: Cat): { label: string; helper: string } {
         label: "View adoption listing",
         helper: `Opens ${organizationName}'s listing in a new tab.`,
       };
+  }
+}
+
+function shouldShowOrganizationWebsite(cat: Cat): boolean {
+  const website = cat.organization.website;
+  if (!website) return false;
+  return !urlsPointToSameDestination(cat.adoptionUrl, website);
+}
+
+function urlsPointToSameDestination(left: string, right: string): boolean {
+  return normalizeUrlForComparison(left) === normalizeUrlForComparison(right);
+}
+
+function normalizeUrlForComparison(value: string): string {
+  try {
+    const url = new URL(value);
+    const path = url.pathname.replace(/\/+$/, "") || "/";
+    return `${url.protocol}//${url.host.toLowerCase()}${path}${url.search}`;
+  } catch {
+    return value.trim().replace(/\/+$/, "").toLowerCase();
   }
 }

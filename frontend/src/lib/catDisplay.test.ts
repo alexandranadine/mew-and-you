@@ -4,6 +4,7 @@ import {
   formatCatDisplayName,
   getCatDetailAttributes,
   hasRealDescription,
+  isKennelIdName,
   missingBioMessage,
 } from "./catDisplay";
 import { makeCat } from "../test/catFixture";
@@ -23,6 +24,7 @@ describe("formatCatDisplayName", () => {
 
   it("preserves kennel-ID-like values", () => {
     expect(formatCatDisplayName("A1928701")).toBe("A1928701");
+    expect(formatCatDisplayName("A2291008")).toBe("A2291008");
   });
 
   it("preserves parenthetical acronyms while title-casing the rest", () => {
@@ -139,6 +141,27 @@ describe("formatCatCardMetadata", () => {
   });
 });
 
+describe("isKennelIdName", () => {
+  it("flags obvious kennel IDs", () => {
+    expect(isKennelIdName("A2291008")).toBe(true);
+    expect(isKennelIdName("A1928701")).toBe(true);
+    expect(isKennelIdName("  ID12345  ")).toBe(true);
+  });
+
+  it("does not flag ordinary or merely unusual cat names", () => {
+    expect(isKennelIdName("Miso")).toBe(false);
+    expect(isKennelIdName("ROOTY TOOTY")).toBe(false);
+    expect(isKennelIdName("Mary-Kate")).toBe(false);
+    expect(isKennelIdName("KitKat")).toBe(false);
+    expect(isKennelIdName("JJ")).toBe(false);
+    expect(isKennelIdName("ED")).toBe(false);
+    expect(isKennelIdName("Luna")).toBe(false);
+    expect(isKennelIdName("Bo123")).toBe(false);
+    expect(isKennelIdName("K9")).toBe(false);
+    expect(isKennelIdName("A1")).toBe(false);
+  });
+});
+
 describe("getCatDetailAttributes", () => {
   it("includes known age, sex, and size", () => {
     expect(getCatDetailAttributes(makeCat())).toEqual([
@@ -146,6 +169,49 @@ describe("getCatDetailAttributes", () => {
       { key: "sex", label: "Sex", value: "Female" },
       { key: "size", label: "Size", value: "Medium" },
     ]);
+  });
+
+  it("shows exact age as primary with age group as secondary when they differ", () => {
+    expect(
+      getCatDetailAttributes(
+        makeCat({ age: "6 Years 1 Month", ageGroup: "adult" }),
+      ).find((attr) => attr.key === "age"),
+    ).toEqual({
+      key: "age",
+      label: "Age",
+      value: "6 Years 1 Month",
+      subvalue: "Adult",
+    });
+  });
+
+  it("does not duplicate Adult when the exact age is just the age group", () => {
+    expect(
+      getCatDetailAttributes(makeCat({ age: "Adult", ageGroup: "adult" })).find(
+        (attr) => attr.key === "age",
+      ),
+    ).toEqual({ key: "age", label: "Age", value: "Adult" });
+  });
+
+  it("shows the age group once when only the group is known", () => {
+    expect(
+      getCatDetailAttributes(
+        makeCat({ age: "Age unknown", ageGroup: "adult" }),
+      ).find((attr) => attr.key === "age"),
+    ).toEqual({ key: "age", label: "Age", value: "Adult" });
+
+    expect(
+      getCatDetailAttributes(makeCat({ age: "", ageGroup: "senior" })).find(
+        (attr) => attr.key === "age",
+      ),
+    ).toEqual({ key: "age", label: "Age", value: "Senior" });
+  });
+
+  it("does not invent an exact age from the age group", () => {
+    const age = getCatDetailAttributes(
+      makeCat({ age: "Age unknown", ageGroup: "adult" }),
+    ).find((attr) => attr.key === "age");
+    expect(age?.value).toBe("Adult");
+    expect(age?.subvalue).toBeUndefined();
   });
 
   it("omits unknown age, sex, or size individually", () => {
@@ -175,6 +241,14 @@ describe("getCatDetailAttributes", () => {
         }),
       ),
     ).toEqual([]);
+  });
+
+  it("omits the age tile when both exact age and age group are unknown", () => {
+    expect(
+      getCatDetailAttributes(
+        makeCat({ age: "Age unknown", ageGroup: "unknown", sex: "male" }),
+      ).map((attr) => attr.key),
+    ).toEqual(["sex", "size"]);
   });
 
   it("does not surface Unknown labels", () => {
