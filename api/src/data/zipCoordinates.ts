@@ -3,6 +3,7 @@
  * until DATA_PROVIDER=rescuegroups is enabled (RescueGroups does real geocoding).
  */
 export const ZIP_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  "90012": { lat: 34.0553, lng: -118.2417 }, // Downtown LA / Civic Center
   "90026": { lat: 34.09, lng: -118.2688 }, // Silver Lake / Echo Park, LA
   "90042": { lat: 34.1092, lng: -118.1937 }, // Highland Park, LA
   "90004": { lat: 34.0762, lng: -118.3088 }, // Koreatown, LA

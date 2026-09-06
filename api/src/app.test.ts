@@ -46,6 +46,22 @@ describe("GET /api/cats validation", () => {
   });
 });
 
+describe("GET /api/cats/sample validation", () => {
+  it("rejects a missing zip with 400 instead of treating sample as a cat id", async () => {
+    const res = await request(app).get("/api/cats/sample");
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("missing_zip");
+  });
+
+  it("rejects an invalid sample count with 400", async () => {
+    const res = await request(app).get(
+      "/api/cats/sample?zip=90012&radius=50&count=0",
+    );
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("invalid_count");
+  });
+});
+
 describe("security headers", () => {
   it("sets helmet security headers", async () => {
     const res = await request(app).get("/health");

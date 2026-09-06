@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fetchCats } from "./catsApi";
+import { fetchCatSample, fetchCats } from "./catsApi";
 import { makeCat } from "../test/catFixture";
 import type { CatWithDistance } from "../types/search";
 
@@ -68,5 +68,33 @@ describe("fetchCats totalCount", () => {
 
     expect(result.cats).toHaveLength(1);
     expect(result.totalCount).toBe(1);
+  });
+});
+
+describe("fetchCatSample", () => {
+  it("requests a small sample from /api/cats/sample instead of the full search", async () => {
+    const cats = [
+      makeCat({ id: "rescuegroups:1", name: "Miso" }),
+      makeCat({ id: "rescuegroups:2", name: "Beans" }),
+    ];
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ cats }),
+      }),
+    );
+
+    const result = await fetchCatSample({
+      zip: "90012",
+      radiusMiles: 50,
+      count: 3,
+    });
+
+    expect(result).toHaveLength(2);
+    expect(vi.mocked(fetch)).toHaveBeenCalledWith(
+      "/api/cats/sample?zip=90012&radius=50&count=3",
+    );
   });
 });

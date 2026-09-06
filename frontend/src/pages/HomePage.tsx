@@ -9,21 +9,14 @@ import {
   websiteJsonLd,
 } from "../config/seo";
 import { PageMeta } from "../components/seo/PageMeta";
-import { useCatsSearch } from "../hooks/useCatsSearch";
+import { useHomeCatSample } from "../hooks/useCatSample";
 import RotatingTagline from "../components/layout/RotatingTagline";
 
-// A fixed, illustrative search so the homepage has something to show before
-// the visitor searches themselves — still served through our real API.
-const FEATURED_QUERY = {
-  zip: "90026",
-  radiusMiles: 50,
-  filters: {},
-  sort: "distance",
-} as const;
-
 export function HomePage() {
-  const { data, isLoading } = useCatsSearch(FEATURED_QUERY);
-  const featuredCats = data?.cats.slice(0, 3) ?? [];
+  const { data, isPending, isError } = useHomeCatSample();
+  const featuredCats = data ?? [];
+  const showSampleSection =
+    isPending || (!isError && featuredCats.length > 0);
 
   return (
     <div>
@@ -90,7 +83,7 @@ export function HomePage() {
 
       <PawDivider />
 
-      {(isLoading || featuredCats.length > 0) && (
+      {showSampleSection && (
         <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
           <div className="mb-8 text-center">
             <h2 className="text-2xl font-semibold text-mauve-700">
@@ -102,7 +95,7 @@ export function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {isLoading
+            {isPending
               ? Array.from({ length: 3 }).map((_, index) => (
                   <CatCardSkeleton key={index} />
                 ))

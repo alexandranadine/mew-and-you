@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ApiError } from "./errors";
-import { validateRadius, validateZip } from "./validation";
+import { validateRadius, validateSampleCount, validateZip } from "./validation";
 
 describe("validateZip", () => {
   it("accepts a valid 5-digit ZIP", () => {
@@ -67,5 +67,23 @@ describe("validateRadius", () => {
 
   it("rejects a radius submitted as a list", () => {
     expect(() => validateRadius(["10", "20"])).toThrow(ApiError);
+  });
+});
+
+describe("validateSampleCount", () => {
+  it("defaults to 3 when omitted", () => {
+    expect(validateSampleCount(undefined)).toBe(3);
+    expect(validateSampleCount("")).toBe(3);
+  });
+
+  it("accepts a valid count", () => {
+    expect(validateSampleCount("3")).toBe(3);
+  });
+
+  it("rejects zero, fractions, lists, and values above the cap", () => {
+    for (const bad of ["0", "-1", "3.5", "13", "abc"]) {
+      expect(() => validateSampleCount(bad)).toThrow(ApiError);
+    }
+    expect(() => validateSampleCount(["3", "4"])).toThrow(ApiError);
   });
 });

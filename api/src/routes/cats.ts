@@ -1,9 +1,34 @@
 import { Router } from "express";
 import { ApiError } from "../lib/errors";
-import { validateRadius, validateZip } from "../lib/validation";
+import { getHomepageSampleCats } from "../lib/homepageSample";
+import {
+  validateRadius,
+  validateSampleCount,
+  validateZip,
+} from "../lib/validation";
 import { getCatProvider } from "../providers";
 
 export const catsRouter = Router();
+
+// GET /api/cats/sample?zip=90012&radius=50&count=3 — random homepage listings.
+// Must be registered before /:id so "sample" is not treated as a cat id.
+catsRouter.get("/sample", async (req, res, next) => {
+  try {
+    const zip = validateZip(req.query.zip);
+    const radiusMiles = validateRadius(req.query.radius);
+    const count = validateSampleCount(req.query.count);
+
+    const { cats } = await getHomepageSampleCats({
+      zip,
+      radiusMiles,
+      count,
+    });
+
+    res.json({ cats });
+  } catch (error) {
+    next(error);
+  }
+});
 
 // GET /api/cats?zip=91350&radius=25 — available cats within a radius of a ZIP code.
 catsRouter.get("/", async (req, res, next) => {

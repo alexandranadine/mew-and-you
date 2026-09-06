@@ -89,6 +89,30 @@ export async function fetchCats(
   return { cats: sorted, totalCount, query };
 }
 
+interface CatsSampleResponseBody {
+  cats: Cat[];
+}
+
+export async function fetchCatSample(params: {
+  zip: string;
+  radiusMiles: number;
+  count?: number;
+}): Promise<Cat[]> {
+  const search = new URLSearchParams({
+    zip: params.zip,
+    radius: String(params.radiusMiles),
+    count: String(params.count ?? 3),
+  });
+  const response = await fetch(`/api/cats/sample?${search.toString()}`);
+
+  if (!response.ok) {
+    await parseErrorResponse(response);
+  }
+
+  const body = (await response.json()) as CatsSampleResponseBody;
+  return Array.isArray(body.cats) ? body.cats : [];
+}
+
 export async function fetchCatById(id: string): Promise<Cat | undefined> {
   const response = await fetch(`/api/cats/${encodeURIComponent(id)}`);
 

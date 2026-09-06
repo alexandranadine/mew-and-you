@@ -49,3 +49,28 @@ export function validateRadius(raw: unknown): number {
   }
   return value;
 }
+
+const DEFAULT_SAMPLE_COUNT = 3;
+const MAX_SAMPLE_COUNT = 12;
+
+export function validateSampleCount(raw: unknown): number {
+  if (raw === undefined || raw === null || raw === "") {
+    return DEFAULT_SAMPLE_COUNT;
+  }
+  if (typeof raw !== "string") {
+    throw new ApiError(
+      '"count" must be a single value.',
+      400,
+      "invalid_count",
+    );
+  }
+  const value = Number(raw);
+  if (!Number.isInteger(value) || value < 1 || value > MAX_SAMPLE_COUNT) {
+    throw new ApiError(
+      `"${String(raw)}" is not a valid sample count (must be an integer between 1 and ${MAX_SAMPLE_COUNT}).`,
+      400,
+      "invalid_count",
+    );
+  }
+  return value;
+}
