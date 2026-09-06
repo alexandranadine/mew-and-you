@@ -11,15 +11,16 @@ import { getCatProvider } from "../providers";
 export const catsRouter = Router();
 
 // GET /api/cats/sample?zip=90012&radius=50&count=3 — random homepage listings.
+// ZIP is validated for API contract compatibility; the candidate pool is built
+// from fixed LA + San Diego centers (see HOMEPAGE_SAMPLE_ZIPS).
 // Must be registered before /:id so "sample" is not treated as a cat id.
 catsRouter.get("/sample", async (req, res, next) => {
   try {
-    const zip = validateZip(req.query.zip);
+    validateZip(req.query.zip);
     const radiusMiles = validateRadius(req.query.radius);
     const count = validateSampleCount(req.query.count);
 
     const { cats } = await getHomepageSampleCats({
-      zip,
       radiusMiles,
       count,
     });

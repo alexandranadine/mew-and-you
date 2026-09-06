@@ -15,6 +15,6 @@ export const brand = {
     "Bring home your new tiny landlord.",
   ],
   description:
-    "Browse adoptable cats from shelters and rescues across Los Angeles County, all in one cozy place.",
-  serviceArea: "Los Angeles County",
+    "Browse adoptable cats from shelters and rescues across Southern California, all in one cozy place.",
+  serviceArea: "Southern California",
 } as const;

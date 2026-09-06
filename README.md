@@ -2,8 +2,8 @@
 
 **Live site:** [https://mewandyou.com](https://mewandyou.com)
 
-A cat-only adoption discovery app that brings adoptable cats from Los Angeles
-County shelters and rescues together in one place.
+A cat-only adoption discovery app that brings adoptable cats from Southern
+California shelters and rescues together in one place.
 
 ![Mew & You home page on desktop](docs/screenshots/home-desktop.png)
 

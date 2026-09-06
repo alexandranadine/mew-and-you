@@ -9,6 +9,13 @@ import { logger } from "./logger";
 /** Modest in-memory TTL so homepage refreshes reuse a candidate pool. */
 export const HOMEPAGE_SAMPLE_TTL_MS = 12 * 60 * 1000;
 
+/**
+ * Candidate pool centers for homepage samples: Los Angeles + San Diego.
+ * The `/api/cats/sample` query still accepts a ZIP for contract compatibility;
+ * these fixed centers drive the pool, not the request ZIP.
+ */
+export const HOMEPAGE_SAMPLE_ZIPS = ["90012", "92101"] as const;
+
 const MAPPER_UNNAMED_FALLBACK = /^unnamed cat$/i;
 
 interface SamplePoolEntry {
@@ -54,8 +61,8 @@ export function pickRandomDistinct<T>(
   return copy.slice(0, take);
 }
 
-function poolCacheKey(zip: string, radiusMiles: number): string {
-  return `${zip}:${radiusMiles}`;
+function poolCacheKey(radiusMiles: number): string {
+  return `${HOMEPAGE_SAMPLE_ZIPS.join("+")}:${radiusMiles}`;
 }
 
 function eligibleUniqueCats(cats: Cat[]): Cat[] {
@@ -72,7 +79,6 @@ function eligibleUniqueCats(cats: Cat[]): Cat[] {
 }
 
 export interface HomepageSampleParams {
-  zip: string;
   radiusMiles: number;
   count: number;
 }
@@ -81,6 +87,38 @@ export interface HomepageSampleOptions {
   now?: () => number;
   random?: () => number;
   searchCats?: (params: CatSearchParams) => Promise<CatSearchProviderResult>;
+}
+
+async function fetchCombinedSamplePool(
+  radiusMiles: number,
+  searchCats: (params: CatSearchParams) => Promise<CatSearchProviderResult>,
+): Promise<Cat[] | null> {
+  const settled = await Promise.allSettled(
+    HOMEPAGE_SAMPLE_ZIPS.map((zip) => searchCats({ zip, radiusMiles })),
+  );
+
+  const combined: Cat[] = [];
+  let successCount = 0;
+
+  for (let i = 0; i < settled.length; i++) {
+    const outcome = settled[i];
+    const zip = HOMEPAGE_SAMPLE_ZIPS[i];
+    if (outcome?.status === "fulfilled") {
+      successCount += 1;
+      combined.push(...outcome.value.cats);
+    } else if (outcome?.status === "rejected") {
+      logger.warn("Homepage sample ZIP search failed; continuing with others", {
+        zip,
+        radiusMiles,
+      });
+    }
+  }
+
+  if (successCount === 0) {
+    return null;
+  }
+
+  return eligibleUniqueCats(combined);
 }
 
 export async function getHomepageSampleCats(
@@ -94,7 +132,7 @@ export async function getHomepageSampleCats(
     ((searchParams: CatSearchParams) =>
       getCatProvider().searchCats(searchParams));
 
-  const key = poolCacheKey(params.zip, params.radiusMiles);
+  const key = poolCacheKey(params.radiusMiles);
   const cached = samplePoolCache.get(key);
   const cacheIsFresh =
     cached !== undefined && now() - cached.fetchedAt < HOMEPAGE_SAMPLE_TTL_MS;
@@ -103,27 +141,27 @@ export async function getHomepageSampleCats(
     return { cats: pickRandomDistinct(cached.cats, params.count, random) };
   }
 
-  try {
-    const result = await searchCats({
-      zip: params.zip,
-      radiusMiles: params.radiusMiles,
-    });
-    const pool = eligibleUniqueCats(result.cats);
+  const pool = await fetchCombinedSamplePool(params.radiusMiles, searchCats);
+
+  if (pool) {
     samplePoolCache.set(key, { cats: pool, fetchedAt: now() });
     return { cats: pickRandomDistinct(pool, params.count, random) };
-  } catch {
-    if (cached) {
-      logger.warn(
-        "Homepage sample pool refresh failed; serving stale cached pool",
-        { zip: params.zip, radiusMiles: params.radiusMiles },
-      );
-      return { cats: pickRandomDistinct(cached.cats, params.count, random) };
-    }
-
-    logger.warn("Homepage sample request failed with no cached pool", {
-      zip: params.zip,
-      radiusMiles: params.radiusMiles,
-    });
-    return { cats: [] };
   }
+
+  if (cached) {
+    logger.warn(
+      "Homepage sample pool refresh failed; serving stale cached pool",
+      {
+        sampleZips: [...HOMEPAGE_SAMPLE_ZIPS],
+        radiusMiles: params.radiusMiles,
+      },
+    );
+    return { cats: pickRandomDistinct(cached.cats, params.count, random) };
+  }
+
+  logger.warn("Homepage sample request failed with no cached pool", {
+    sampleZips: [...HOMEPAGE_SAMPLE_ZIPS],
+    radiusMiles: params.radiusMiles,
+  });
+  return { cats: [] };
 }

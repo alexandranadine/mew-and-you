@@ -38,7 +38,7 @@ export function truncateMetaDescription(
 }
 
 export const homeSeo = {
-  title: `${brand.name} — Adoptable Cats in LA County`,
+  title: `${brand.name} — Adoptable Cats in Southern California`,
   description: brand.description,
   canonicalPath: "/",
 } as const;
