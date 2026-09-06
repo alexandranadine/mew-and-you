@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { brand } from "../../config/brand";
+import { PawIcon } from "../decorative/PawIcon";
 
 export function SiteHeader() {
   return (
@@ -9,9 +10,7 @@ export function SiteHeader() {
           to="/"
           className="focus-ring flex min-w-0 items-center gap-1.5 sm:gap-2"
         >
-          <span aria-hidden="true" className="shrink-0 text-2xl">
-            🐾
-          </span>
+          <PawIcon className="size-6 shrink-0" />
           <span className="truncate font-display text-lg font-semibold text-mauve-700 sm:text-xl">
             {brand.name}
           </span>
