@@ -7,3 +7,14 @@ coverage/
 .env.*.local
 .DS_Store
 *.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Safe public production config
+!frontend/.env.production
+
+.wrangler
