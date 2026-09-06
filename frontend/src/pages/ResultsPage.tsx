@@ -301,7 +301,7 @@ export function ResultsPage() {
           </div>
         </div>
         <p
-          className="mt-1.5 text-sm leading-snug text-mauve-400 sm:text-base"
+          className="mt-1 text-sm leading-snug text-mauve-400 sm:mt-1.5 sm:text-base"
           aria-live="polite"
         >
           {showInitialLoading ? (
@@ -325,7 +325,7 @@ export function ResultsPage() {
         </p>
       </div>
 
-      <div className="mb-7 sm:mb-8">
+      <div className="mb-9 sm:mb-8">
         <CatFilterBar
           filters={activeQuery.filters}
           sort={activeQuery.sort}

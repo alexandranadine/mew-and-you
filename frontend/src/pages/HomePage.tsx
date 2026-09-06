@@ -58,7 +58,7 @@ export function HomePage() {
             {brand.description}
           </p>
 
-          <div className="relative mt-36 w-full max-w-md sm:mt-40">
+          <div className="relative mt-32 w-full max-w-md sm:mt-40">
             <img
               src="/images/mew-and-you-cat-peek.png"
               alt=""

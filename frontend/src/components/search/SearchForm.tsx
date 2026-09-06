@@ -61,21 +61,21 @@ export function SearchForm() {
         <p
           id="zip-error"
           role={error ? "alert" : undefined}
-          className={`mt-1 min-h-5 text-sm text-blush-600 sm:mt-1.5 ${
+          className={`mt-0.5 min-h-3 text-sm text-blush-600 sm:mt-1.5 sm:min-h-5 ${
             error ? "" : "invisible"
           }`}
           aria-hidden={error ? undefined : true}
         >
           {error ?? "\u00a0"}
         </p>
-        <p id="zip-hint" className="mt-0.5 text-xs leading-relaxed text-mauve-400">
-          Try:{" "}
+        <p id="zip-hint" className="mt-0 text-xs leading-relaxed text-mauve-400 sm:mt-0.5">
+          <span className="text-[0.6875rem] text-mauve-300">Try:</span>{" "}
           {SAMPLE_KNOWN_ZIPS.map((sampleZip, index) => (
             <span key={sampleZip}>
               <button
                 type="button"
                 onClick={() => setZip(sampleZip)}
-                className="inline-flex min-h-9 items-center px-0.5 underline decoration-dotted underline-offset-2 hover:text-mauve-600 sm:px-1"
+                className="inline-flex min-h-9 items-center px-0.5 text-xs underline decoration-dotted underline-offset-2 hover:text-mauve-600 sm:px-1"
               >
                 {sampleZip}
               </button>
