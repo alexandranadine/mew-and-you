@@ -83,7 +83,7 @@ describe("CatDetailPage identity and stats", () => {
     expect(screen.queryByText("Shelter ID")).not.toBeInTheDocument();
 
     const favorite = screen.getByRole("button", {
-      name: /Save Miso to favorites/i,
+      name: /Add Miso to favorites/i,
     });
     expect(identity?.contains(favorite)).toBe(false);
     expect(favorite).toHaveAttribute("aria-pressed", "false");
@@ -221,10 +221,11 @@ describe("CatDetailPage adoption CTA", () => {
         "We couldn't grab a direct link for this cat, but you can visit Sunset Paws's adoption page to learn more.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Visit website" })).toHaveAttribute(
-      "href",
-      "https://example.com/sunset-paws",
-    );
+    expect(
+      screen.getByRole("link", {
+        name: "Visit website (opens in a new tab)",
+      }),
+    ).toHaveAttribute("href", "https://example.com/sunset-paws");
   });
 
   it("uses organization website copy and does not duplicate that destination", async () => {
@@ -322,7 +323,7 @@ describe("CatDetailPage sparse listing and favorites", () => {
     await loadedHeading("Miso");
 
     const favorite = screen.getByRole("button", {
-      name: /Save Miso to favorites/i,
+      name: /Add Miso to favorites/i,
     });
     expect(favorite).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(favorite);

@@ -390,10 +390,7 @@ export function ResultsPage() {
 
       {!showInitialLoading && data && matchedCats.length > 0 && (
         <>
-          <div
-            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-            aria-live="polite"
-          >
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {revealedCats.map((cat) => (
               <CatCard
                 key={cat.id}
@@ -435,11 +432,12 @@ export function ResultsPage() {
 function SearchErrorState({ error }: { error: CatSearchParamsError }) {
   if (error.code === "missing-zip") {
     return (
-      <SearchStateCard
-        icon="🐾"
-        title="Start a search to see cats"
-        message="Head back home and enter a ZIP code to find adoptable cats nearby."
-      >
+        <SearchStateCard
+          headingLevel={1}
+          icon="🐾"
+          title="Start a search to see cats"
+          message="Head back home and enter a ZIP code to find adoptable cats nearby."
+        >
         <Link to="/" className="btn-primary">
           Go to search
         </Link>
@@ -449,11 +447,12 @@ function SearchErrorState({ error }: { error: CatSearchParamsError }) {
 
   if (error.code === "invalid-zip") {
     return (
-      <SearchStateCard
-        icon="⚠️"
-        title="That doesn't look like a ZIP code"
-        message={`"${error.zip}" isn't a valid 5-digit ZIP code. Please try again.`}
-      >
+        <SearchStateCard
+          headingLevel={1}
+          icon="⚠️"
+          title="That doesn't look like a ZIP code"
+          message={`"${error.zip}" isn't a valid 5-digit ZIP code. Please try again.`}
+        >
         <Link to="/" className="btn-primary">
           Back to search
         </Link>
@@ -463,6 +462,7 @@ function SearchErrorState({ error }: { error: CatSearchParamsError }) {
 
   return (
     <SearchStateCard
+      headingLevel={1}
       icon="⚠️"
       title="Invalid search radius"
       message={`"${error.value}" isn't a supported search radius.`}

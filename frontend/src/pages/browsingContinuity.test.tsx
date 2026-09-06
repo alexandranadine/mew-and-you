@@ -335,7 +335,7 @@ describe("Results ↔ Detail browsing continuity", () => {
     fireEvent.click(screen.getByRole("link", { name: /Meet Fiona/i }));
 
     const favorite = await screen.findByRole("button", {
-      name: /Save Fiona to favorites/i,
+      name: /Add Fiona to favorites/i,
     });
     expect(favorite).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(favorite);

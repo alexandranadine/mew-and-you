@@ -36,7 +36,7 @@ export function FavoriteButton({
       aria-label={
         saved
           ? `Remove ${catName} from favorites`
-          : `Save ${catName} to favorites`
+          : `Add ${catName} to favorites`
       }
       onClick={(event) => {
         event.preventDefault();

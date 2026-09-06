@@ -25,7 +25,8 @@
   --color-mauve-200: #d9b7c4;
   --color-mauve-300: #b98ca0;
   /* Darkened slightly from the original #96677e so body text using this
-     token clears WCAG AA contrast (4.5:1) against the cream background. */
+     token clears WCAG AA contrast (4.5:1) against the cream background.
+     mauve-300 stays decorative; placeholders and small copy use 400+. */
   --color-mauve-400: #8f5f76;
   --color-mauve-500: #7a4d64;
   --color-mauve-600: #5f3a4d;
@@ -92,8 +93,9 @@ h4 {
 
   .field-input {
     @apply w-full rounded-2xl border-2 border-blush-200 bg-white/80 px-4 py-2.5 text-mauve-800
-      placeholder:text-mauve-300 transition focus:border-blush-400 focus:outline-none
-      focus:ring-4 focus:ring-blush-100;
+      placeholder:text-mauve-400 transition focus:outline-none
+      focus-visible:border-blush-400 focus-visible:outline focus-visible:outline-2
+      focus-visible:outline-offset-2 focus-visible:outline-mauve-400;
   }
 
   .card {
@@ -117,6 +119,40 @@ h4 {
      prefers-reduced-motion rules collapse this to a near-instant flash. */
   .favorite-heart-pop {
     animation: favorite-heart-pop 280ms ease-out;
+  }
+
+  /* Off-screen until keyboard focus so every route can skip chrome. */
+  .skip-link {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .skip-link:focus-visible {
+    left: 1rem;
+    top: 1rem;
+    z-index: 50;
+    width: auto;
+    height: auto;
+    margin: 0;
+    clip: auto;
+    overflow: visible;
+    white-space: nowrap;
+    border-radius: 9999px;
+    background-color: var(--color-mauve-600);
+    padding: 0.5rem 1rem;
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-cream-50);
+    outline: 2px solid var(--color-mauve-400);
+    outline-offset: 2px;
   }
 }
 

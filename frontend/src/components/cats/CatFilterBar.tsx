@@ -43,7 +43,7 @@ function FilterChipGroup<T extends string>({
   return (
     <fieldset className="min-w-0">
       <legend className="field-label mb-1.5 px-0">{legend}</legend>
-      <div className="flex flex-wrap gap-2" role="group" aria-label={legend}>
+      <div className="flex flex-wrap gap-2">
         {options.map((option) => {
           const isActive = selected.has(option.value);
           return (

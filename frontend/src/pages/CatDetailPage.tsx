@@ -82,6 +82,7 @@ export function CatDetailPage() {
           robots={meta.robots}
         />
         <SearchStateCard
+          headingLevel={1}
           icon="🙀"
           title="We couldn't find that cat"
           message="This listing may have been adopted already, or the link might be incorrect."
@@ -104,6 +105,7 @@ export function CatDetailPage() {
           canonicalPath={meta.canonicalPath}
         />
         <SearchStateCard
+          headingLevel={1}
           icon="🐾"
           title="Fetching this cat's profile…"
           message="One moment."
@@ -122,6 +124,7 @@ export function CatDetailPage() {
           canonicalPath={meta.canonicalPath}
         />
         <SearchStateCard
+          headingLevel={1}
           icon="⚠️"
           title="Something went wrong"
           message={
@@ -157,6 +160,7 @@ export function CatDetailPage() {
           robots={meta.robots}
         />
         <SearchStateCard
+          headingLevel={1}
           icon="🙀"
           title="We couldn't find that cat"
           message="This listing may have been adopted already, or the link might be incorrect."
@@ -240,7 +244,7 @@ export function CatDetailPage() {
                     type="button"
                     onClick={() => setSelectedPhotoIndex(index)}
                     aria-label={`View photo ${index + 1} of ${cat.photos.length}`}
-                    aria-current={isSelected}
+                    aria-current={isSelected ? true : undefined}
                     className={`focus-ring h-[4.5rem] w-[5.5rem] shrink-0 overflow-hidden rounded-xl border-2 transition sm:h-16 sm:w-20 ${
                       isSelected
                         ? "border-mauve-500"
@@ -371,6 +375,9 @@ export function CatDetailPage() {
               <span aria-hidden="true" className="shrink-0">
                 ↗
               </span>
+              {adoptionCta.mentionsNewTab ? null : (
+                <span className="sr-only"> (opens in a new tab)</span>
+              )}
             </a>
             <p className="mt-2 max-w-prose text-sm leading-snug text-pretty text-mauve-400">
               {adoptionCta.helper}
@@ -401,6 +408,7 @@ export function CatDetailPage() {
                 className="focus-ring mt-1 inline-flex min-h-11 items-center text-sm text-mauve-500 underline-offset-2 hover:underline"
               >
                 Visit website
+                <span className="sr-only"> (opens in a new tab)</span>
               </a>
             ) : null}
           </section>
@@ -422,30 +430,38 @@ function attributeTileClass(count: number): string {
   return "w-full min-w-0 max-w-none flex-none rounded-2xl bg-blush-50 px-3 py-3 sm:w-max sm:min-w-[7.5rem] sm:max-w-[11rem]";
 }
 
-function adoptionCtaCopy(cat: Cat): { label: string; helper: string } {
+function adoptionCtaCopy(cat: Cat): {
+  label: string;
+  helper: string;
+  mentionsNewTab: boolean;
+} {
   const organizationName = cat.organization.name;
   switch (cat.adoptionUrlSource) {
     case "organizationAdoption":
       return {
         label: `Adopt through ${organizationName}`,
         helper: `We couldn't grab a direct link for this cat, but you can visit ${organizationName}'s adoption page to learn more.`,
+        mentionsNewTab: false,
       };
     case "organizationWebsite":
       return {
         label: `Visit ${organizationName}`,
         helper: `We couldn't grab a direct link for this cat, but you can visit ${organizationName} to learn more.`,
+        mentionsNewTab: false,
       };
     case "fallback":
       return {
         label: "View adoption listing",
         helper:
           "We couldn't grab a direct listing for this cat. This link will take you to RescueGroups instead.",
+        mentionsNewTab: false,
       };
     case "animal":
     default:
       return {
         label: "View adoption listing",
         helper: `Opens ${organizationName}'s listing in a new tab.`,
+        mentionsNewTab: true,
       };
   }
 }

@@ -96,7 +96,7 @@ describe("HomePage live sample listings", () => {
 
     renderHome();
     const favorite = await screen.findByRole("button", {
-      name: "Save Miso to favorites",
+      name: "Add Miso to favorites",
     });
 
     fireEvent.click(favorite);

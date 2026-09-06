@@ -69,7 +69,7 @@ export function AboutPage() {
       >
         <div className="grid items-center gap-10 md:grid-cols-2 md:gap-14">
           <div>
-            <p className="font-display text-sm font-medium tracking-wide text-blush-500">
+            <p className="font-display text-sm font-medium tracking-wide text-blush-600">
               Why {brand.name}?
             </p>
             <h2
@@ -113,7 +113,7 @@ export function AboutPage() {
         className="mx-auto max-w-5xl px-6 pt-10 pb-8 sm:pt-14"
       >
         <div className="text-center">
-          <p className="font-display text-sm font-medium tracking-wide text-blush-500">
+          <p className="font-display text-sm font-medium tracking-wide text-blush-600">
             Nice and simple
           </p>
           <h2
@@ -135,7 +135,7 @@ export function AboutPage() {
                 index % 2 === 0 ? "bg-blush-50/70" : "bg-cream-200/60"
               }`}
             >
-              <span className="font-display text-4xl font-semibold text-blush-200">
+              <span className="font-display text-4xl font-semibold text-blush-500">
                 <span className="sr-only">Step </span>
                 {item.step}
               </span>
@@ -163,7 +163,7 @@ export function AboutPage() {
             className="pointer-events-none absolute -top-10 -right-10 h-32 w-32 rounded-full bg-blush-200/50 blur-2xl"
           />
           <div className="relative mx-auto max-w-2xl">
-            <p className="font-display text-sm font-medium tracking-wide text-blush-500">
+            <p className="font-display text-sm font-medium tracking-wide text-blush-600">
               Good to know
             </p>
             <h2
@@ -199,7 +199,7 @@ export function AboutPage() {
         className="mx-auto max-w-5xl px-6 pb-10 text-center sm:pb-14"
       >
         <div className="mx-auto max-w-2xl">
-          <p className="font-display text-sm font-medium tracking-wide text-blush-500">
+          <p className="font-display text-sm font-medium tracking-wide text-blush-600">
             Our soft goal
           </p>
           <h2

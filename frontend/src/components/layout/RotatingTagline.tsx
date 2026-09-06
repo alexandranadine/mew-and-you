@@ -1,18 +1,35 @@
 import { useEffect, useState } from "react";
 import { brand } from "../../config/brand";
 
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)
+  );
+}
+
 export default function RotatingTagline() {
   const [index, setIndex] = useState(() =>
     Math.floor(Math.random() * brand.taglines.length),
   );
-
   const [visible, setVisible] = useState(true);
+  const [reduceMotion, setReduceMotion] = useState(prefersReducedMotion);
 
   useEffect(() => {
-    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    // Users who've asked for reduced motion still get a tagline, it just
-    // doesn't auto-change or animate — avoids distracting/flashing content.
-    if (motionQuery.matches) return;
+    const motionQuery = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    );
+    if (!motionQuery) return;
+    const onChange = () => setReduceMotion(motionQuery.matches);
+    motionQuery.addEventListener("change", onChange);
+    return () => motionQuery.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setVisible(true);
+      return;
+    }
 
     let timeoutId: number;
 
@@ -29,13 +46,17 @@ export default function RotatingTagline() {
       window.clearInterval(intervalId);
       window.clearTimeout(timeoutId);
     };
-  }, []);
+  }, [reduceMotion]);
 
   return (
     <span
-      className={`inline-block max-w-full transition-all duration-500 ease-out ${
-        visible ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
-      }`}
+      className={
+        reduceMotion
+          ? "inline-block max-w-full"
+          : `inline-block max-w-full transition-all duration-500 ease-out ${
+              visible ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
+            }`
+      }
     >
       {brand.taglines[index]}
     </span>

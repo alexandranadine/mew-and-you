@@ -61,7 +61,8 @@ describe("CatCard missing-data display", () => {
 
     expect(container.querySelector("img")).toBeNull();
     expect(screen.getByRole("heading", { name: "Miso" })).toBeInTheDocument();
-    expect(container.textContent).toContain("🐱");
+    const hidden = [...container.querySelectorAll("[aria-hidden='true']")];
+    expect(hidden.some((node) => node.textContent?.includes("🐱"))).toBe(true);
   });
 
   it("displays a friendly title-cased name for ALL-CAPS shelter names", () => {

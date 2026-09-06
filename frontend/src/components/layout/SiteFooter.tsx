@@ -10,7 +10,10 @@ export function SiteFooter() {
           rescues across {brand.serviceArea}. Always confirm availability
           directly with the organization.
         </p>
-        <p className="mt-2">🐾 Made with love for cats without homes yet.</p>
+        <p className="mt-2">
+          <span aria-hidden="true">🐾 </span>
+          Made with love for cats without homes yet.
+        </p>
         <p className="mt-3 flex flex-wrap items-center justify-center gap-x-1 gap-y-1">
           <Link
             to="/favorites"
