@@ -2,10 +2,25 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vitest/config";
 
-function siteOrigin(): string {
-  return (process.env.VITE_SITE_URL ?? "http://localhost:5173").replace(
-    /\/$/,
-    "",
+export function siteOrigin(
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  return (env.VITE_SITE_URL ?? "http://localhost:5173").replace(/\/$/, "");
+}
+
+/** Rewrite crawler-fallback absolute URLs using the build-time site origin. */
+export function transformSeoIndexHtml(html: string, origin: string): string {
+  const withAbsoluteImages = html.replaceAll(
+    'content="/images/mew-and-you-cat-peek.png"',
+    `content="${origin}/images/mew-and-you-cat-peek.png"`,
+  );
+  const withOgUrl = withAbsoluteImages.replace(
+    '<meta property="og:url" content="/" />',
+    `<meta property="og:url" content="${origin}/" />`,
+  );
+  return withOgUrl.replace(
+    "</head>",
+    `    <link rel="canonical" href="${origin}/" />\n  </head>`,
   );
 }
 
@@ -90,14 +105,7 @@ function seoStaticFiles(): Plugin {
       });
     },
     transformIndexHtml(html) {
-      const withAbsoluteImages = html.replaceAll(
-        'content="/images/mew-and-you-cat-peek.png"',
-        `content="${origin}/images/mew-and-you-cat-peek.png"`,
-      );
-      return withAbsoluteImages.replace(
-        "</head>",
-        `    <link rel="canonical" href="${origin}/" />\n  </head>`,
-      );
+      return transformSeoIndexHtml(html, origin);
     },
   };
 }

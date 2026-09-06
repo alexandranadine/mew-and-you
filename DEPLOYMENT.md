@@ -141,7 +141,7 @@ Copy [`frontend/.env.example`](frontend/.env.example).
 
 | Variable | Where | Required | Default | Notes |
 | -------- | ----- | -------- | ------- | ----- |
-| `VITE_SITE_URL` | Cloudflare Pages **build** env (Production / Preview) | **Yes** for staging/prod | `http://localhost:5173` | Public SPA origin, **no trailing slash**. Baked into `robots.txt`, `sitemap.xml`, canonical `<link>`, and Open Graph image URLs at build time. |
+| `VITE_SITE_URL` | Cloudflare Pages **build** env (Production / Preview) | **Yes** for staging/prod | `http://localhost:5173` | Public SPA origin, **no trailing slash**. Baked into `robots.txt`, `sitemap.xml`, canonical `<link>`, `og:url`, and Open Graph image URLs at build time. |
 | `API_ORIGIN` | Cloudflare Pages **runtime** env (Production / Preview) | **Yes** when using the Pages Function proxy | — | Render API origin, **no trailing slash** (e.g. `https://YOUR-SERVICE.onrender.com`). Read only by `frontend/functions/api/[[path]].ts`. Never commit the real hostname into source. |
 
 **Production build example**:
