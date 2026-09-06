@@ -10,7 +10,7 @@ export function SiteHeader() {
           className="focus-ring flex min-w-0 items-center gap-1.5 sm:gap-2"
         >
           <img
-            src="/favicon.svg"
+            src="/images/paw-logo-v2.png"
             alt=""
             aria-hidden="true"
             width={32}

@@ -100,7 +100,7 @@ export function AboutPage() {
           >
             <div className="absolute inset-x-4 inset-y-8 rounded-[3rem] bg-gradient-to-br from-blush-50 via-cream-100 to-sage-100 blur-xl sm:inset-y-10" />
             <img
-              src="/images/about-cat.png"
+              src="/images/about-cat-v2.png"
               alt=""
               width={1536}
               height={1024}

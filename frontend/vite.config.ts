@@ -17,8 +17,8 @@ export function siteOrigin(
 /** Rewrite crawler-fallback absolute URLs using the build-time site origin. */
 export function transformSeoIndexHtml(html: string, origin: string): string {
   const withAbsoluteImages = html.replaceAll(
-    'content="/images/mew-and-you-cat-peek.png"',
-    `content="${origin}/images/mew-and-you-cat-peek.png"`,
+    'content="/images/mew-and-you-cat-peek-v3.png"',
+    `content="${origin}/images/mew-and-you-cat-peek-v3.png"`,
   );
   const withOgUrl = withAbsoluteImages.replace(
     '<meta property="og:url" content="/" />',

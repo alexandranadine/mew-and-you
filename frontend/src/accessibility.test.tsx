@@ -140,7 +140,7 @@ describe("decorative imagery and status semantics", () => {
     );
 
     const peek = document.querySelector(
-      'img[src="/images/mew-and-you-cat-peek.png"]',
+      'img[src="/images/mew-and-you-cat-peek-v3.png"]',
     );
     expect(peek).toHaveAttribute("alt", "");
     expect(peek).toHaveAttribute("aria-hidden", "true");

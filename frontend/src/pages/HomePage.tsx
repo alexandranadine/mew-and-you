@@ -54,7 +54,7 @@ export function HomePage() {
 
           <div className="relative mt-40 w-full max-w-md sm:mt-60">
             <img
-              src="/images/mew-and-you-cat-peek.png"
+              src="/images/mew-and-you-cat-peek-v3.png"
               alt=""
               aria-hidden="true"
               width={1536}

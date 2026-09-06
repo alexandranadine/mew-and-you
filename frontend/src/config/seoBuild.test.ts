@@ -50,7 +50,7 @@ describe("transformSeoIndexHtml", () => {
       '<link rel="canonical" href="https://mewandyou.com/" />',
     );
     expect(html).toContain(
-      'content="https://mewandyou.com/images/mew-and-you-cat-peek.png"',
+      'content="https://mewandyou.com/images/mew-and-you-cat-peek-v3.png"',
     );
   });
 

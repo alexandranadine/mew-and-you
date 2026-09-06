@@ -3,7 +3,7 @@ import { formatCatDisplayName, hasRealDescription } from "../lib/catDisplay";
 import type { Cat } from "../types/cat";
 
 /** Default share image — the existing brand illustration in `public/`. */
-export const DEFAULT_SHARE_IMAGE_PATH = "/images/mew-and-you-cat-peek.png";
+export const DEFAULT_SHARE_IMAGE_PATH = "/images/mew-and-you-cat-peek-v3.png";
 
 export const DEFAULT_SHARE_IMAGE_ALT =
   "Illustrated calico kitten peeking over an edge, surrounded by flowers and yarn";

@@ -62,13 +62,13 @@ describe("PageMeta image preload", () => {
         title="Home"
         description="Browse adoptable cats."
         canonicalPath="/"
-        preloadImage="/images/mew-and-you-cat-peek.png"
+        preloadImage="/images/mew-and-you-cat-peek-v3.png"
       />,
     );
 
     const link = imagePreload();
     expect(link).not.toBeNull();
-    expect(link).toHaveAttribute("href", "/images/mew-and-you-cat-peek.png");
+    expect(link).toHaveAttribute("href", "/images/mew-and-you-cat-peek-v3.png");
     expect(link).toHaveAttribute("fetchpriority", "high");
   });
 
@@ -90,7 +90,7 @@ describe("PageMeta image preload", () => {
         title="Home"
         description="Browse adoptable cats."
         canonicalPath="/"
-        preloadImage="/images/mew-and-you-cat-peek.png"
+        preloadImage="/images/mew-and-you-cat-peek-v3.png"
       />,
     );
 

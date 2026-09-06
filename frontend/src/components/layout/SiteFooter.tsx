@@ -12,7 +12,7 @@ export function SiteFooter() {
         </p>
         <p className="mt-2">
           <img
-            src="/favicon.svg"
+            src="/images/paw-logo-v2.png"
             alt=""
             aria-hidden="true"
             width={32}
