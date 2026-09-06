@@ -4,6 +4,7 @@ import { PawDivider } from "../components/decorative/PawDivider";
 import { SearchForm } from "../components/search/SearchForm";
 import { brand } from "../config/brand";
 import {
+  DEFAULT_SHARE_IMAGE_PATH,
   getSiteOrigin,
   homeSeo,
   websiteJsonLd,
@@ -24,6 +25,7 @@ export function HomePage() {
         title={homeSeo.title}
         description={homeSeo.description}
         canonicalPath={homeSeo.canonicalPath}
+        preloadImage={DEFAULT_SHARE_IMAGE_PATH}
         jsonLd={websiteJsonLd(getSiteOrigin())}
       />
       <section className="relative overflow-hidden px-4 pt-14 pb-8 sm:px-6 sm:pt-24">

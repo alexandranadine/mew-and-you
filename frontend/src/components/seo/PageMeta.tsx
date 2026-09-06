@@ -8,6 +8,7 @@ import {
 import { brand } from "../../config/brand";
 
 const JSON_LD_SCRIPT_ID = "page-json-ld";
+const ROUTE_IMAGE_PRELOAD_ID = "route-image-preload";
 
 export interface PageMetaProps {
   title: string;
@@ -16,6 +17,8 @@ export interface PageMetaProps {
   robots?: string;
   image?: string;
   imageAlt?: string;
+  /** When set, injects a high-priority image preload for this route only. */
+  preloadImage?: string;
   jsonLd?: Record<string, unknown> | null;
 }
 
@@ -61,6 +64,25 @@ function upsertJsonLd(data: Record<string, unknown> | null | undefined) {
   if (!existing) document.head.appendChild(script);
 }
 
+function syncImagePreload(href: string | undefined) {
+  const existing = document.getElementById(ROUTE_IMAGE_PRELOAD_ID);
+  if (!href) {
+    existing?.remove();
+    return;
+  }
+
+  const link =
+    existing instanceof HTMLLinkElement
+      ? existing
+      : document.createElement("link");
+  link.id = ROUTE_IMAGE_PRELOAD_ID;
+  link.rel = "preload";
+  link.as = "image";
+  link.href = href;
+  link.setAttribute("fetchpriority", "high");
+  if (!existing) document.head.appendChild(link);
+}
+
 /** Sets document title and social/SEO tags for the current route. Renders nothing. */
 export function PageMeta({
   title,
@@ -69,6 +91,7 @@ export function PageMeta({
   robots = "index, follow",
   image,
   imageAlt,
+  preloadImage,
   jsonLd,
 }: PageMetaProps) {
   const jsonLdKey = jsonLd ? JSON.stringify(jsonLd) : "";
@@ -104,6 +127,11 @@ export function PageMeta({
     upsertMeta("name", "twitter:image:alt", alt);
 
     upsertJsonLd(parsedJsonLd);
+    syncImagePreload(preloadImage);
+
+    return () => {
+      if (preloadImage) syncImagePreload(undefined);
+    };
   }, [
     title,
     description,
@@ -111,6 +139,7 @@ export function PageMeta({
     robots,
     image,
     imageAlt,
+    preloadImage,
     jsonLdKey,
   ]);
 
