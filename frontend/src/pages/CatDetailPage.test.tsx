@@ -406,3 +406,104 @@ describe("CatDetailPage sparse listing and favorites", () => {
     ).toHaveAttribute("aria-pressed", "true");
   });
 });
+
+function renderDetailFetch(
+  catId: string,
+  response: { ok: boolean; status: number; json?: () => Promise<unknown> },
+  search = "",
+) {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, gcTime: 0 },
+    },
+  });
+
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response));
+
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={[`/cats/${catId}${search}`]}>
+        <Routes>
+          <Route path="/cats/:catId" element={<CatDetailPage />} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
+describe("CatDetailPage load failure and missing listing", () => {
+  it("shows a fixed generic error without raw query or library text", async () => {
+    renderDetailFetch("rescuegroups:999999999999", {
+      ok: false,
+      status: 500,
+      json: async () => ({
+        error: {
+          message: '["cats","detail","rescuegroups:999999999999"] data is undefined',
+        },
+      }),
+    });
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Something went wrong",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "We couldn't load this cat's details right now. Please try again, or head back to the results.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Back to search" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/data is undefined/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/rescuegroups:999999999999/i)).not.toBeInTheDocument();
+  });
+
+  it("keeps Back to results on generic failure when results context exists", async () => {
+    renderDetailFetch(
+      "broken-cat",
+      {
+        ok: false,
+        status: 503,
+        json: async () => ({ error: { message: "upstream timeout" } }),
+      },
+      "?zip=91350",
+    );
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Something went wrong",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Back to results" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/upstream timeout/i)).not.toBeInTheDocument();
+  });
+
+  it("uses the distinct missing-listing state for API 404", async () => {
+    renderDetailFetch("gone-cat", { ok: false, status: 404 });
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "We couldn't find this cat",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "This listing may have been removed or the cat may no longer be available.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Back to search" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/data is undefined/i)).not.toBeInTheDocument();
+  });
+});

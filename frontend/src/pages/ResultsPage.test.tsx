@@ -363,3 +363,25 @@ describe("ResultsPage loading layout and image priority", () => {
     expect(images[2]).not.toHaveAttribute("fetchpriority");
   });
 });
+
+describe("ResultsPage API error state", () => {
+  it("shows fixed error copy without raw fetch or library messages", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new TypeError("Failed to fetch")),
+    );
+
+    renderResults("/cats?zip=91350&radius=25");
+
+    expect(
+      await screen.findByRole("heading", { name: "Something went wrong" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "We couldn't load the cats right now. Please try again in a moment.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
+    expect(screen.queryByText(/Failed to fetch/i)).not.toBeInTheDocument();
+  });
+});

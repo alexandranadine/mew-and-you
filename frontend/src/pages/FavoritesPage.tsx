@@ -64,7 +64,7 @@ export function FavoritesPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-semibold text-mauve-700">Favorites</h1>
         <p className="mt-1 text-mauve-400">
-          Cats you&apos;ve saved on this device. Favorites stay here until you
+          Cats you&apos;ve saved on this device. They&apos;ll stay here until you
           remove them.
         </p>
       </div>

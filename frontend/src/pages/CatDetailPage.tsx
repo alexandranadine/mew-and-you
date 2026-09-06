@@ -37,7 +37,7 @@ export function CatDetailPage() {
   const { catId } = useParams<{ catId: string }>();
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const { data: cat, isPending, isError, error, refetch, isFetching } =
+  const { data: cat, isPending, isError, refetch, isFetching } =
     useCatDetail(catId);
   const [galleryCatId, setGalleryCatId] = useState(catId);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
@@ -127,11 +127,7 @@ export function CatDetailPage() {
           headingLevel={1}
           icon="⚠️"
           title="Something went wrong"
-          message={
-            error instanceof Error
-              ? error.message
-              : "We couldn't load this cat's profile. Please try again."
-          }
+          message="We couldn't load this cat's details right now. Please try again, or head back to the results."
         >
           <button
             type="button"
@@ -162,8 +158,8 @@ export function CatDetailPage() {
         <SearchStateCard
           headingLevel={1}
           icon="🙀"
-          title="We couldn't find that cat"
-          message="This listing may have been adopted already, or the link might be incorrect."
+          title="We couldn't find this cat"
+          message="This listing may have been removed or the cat may no longer be available."
         >
           <Link to={backHref} state={backState} className="btn-primary">
             {hasResultsContext ? "Back to results" : "Back to search"}

@@ -61,7 +61,6 @@ export function ResultsPage() {
     data,
     isPending,
     isError,
-    error,
     refetch,
     isFetching,
     isPlaceholderData,
@@ -352,11 +351,7 @@ export function ResultsPage() {
         <SearchStateCard
           icon="⚠️"
           title="Something went wrong"
-          message={
-            error instanceof Error
-              ? error.message
-              : "We couldn't load cats for this search. Please try again."
-          }
+          message="We couldn't load the cats right now. Please try again in a moment."
         >
           <button
             type="button"
