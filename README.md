@@ -1,52 +1,101 @@
 # Mew & You
 
-A web app for finding adoptable cats in Los Angeles County, aggregated from
-shelter and rescue data sources.
+**Live site:** [https://mewandyou.com](https://mewandyou.com)
 
-> The name "Mew & You" is a placeholder brand — see
-> [`frontend/src/config/brand.ts`](frontend/src/config/brand.ts) to re-skin it.
+A cat-only adoption discovery app that brings adoptable cats from Los Angeles
+County shelters and rescues together in one place.
 
-## Project structure
+![Mew & You home page on desktop](docs/screenshots/home-desktop.png)
+
+## Features
+
+- **ZIP + radius search** — find cats near a 5-digit ZIP within a chosen mile
+  radius
+- **Live shelter & rescue listings** — data from [RescueGroups](https://rescuegroups.org/),
+  normalized into one shared `Cat` model
+- **Distance-aware results** — listings include distance from the search ZIP;
+  default sort is closest first
+- **Filters & sorting** — age, sex, size, and organization, plus sort by
+  distance or name
+- **Cat detail pages** — profiles with photo galleries, traits, and links back
+  to the listing organization
+- **Favorites** — save cats on-device via `localStorage` (no account required)
+- **Responsive layout** — built for mobile, tablet, and desktop browsing
+- **Accessibility** — labeled forms, pressed-state controls, focus styles, and
+  live-region feedback where it matters
+- **SEO & social metadata** — page titles/descriptions, Open Graph / Twitter
+  tags, canonical URLs, JSON-LD, plus build-time `robots.txt` and `sitemap.xml`
+- **Frontend security headers** — HSTS, CSP, framing controls, and related
+  headers via Cloudflare Pages `_headers`
+
+## Responsive design
+
+<table>
+  <tr>
+    <td width="55%">
+      <img src="docs/screenshots/home-tablet.png" alt="Mew & You home page on tablet" />
+    </td>
+    <td width="45%">
+      <img src="docs/screenshots/home-mobile.png" alt="Mew & You home page on mobile" />
+    </td>
+  </tr>
+</table>
+
+## How it works
+
+```
+Browser  →  Cloudflare Pages (React SPA)
+              ├─ static assets + SPA routes
+              └─ /api/*  →  Pages Function proxy  →  Render (Express API)
+                                                      └─ RescueGroups
+```
+
+The frontend always calls same-origin `/api/*`. Locally, Vite proxies those
+requests to the API. In production, Cloudflare Pages serves the SPA and a
+Pages Function forwards `/api/*` to the Node/Express backend on Render, which
+maps RescueGroups animals into the shared `Cat` model the UI already expects.
 
 ```
 mew-and-you/
-├─ frontend/   React + Vite + TypeScript + Tailwind CSS UI
-└─ api/        Node.js + Express + TypeScript backend (wraps RescueGroups.org)
+├─ frontend/   React + Vite SPA (Cloudflare Pages)
+└─ api/        Express API (Render)
 ```
 
-The frontend never talks to shelter/rescue APIs directly — it only calls our
-own backend, which normalizes every source into one shared `Cat` model.
+## Tech stack
 
-## Status
-
-- [x] Frontend scaffold (Vite + React + TS + Tailwind, React Router, TanStack Query)
-- [x] Shared `Cat` types, mock data, routing skeleton
-- [x] Home / search page
-- [x] Results page (filters, sort, distance) + cat detail page
-- [x] Backend (Express + TS) with a RescueGroups adapter
-- [ ] Additional source adapters
-- [ ] Favorites, auth, persistence
+| Layer | Stack |
+| ----- | ----- |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS, React Router, TanStack Query |
+| Backend | Node.js, Express, TypeScript |
+| Data | RescueGroups adoptable-pet API (with a local mock provider for development) |
+| Hosting | Cloudflare Pages (frontend + `/api` proxy) · Render (API) |
 
 ## Running locally
 
-Two servers, two terminals:
+Two terminals:
 
-```
+```bash
 cd api
 npm install
-cp .env.example .env   # add your RESCUEGROUPS_API_KEY
-npm run dev             # http://localhost:3001
+cp .env.example .env   # add RESCUEGROUPS_API_KEY if using live data
+npm run dev            # http://localhost:3001
 ```
 
-```
+```bash
 cd frontend
 npm install
-npm run dev             # http://localhost:5173, proxies /api/* to the backend above
+npm run dev            # http://localhost:5173 — proxies /api/* to the API
 ```
 
-See [`api/README.md`](api/README.md) and [`frontend/README.md`](frontend/README.md) for details.
+By default the API uses `DATA_PROVIDER=mock` (no key required). Set
+`DATA_PROVIDER=rescuegroups` and `RESCUEGROUPS_API_KEY` for live listings.
+
+More detail: [`api/README.md`](api/README.md) · [`frontend/README.md`](frontend/README.md)
 
 ## Deployment
 
-See [`DEPLOYMENT.md`](DEPLOYMENT.md) for staging/production build commands,
-environment variables, SPA routing, API proxying, and CORS configuration.
+Production: **Cloudflare Pages** for the frontend, **Render** for the API, with
+same-origin `/api/*` preserved by a Pages Function.
+
+See [`DEPLOYMENT.md`](DEPLOYMENT.md) for build commands, environment variables,
+SPA routing, the API proxy, and CORS.
