@@ -42,14 +42,39 @@ describe("errorHandler", () => {
     expect(res404.status).toHaveBeenCalledWith(404);
     const body404 = res404.json.mock.calls[0][0];
     expect(body404.error.code).toBe("not_found");
+    expect(body404.error.message).toBe("The requested cat was not found.");
     expect(JSON.stringify(body404)).not.toContain("should-not-leak");
 
     const res429 = makeRes();
     errorHandler(new RescueGroupsApiError("slow down", 429), req, res429, next);
     expect(res429.status).toHaveBeenCalledWith(429);
     expect(res429.json).toHaveBeenCalledWith({
-      error: { code: "rescuegroups_rate_limited", message: "slow down" },
+      error: {
+        code: "rescuegroups_rate_limited",
+        message: "Too many requests right now. Please try again shortly.",
+      },
     });
+  });
+
+  it("never leaks RescueGroups operator messages or env var names to the client", () => {
+    const res = makeRes();
+    errorHandler(
+      new RescueGroupsApiError(
+        "RescueGroups returned an empty response. Check that RESCUEGROUPS_API_KEY is valid.",
+        502,
+      ),
+      req,
+      res,
+      next,
+    );
+
+    expect(res.status).toHaveBeenCalledWith(502);
+    const body = res.json.mock.calls[0][0];
+    expect(body.error.code).toBe("rescuegroups_error");
+    expect(body.error.message).toBe(
+      "Cat listings are temporarily unavailable. Please try again shortly.",
+    );
+    expect(JSON.stringify(body)).not.toContain("RESCUEGROUPS_API_KEY");
   });
 
   it("never leaks a raw/unexpected error's message or stack to the client", () => {

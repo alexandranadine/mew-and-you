@@ -1,11 +1,9 @@
 /**
  * Same-origin /api/* reverse proxy for Cloudflare Pages.
  *
- * Forwards to the Render Express API. Keep this origin in sync with the
- * deployed API service hostname (Pages dashboard API_ORIGIN is not required).
+ * Forwards to the Render Express API. Set API_ORIGIN in the Pages dashboard
+ * (Production / Preview runtime env). Do not commit the real hostname.
  */
-
-const API_ORIGIN = "https://mew-and-you-api.onrender.com";
 
 const HOP_BY_HOP_HEADERS = new Set([
   "connection",
@@ -17,6 +15,29 @@ const HOP_BY_HOP_HEADERS = new Set([
   "transfer-encoding",
   "upgrade",
 ]);
+
+interface PagesEnv {
+  API_ORIGIN?: string;
+}
+
+function resolveApiOrigin(env: PagesEnv | undefined): string | null {
+  const raw = env?.API_ORIGIN?.trim();
+  if (!raw) return null;
+  const origin = raw.replace(/\/$/, "");
+  if (!/^https?:\/\//i.test(origin)) return null;
+  try {
+    return new URL(origin).origin;
+  } catch {
+    return null;
+  }
+}
+
+function jsonError(status: number, code: string, message: string): Response {
+  return new Response(JSON.stringify({ error: { code, message } }), {
+    status,
+    headers: { "Content-Type": "application/json; charset=utf-8" },
+  });
+}
 
 function proxyRequestHeaders(request: Request, targetOrigin: string): Headers {
   const headers = new Headers();
@@ -45,19 +66,39 @@ function proxyRequestHeaders(request: Request, targetOrigin: string): Headers {
   return headers;
 }
 
-export async function onRequest(context: EventContext): Promise<Response> {
+export async function onRequest(context: {
+  request: Request;
+  env: PagesEnv;
+}): Promise<Response> {
+  const apiOrigin = resolveApiOrigin(context.env);
+  if (!apiOrigin) {
+    return jsonError(
+      503,
+      "api_proxy_not_configured",
+      "The API proxy is not configured. Set API_ORIGIN in the Cloudflare Pages environment.",
+    );
+  }
+
   const incoming = new URL(context.request.url);
-  const target = new URL(incoming.pathname + incoming.search, API_ORIGIN);
+  const target = new URL(incoming.pathname + incoming.search, apiOrigin);
 
   const method = context.request.method;
   const hasBody = method !== "GET" && method !== "HEAD";
 
-  return fetch(
-    new Request(target.toString(), {
-      method,
-      headers: proxyRequestHeaders(context.request, API_ORIGIN),
-      body: hasBody ? context.request.body : undefined,
-      redirect: "manual",
-    }),
-  );
+  try {
+    return await fetch(
+      new Request(target.toString(), {
+        method,
+        headers: proxyRequestHeaders(context.request, apiOrigin),
+        body: hasBody ? context.request.body : undefined,
+        redirect: "manual",
+      }),
+    );
+  } catch {
+    return jsonError(
+      502,
+      "api_proxy_upstream_unavailable",
+      "The API is temporarily unavailable. Please try again shortly.",
+    );
+  }
 }

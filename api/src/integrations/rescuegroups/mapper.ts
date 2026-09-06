@@ -110,6 +110,20 @@ function capitalize(value: string): string {
   return value.length ? value[0].toUpperCase() + value.slice(1) : value;
 }
 
+/** Obvious kennel/system placeholder bios — treat as missing, not real copy. */
+const PLACEHOLDER_DESCRIPTION_PATTERN = /^placeholder(?:\s+for\b.*)?$/i;
+
+function mapDescription(
+  text: string | null | undefined,
+  html: string | null | undefined,
+): string {
+  const cleaned = cleanText(text) || cleanText(html);
+  if (!cleaned || PLACEHOLDER_DESCRIPTION_PATTERN.test(cleaned)) {
+    return "No description provided yet.";
+  }
+  return cleaned;
+}
+
 function buildBreedLabel(attrs: RgAnimalResource["attributes"]): string {
   const primary = attrs.breedPrimary?.trim();
   if (primary) {
@@ -299,16 +313,13 @@ export function mapRescueGroupsAnimal(
   return {
     id: `rescuegroups:${animal.id}`,
     source: "rescuegroups",
-    name: attrs.name?.trim() || "Unnamed cat",
+    name: cleanText(attrs.name) || "Unnamed cat",
     breed: buildBreedLabel(attrs),
     age,
     ageGroup,
     sex: mapSex(attrs.sex),
     size: mapSize(attrs.sizeGroup),
-    description:
-      cleanText(attrs.descriptionText) ||
-      cleanText(attrs.descriptionHtml) ||
-      "No description provided yet.",
+    description: mapDescription(attrs.descriptionText, attrs.descriptionHtml),
     photos,
     organization,
     location: { zip, city, state, lat, lng },
@@ -317,6 +328,7 @@ export function mapRescueGroupsAnimal(
       goodWithCats: boolOrUndefined(attrs.isCatsOk),
       goodWithChildren: boolOrUndefined(attrs.isKidsOk),
       houseTrained: boolOrUndefined(attrs.isHousetrained),
+      spayedNeutered: boolOrUndefined(attrs.isAltered),
     },
     adoptionUrl: adoption.url,
     adoptionUrlSource: adoption.source,

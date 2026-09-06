@@ -4,6 +4,21 @@ import { ApiError } from "../lib/errors";
 import { logger } from "../lib/logger";
 
 /**
+ * Safe, user-facing copy for RescueGroups failures. Operator/detail messages
+ * stay in server logs only — never echo env var names, auth hints, or upstream
+ * error payloads to the browser.
+ */
+function clientMessageForRescueGroupsError(err: RescueGroupsApiError): string {
+  if (err.status === 404) {
+    return "The requested cat was not found.";
+  }
+  if (err.status === 429) {
+    return "Too many requests right now. Please try again shortly.";
+  }
+  return "Cat listings are temporarily unavailable. Please try again shortly.";
+}
+
+/**
  * Central error handler. Client responses only ever contain a safe `code` +
  * `message` — never stack traces, provider internals, or raw upstream
  * error bodies. Full detail (for debugging) goes to server-side logs only.
@@ -41,7 +56,9 @@ export function errorHandler(
       message: err.message,
       details: err.details,
     });
-    res.status(err.status).json({ error: { code, message: err.message } });
+    res.status(err.status).json({
+      error: { code, message: clientMessageForRescueGroupsError(err) },
+    });
     return;
   }
 

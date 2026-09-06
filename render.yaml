@@ -1,8 +1,13 @@
 # Render Blueprint — API staging only (Free tier).
 # See DEPLOYMENT.md for env var details and frontend routing (not configured here).
+#
+# DATA_PROVIDER and RESCUEGROUPS_API_KEY use sync: false so a Blueprint sync
+# cannot silently reset a live RescueGroups deploy back to mock (or wipe the key).
+# Set both in the Render dashboard for production:
+#   DATA_PROVIDER=rescuegroups
+#   RESCUEGROUPS_API_KEY=<server-side key only>
 # Set CORS_ORIGIN in the Render dashboard to the Cloudflare Pages SPA origin, e.g.
 #   CORS_ORIGIN=https://mew-and-you.pages.dev
-# (sync: false — value is not stored in this file.)
 services:
   - type: web
     name: mew-and-you-api-staging
@@ -16,7 +21,9 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATA_PROVIDER
-        value: mock
+        sync: false
+      - key: RESCUEGROUPS_API_KEY
+        sync: false
       - key: TRUST_PROXY
         value: "true"
       - key: CORS_ORIGIN

@@ -29,6 +29,7 @@ export interface SearchAvailableCatsParams {
 
 function assertApiKeyConfigured(): string {
   if (!env.rescueGroupsApiKey) {
+    // Message is for server logs / operators; errorHandler maps a safe client copy.
     throw new RescueGroupsApiError(
       "RescueGroups API key is not configured on the server. Set RESCUEGROUPS_API_KEY (see .env.example).",
       500,
@@ -108,6 +109,7 @@ async function rescueGroupsFetch<T>(
   // letting response.json() throw a SyntaxError into the generic 500 path.
   const rawBody = await response.text();
   if (!rawBody.trim()) {
+    // Likely auth failure (invalid key); keep operator detail in logs only.
     throw new RescueGroupsApiError(
       "RescueGroups returned an empty response. Check that RESCUEGROUPS_API_KEY is valid.",
       502,
@@ -201,6 +203,7 @@ const ANIMAL_DETAIL_FIELDS = [
   "isCatsOk",
   "isKidsOk",
   "isHousetrained",
+  "isAltered",
 ].join(",");
 
 /** Org fields the mapper needs for location + adoption CTA fallbacks. */

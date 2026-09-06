@@ -100,23 +100,28 @@ Copy [`api/.env.example`](api/.env.example) as a starting point.
 | `RATE_LIMIT_WINDOW_MS` | No | `900000` (15 min) | Rate-limit window for `/api/cats*`. |
 | `RATE_LIMIT_MAX` | No | `100` | Max requests per IP per window on `/api/cats*`. |
 
-**Production / staging on Render** (mock data, no RescueGroups key):
-
-```env
-NODE_ENV=production
-PORT=3001
-DATA_PROVIDER=mock
-CORS_ORIGIN=https://mew-and-you.pages.dev
-TRUST_PROXY=true
-```
-
-**Production / staging on Render** (live RescueGroups data):
+**Production / staging on Render** (live RescueGroups data — recommended for launch):
 
 ```env
 NODE_ENV=production
 PORT=3001
 DATA_PROVIDER=rescuegroups
 RESCUEGROUPS_API_KEY=<your-key>
+CORS_ORIGIN=https://mew-and-you.pages.dev
+TRUST_PROXY=true
+```
+
+`DATA_PROVIDER` and `RESCUEGROUPS_API_KEY` are declared in
+[`render.yaml`](render.yaml) with `sync: false` so a Blueprint sync cannot
+silently reset a live site back to mock or wipe the key. Set both in the
+Render dashboard (never commit the real key).
+
+**Local / optional mock on Render** (no RescueGroups key):
+
+```env
+NODE_ENV=production
+PORT=3001
+DATA_PROVIDER=mock
 CORS_ORIGIN=https://mew-and-you.pages.dev
 TRUST_PROXY=true
 ```
@@ -250,9 +255,12 @@ Both return a JSON liveness response and are **not** rate-limited.
 - [ ] `NODE_ENV=production` on the Render API service
 - [ ] Render `CORS_ORIGIN=https://mew-and-you.pages.dev` (plus any Preview origins)
 - [ ] `TRUST_PROXY=true` on Render (already in `render.yaml`)
-- [ ] `DATA_PROVIDER` and `RESCUEGROUPS_API_KEY` set appropriately
+- [ ] `DATA_PROVIDER` and `RESCUEGROUPS_API_KEY` set in the Render dashboard
+      (`sync: false` in `render.yaml` — Blueprint sync will not overwrite them;
+      use `rescuegroups` + key for live launch data)
 - [ ] Cloudflare Pages build env: `VITE_SITE_URL=https://mew-and-you.pages.dev`
 - [ ] Cloudflare Pages runtime env: `API_ORIGIN=https://YOUR-SERVICE.onrender.com`
+      (required — missing/invalid origin returns 503 `api_proxy_not_configured`)
 - [ ] `frontend/public/_headers` present in the deploy artifact (tracked in git)
 - [ ] `npm run build` + `npm run test` (API) and `npm run build` / `npm run lint` (frontend) succeed
 - [ ] Smoke test: home page loads, `/api/health` via Pages, search returns cats, direct URL to `/cats/:id` works on refresh

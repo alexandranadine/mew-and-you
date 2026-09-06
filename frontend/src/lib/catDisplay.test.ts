@@ -55,6 +55,11 @@ describe("hasRealDescription", () => {
     expect(hasRealDescription("no description provided yet")).toBe(false);
   });
 
+  it("treats obvious Placeholder for… bios as missing", () => {
+    expect(hasRealDescription("Placeholder for Willy")).toBe(false);
+    expect(hasRealDescription("Placeholder")).toBe(false);
+  });
+
   it("keeps real bios", () => {
     expect(hasRealDescription("Loves laser pointers.")).toBe(true);
   });

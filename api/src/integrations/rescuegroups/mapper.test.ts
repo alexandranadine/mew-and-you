@@ -110,6 +110,7 @@ describe("mapRescueGroupsAnimal", () => {
       goodWithCats: true,
       goodWithChildren: true,
       houseTrained: true,
+      spayedNeutered: undefined,
     });
     expect(cat.adoptionUrl).toBe("https://example.org/sunset-paws");
     expect(cat.adoptionUrlSource).toBe("organizationWebsite");
@@ -395,6 +396,48 @@ describe("mapRescueGroupsAnimal", () => {
 
     expect(cat.ageGroup).toBe("young");
     expect(cat.size).toBe("large");
+  });
+
+  it("maps isAltered to spayedNeutered", () => {
+    const altered = mapRescueGroupsAnimal(
+      makeAnimal({ attributes: { isAltered: true } }),
+      fullIncluded,
+    );
+    const intact = mapRescueGroupsAnimal(
+      makeAnimal({ attributes: { isAltered: false } }),
+      fullIncluded,
+    );
+    const missing = mapRescueGroupsAnimal(
+      makeAnimal({ attributes: { isAltered: null } }),
+      fullIncluded,
+    );
+
+    expect(altered.traits.spayedNeutered).toBe(true);
+    expect(intact.traits.spayedNeutered).toBe(false);
+    expect(missing.traits.spayedNeutered).toBeUndefined();
+  });
+
+  it("collapses unusual whitespace in names", () => {
+    const cat = mapRescueGroupsAnimal(
+      makeAnimal({ attributes: { name: "  Rooty\n\tTooty  " } }),
+      fullIncluded,
+    );
+
+    expect(cat.name).toBe("Rooty Tooty");
+  });
+
+  it("treats Placeholder for… descriptions as missing bio", () => {
+    const placeholder = mapRescueGroupsAnimal(
+      makeAnimal({ attributes: { descriptionText: "Placeholder for Willy" } }),
+      fullIncluded,
+    );
+    const bare = mapRescueGroupsAnimal(
+      makeAnimal({ attributes: { descriptionText: "Placeholder" } }),
+      fullIncluded,
+    );
+
+    expect(placeholder.description).toBe("No description provided yet.");
+    expect(bare.description).toBe("No description provided yet.");
   });
 
   it("uses descriptionHtml when descriptionText is missing", () => {

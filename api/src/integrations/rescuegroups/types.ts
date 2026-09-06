@@ -33,6 +33,8 @@ export interface RgAnimalAttributes {
   isCatsOk?: boolean | null;
   isKidsOk?: boolean | null;
   isHousetrained?: boolean | null;
+  /** Spayed / neutered (RescueGroups animal attribute). */
+  isAltered?: boolean | null;
 }
 
 export interface RgAnimalResource {

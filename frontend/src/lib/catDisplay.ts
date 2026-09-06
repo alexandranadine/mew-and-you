@@ -4,6 +4,9 @@ import type { Cat, CatSex, CatSize } from "../types/cat";
 /** Backend mapper placeholder — treat as missing on the client. */
 const EMPTY_DESCRIPTION_PATTERN = /^no description provided yet\.?$/i;
 
+/** Obvious kennel/system placeholder bios that occasionally leak upstream. */
+const PLACEHOLDER_DESCRIPTION_PATTERN = /^placeholder(?:\s+for\b.*)?$/i;
+
 /** Kennel / shelter ID style values (e.g. A1928701) — leave unchanged. */
 const KENNEL_ID_PATTERN = /^[A-Z]{1,3}\d{3,}[A-Z0-9]*$/i;
 
@@ -26,7 +29,9 @@ export function isKennelIdName(name: string): boolean {
 export function hasRealDescription(description: string): boolean {
   const trimmed = description.replace(/\s+/g, " ").trim();
   if (!trimmed) return false;
-  return !EMPTY_DESCRIPTION_PATTERN.test(trimmed);
+  if (EMPTY_DESCRIPTION_PATTERN.test(trimmed)) return false;
+  if (PLACEHOLDER_DESCRIPTION_PATTERN.test(trimmed)) return false;
+  return true;
 }
 
 /**
