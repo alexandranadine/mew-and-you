@@ -1,5 +1,18 @@
-# Cloudflare Pages custom headers for cache-friendly static assets.
+# Cloudflare Pages custom headers.
 # https://developers.cloudflare.com/pages/configuration/headers/
+#
+# Security headers apply to static asset responses (including the SPA shell).
+# Pages Functions (/api/*) are not covered by this file; the SPA talks to them
+# same-origin via connect-src 'self'.
+
+# --- Production security headers (all static routes / SPA documents) ---
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://cdn.rescuegroups.org; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
 
 # Vite emits content-hashed filenames under /assets — safe to cache forever.
 /assets/*
