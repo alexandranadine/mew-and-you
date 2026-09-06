@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { CatCard } from "../components/cats/CatCard";
 import { CatCardSkeleton } from "../components/cats/CatCardSkeleton";
 import {
@@ -10,6 +10,14 @@ import { SearchStateCard } from "../components/cats/SearchStateCard";
 import { PageMeta } from "../components/seo/PageMeta";
 import { useCatsSearch } from "../hooks/useCatsSearch";
 import { filterCats, hasActiveFilters } from "../lib/catFilters";
+import {
+  clampRestoredVisibleCount,
+  isResultsBrowsingForSearch,
+  REVEAL_PAGE_SIZE,
+  type CatDetailLocationState,
+  type ResultsBrowsingState,
+  type ResultsLocationState,
+} from "../lib/resultsBrowsing";
 import { sortCats } from "../lib/catSort";
 import {
   formatResultsHeadline,
@@ -24,9 +32,6 @@ import {
 } from "../lib/searchParams";
 import { invalidSearchSeo, searchSeo } from "../config/seo";
 import type { CatSearchQuery } from "../types/search";
-
-/** How many result cards to mount at once (client-side reveal only). */
-const REVEAL_PAGE_SIZE = 24;
 
 /** Identity for ZIP / radius / filters — sort changes do not reset reveal. */
 export function revealResetKeyForQuery(query: CatSearchQuery | undefined): string {
@@ -43,6 +48,8 @@ export function revealResetKeyForQuery(query: CatSearchQuery | undefined): strin
 
 export function ResultsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const searchKey = searchParams.toString();
   const parsed = useMemo(
     () => parseCatSearchParams(new URLSearchParams(searchKey)),
@@ -81,23 +88,102 @@ export function ResultsPage() {
     return sortCats(filtered, query.sort);
   }, [data, query]);
 
+  // Capture matching restore payload once per mount; keyed to this search URL.
+  const restoreRef = useRef<ResultsBrowsingState | null>(null);
+  if (restoreRef.current === null) {
+    const candidate = (location.state as ResultsLocationState | null)
+      ?.resultsBrowsing;
+    if (isResultsBrowsingForSearch(candidate, searchKey)) {
+      restoreRef.current = candidate;
+    }
+  }
+  const pendingRestore = restoreRef.current;
+
   const revealResetKey = revealResetKeyForQuery(query);
-  const [visibleCount, setVisibleCount] = useState(REVEAL_PAGE_SIZE);
+  const [visibleCount, setVisibleCount] = useState(() =>
+    pendingRestore?.visibleCount ?? REVEAL_PAGE_SIZE,
+  );
   const [prevRevealResetKey, setPrevRevealResetKey] = useState(revealResetKey);
+  const scrollRestoreDoneRef = useRef(false);
+  const browsingStateClearedRef = useRef(false);
 
   // Reset progressive reveal when ZIP, radius, or filters change (not sort).
+  // A keyed restore from Detail/Back must not be wiped by the initial key sync.
   if (revealResetKey !== prevRevealResetKey) {
     setPrevRevealResetKey(revealResetKey);
-    setVisibleCount(REVEAL_PAGE_SIZE);
+    if (!pendingRestore || pendingRestore.searchKey !== searchKey) {
+      setVisibleCount(REVEAL_PAGE_SIZE);
+    }
+    // Stale restore for a different search context must not apply.
+    if (pendingRestore && pendingRestore.searchKey !== searchKey) {
+      restoreRef.current = null;
+    }
   }
 
   const revealedCount = Math.min(visibleCount, matchedCats.length);
   const revealedCats = matchedCats.slice(0, revealedCount);
   const hasMoreToReveal = revealedCount < matchedCats.length;
+  const showInitialLoading = isPending && !data;
+
+  // Clamp reveal + restore scroll once result content is available.
+  useLayoutEffect(() => {
+    if (!pendingRestore) return;
+    if (pendingRestore.searchKey !== searchKey) return;
+    if (showInitialLoading) return;
+    if (scrollRestoreDoneRef.current) return;
+
+    scrollRestoreDoneRef.current = true;
+    setVisibleCount((count) =>
+      clampRestoredVisibleCount(count, matchedCats.length),
+    );
+
+    const y = pendingRestore.scrollY;
+    if (y > 0) {
+      window.scrollTo({ top: y, left: 0, behavior: "auto" });
+    }
+
+    if (!browsingStateClearedRef.current) {
+      browsingStateClearedRef.current = true;
+      // Drop restore payload so a later in-place filter/radius replace cannot
+      // re-apply stale scroll/reveal if the page remounts with the same entry.
+      navigate(
+        { pathname: "/cats", search: searchKey ? `?${searchKey}` : "" },
+        { replace: true, state: null },
+      );
+    }
+  }, [
+    pendingRestore,
+    searchKey,
+    showInitialLoading,
+    matchedCats.length,
+    navigate,
+  ]);
 
   function updateParams(patch: Record<string, string | undefined>) {
     setSearchParams((prev) => patchSearchParams(prev, patch), {
       replace: true,
+    });
+  }
+
+  function handlePrimaryDetailNavigation(
+    detailHref: string,
+    detailState: CatDetailLocationState | undefined,
+  ) {
+    const resultsBrowsing: ResultsBrowsingState = {
+      searchKey,
+      visibleCount,
+      scrollY: window.scrollY,
+    };
+    // Stamp the Results history entry so browser Back can restore.
+    navigate(
+      { pathname: "/cats", search: searchKey ? `?${searchKey}` : "" },
+      { replace: true, state: { resultsBrowsing } satisfies ResultsLocationState },
+    );
+    navigate(detailHref, {
+      state: {
+        ...detailState,
+        resultsBrowsing,
+      } satisfies CatDetailLocationState,
     });
   }
 
@@ -150,9 +236,9 @@ export function ResultsPage() {
     updateParams({ radius: String(radiusMiles) });
   }
 
-  const detailQuery = `zip=${encodeURIComponent(activeQuery.zip)}`;
+  // Full results query string so Detail → Back reconstructs the exact URL.
+  const detailQuery = searchKey;
   const meta = searchSeo(activeQuery.zip);
-  const showInitialLoading = isPending && !data;
   const showUpdating = isFetching && isPlaceholderData;
 
   return (
@@ -288,6 +374,12 @@ export function ResultsPage() {
                 cat={cat}
                 distanceMiles={cat.distanceMiles}
                 detailQuery={detailQuery}
+                detailState={
+                  typeof cat.distanceMiles === "number"
+                    ? { distanceMiles: cat.distanceMiles }
+                    : undefined
+                }
+                onPrimaryDetailNavigation={handlePrimaryDetailNavigation}
               />
             ))}
           </div>

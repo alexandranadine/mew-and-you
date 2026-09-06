@@ -18,6 +18,11 @@ import {
   missingBioMessage,
 } from "../lib/catDisplay";
 import {
+  backHrefFromDetailSearchParams,
+  type CatDetailLocationState,
+  type ResultsLocationState,
+} from "../lib/resultsBrowsing";
+import {
   catDetailLoadingSeo,
   catDetailMissingSeo,
   catDetailSeo,
@@ -26,10 +31,6 @@ import {
   toAbsoluteUrl,
 } from "../config/seo";
 import type { Cat } from "../types/cat";
-
-interface CatDetailLocationState {
-  distanceMiles?: number;
-}
 
 export function CatDetailPage() {
   const { catId } = useParams<{ catId: string }>();
@@ -58,11 +59,17 @@ export function CatDetailPage() {
   // Distance is only known in the context of a search (passed along when
   // navigating from a results card); there's no way to recompute it here
   // without re-geocoding, so it's simply omitted otherwise.
-  const distanceMiles = (location.state as CatDetailLocationState | null)
-    ?.distanceMiles;
-  const zip = searchParams.get("zip");
-  const backHref = zip ? `/cats?zip=${encodeURIComponent(zip)}` : "/";
-  const backLabel = zip ? "← Back to results" : "← Back to search";
+  const detailState = location.state as CatDetailLocationState | null;
+  const distanceMiles = detailState?.distanceMiles;
+  const { href: backHref, hasResultsContext } =
+    backHrefFromDetailSearchParams(searchParams);
+  const backLabel = hasResultsContext
+    ? "← Back to results"
+    : "← Back to search";
+  const backState: ResultsLocationState | undefined =
+    detailState?.resultsBrowsing
+      ? { resultsBrowsing: detailState.resultsBrowsing }
+      : undefined;
 
   if (!catId) {
     const meta = catDetailMissingSeo(undefined);
@@ -131,8 +138,8 @@ export function CatDetailPage() {
           >
             {isFetching ? "Retrying…" : "Try again"}
           </button>
-          <Link to={backHref} className="btn-secondary">
-            {zip ? "Back to results" : "Back to search"}
+          <Link to={backHref} state={backState} className="btn-secondary">
+            {hasResultsContext ? "Back to results" : "Back to search"}
           </Link>
         </SearchStateCard>
       </div>
@@ -154,8 +161,8 @@ export function CatDetailPage() {
           title="We couldn't find that cat"
           message="This listing may have been adopted already, or the link might be incorrect."
         >
-          <Link to={backHref} className="btn-primary">
-            {zip ? "Back to results" : "Back to search"}
+          <Link to={backHref} state={backState} className="btn-primary">
+            {hasResultsContext ? "Back to results" : "Back to search"}
           </Link>
         </SearchStateCard>
       </div>
@@ -185,6 +192,7 @@ export function CatDetailPage() {
       />
       <Link
         to={backHref}
+        state={backState}
         className="focus-ring inline-block py-1 text-sm font-medium text-mauve-500 hover:text-mauve-700"
       >
         {backLabel}

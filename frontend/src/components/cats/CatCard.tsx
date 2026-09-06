@@ -1,4 +1,4 @@
-import { useState, type SyntheticEvent } from "react";
+import { useState, type MouseEvent, type SyntheticEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Cat } from "../../types/cat";
 import {
@@ -6,6 +6,7 @@ import {
   formatCatDisplayName,
 } from "../../lib/catDisplay";
 import { selectCatCardImage } from "../../lib/catPhoto";
+import type { CatDetailLocationState } from "../../lib/resultsBrowsing";
 import { CatTraitBadges } from "./CatTraitBadges";
 import { FavoriteButton } from "./FavoriteButton";
 
@@ -15,9 +16,35 @@ interface CatCardProps {
   distanceMiles?: number;
   /** Query string (no leading "?") to carry search context onto the detail page, e.g. "zip=91350". */
   detailQuery?: string;
+  /** Router location state for the detail page (distance + results browsing). */
+  detailState?: CatDetailLocationState;
+  /**
+   * Primary (unmodified left-click) in-app navigation. Keeps a real `href` for
+   * new-tab / modified clicks while letting Results stamp scroll/reveal state.
+   */
+  onPrimaryDetailNavigation?: (
+    detailHref: string,
+    detailState: CatDetailLocationState | undefined,
+  ) => void;
 }
 
-export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
+function isModifiedOrNonPrimaryClick(event: MouseEvent): boolean {
+  return (
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.altKey ||
+    event.shiftKey
+  );
+}
+
+export function CatCard({
+  cat,
+  distanceMiles,
+  detailQuery,
+  detailState,
+  onPrimaryDetailNavigation,
+}: CatCardProps) {
   const photo = cat.photos[0];
   const [imgCatId, setImgCatId] = useState(cat.id);
   const [failedSrcs, setFailedSrcs] = useState<Set<string>>(() => new Set());
@@ -34,6 +61,10 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
     ? `/cats/${encodeURIComponent(cat.id)}?${detailQuery}`
     : `/cats/${encodeURIComponent(cat.id)}`;
 
+  const linkState: CatDetailLocationState | undefined =
+    detailState ??
+    (typeof distanceMiles === "number" ? { distanceMiles } : undefined);
+
   const metadata = formatCatCardMetadata(cat);
   const displayName = formatCatDisplayName(cat.name);
 
@@ -42,6 +73,13 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
       event.currentTarget.currentSrc || event.currentTarget.src || image?.src;
     if (!failed) return;
     setFailedSrcs((prev) => new Set(prev).add(failed));
+  }
+
+  function handleDetailClick(event: MouseEvent<HTMLAnchorElement>) {
+    if (!onPrimaryDetailNavigation) return;
+    if (event.defaultPrevented || isModifiedOrNonPrimaryClick(event)) return;
+    event.preventDefault();
+    onPrimaryDetailNavigation(detailHref, linkState);
   }
 
   return (
@@ -53,7 +91,8 @@ export function CatCard({ cat, distanceMiles, detailQuery }: CatCardProps) {
       />
       <Link
         to={detailHref}
-        state={typeof distanceMiles === "number" ? { distanceMiles } : undefined}
+        state={linkState}
+        onClick={handleDetailClick}
         className="focus-ring flex flex-1 flex-col overflow-hidden rounded-[2rem]"
       >
         {/* Fixed aspect ratio reserves space up front so the layout doesn't shift once the image loads. */}
