@@ -8,17 +8,17 @@ const howItWorks = [
   {
     step: "1",
     title: "Enter your ZIP",
-    body: "Tell us roughly where you are so we can look nearby.",
+    body: "Tell us roughly where you are, and we'll find cats nearby.",
   },
   {
     step: "2",
-    title: "Discover cats",
-    body: "Browse listings gathered from shelters and rescues in one place.",
+    title: "Meet some cats",
+    body: "Browse adoptable cats from shelters and rescues all in one place.",
   },
   {
     step: "3",
-    title: "Adopt through them",
-    body: "When you find a match, continue with the shelter or rescue that listed them.",
+    title: "Make your move",
+    body: "Found somebody? We'll send you to the shelter or rescue that knows them best to take it from there.",
   },
 ] as const;
 
@@ -56,8 +56,8 @@ export function AboutPage() {
             About {brand.name}
           </h1>
           <p className="mt-4 max-w-lg text-lg leading-relaxed text-mauve-500">
-            A soft, simple way to find adoptable cats in {brand.serviceArea} —
-            then meet them through the people who know them best.
+            A softer, simpler way to find adoptable cats in {brand.serviceArea}{" "}
+            — and meet them through the people who know them best.
           </p>
         </div>
       </section>
@@ -79,13 +79,18 @@ export function AboutPage() {
               One cozy place to look
             </h2>
             <p className="mt-4 leading-relaxed text-mauve-500">
-              Placeholder: searching many shelter and rescue sites is a lot of
-              tabs. We gather listings so you can browse calmly, then go
-              straight to the organization when you&apos;re ready.
+              Finding a cat shouldn't mean keeping twelve shelter tabs open and
+              trying to remember which whiskered face you saw where.
             </p>
             <p className="mt-3 leading-relaxed text-mauve-500">
-              Placeholder: built for {brand.serviceArea} — local first, soft on
-              the eyes, and honest about what we are (and aren&apos;t).
+              Mew & You brings adoptable cats from shelters and rescues around{" "}
+              {brand.serviceArea} together in one place, so you can spend less
+              time searching websites and more time finding someone you can't
+              stop thinking about.
+            </p>
+            <p className="mt-4 leading-relaxed text-mauve-500">
+              Local first, easy on the eyes, and built for one very specific
+              purpose: <strong>helping you find your cat.</strong>
             </p>
           </div>
 
@@ -123,7 +128,7 @@ export function AboutPage() {
             How it works
           </h2>
           <p className="mx-auto mt-3 max-w-md text-mauve-500">
-            Three gentle steps from ZIP code to shelter door.
+            Three little steps from ZIP code to oh no, I love this one.
           </p>
         </div>
 
@@ -174,17 +179,18 @@ export function AboutPage() {
             </h2>
             <div className="mt-5 space-y-4">
               <p className="leading-relaxed text-mauve-500">
-                Placeholder: {brand.name} helps you find cats. We do not house,
-                foster, or process adoptions ourselves.
+                {brand.name} helps you find cats, but we don't house, foster, or
+                adopt them out ourselves. Every cat you see here comes from a
+                shelter or rescue responsible for their care and adoption.
               </p>
               <p className="leading-relaxed text-mauve-500">
-                Placeholder: listings come from shelters and rescues. Cats move
-                quickly — always confirm availability and next steps with the
-                organization before you visit.
+                And cats move fast. A listing can change between your morning
+                coffee and your afternoon scroll, so always check with the
+                shelter or rescue for current availability and next steps.
               </p>
               <p className="leading-relaxed text-mauve-500">
-                Placeholder: they know each cat best. When you&apos;re ready, we
-                send you to their page to continue.
+                They're the ones who know each cat's story. We're just here to
+                help you find each other.
               </p>
             </div>
           </div>
@@ -209,9 +215,12 @@ export function AboutPage() {
             More cats finding the right couches
           </h2>
           <p className="mx-auto mt-4 max-w-md leading-relaxed text-mauve-500">
-            Placeholder: make local adoption browsing a little calmer, clearer,
-            and kinder — then get out of the way so shelters and rescues can do
-            what they do best.
+            That's really it!
+          </p>
+          <p className="mx-auto mt-4 max-w-md leading-relaxed text-mauve-500">
+            Make finding adoptable cats a little calmer, a little easier, and
+            maybe even a little fun, then get out of the way and let shelters
+            and rescues do what they do best.
           </p>
         </div>
       </section>
@@ -228,7 +237,7 @@ export function AboutPage() {
           Ready to peek around?
         </h2>
         <p className="mt-3 text-mauve-500">
-          Start with a ZIP on the home page and see who&apos;s nearby.
+          Your future roommate might already be waiting.
         </p>
         <Link to="/" className="btn-primary mt-8 inline-flex">
           Find a cat
