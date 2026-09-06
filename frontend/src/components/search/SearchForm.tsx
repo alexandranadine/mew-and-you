@@ -4,7 +4,7 @@ import {
   DEFAULT_RADIUS_MILES,
   RADIUS_OPTIONS_MILES,
 } from "../../lib/searchOptions";
-import { isValidZipFormat, SAMPLE_KNOWN_ZIPS } from "../../lib/zipLookup";
+import { isValidZipFormat } from "../../lib/zipLookup";
 
 export function SearchForm() {
   const navigate = useNavigate();
@@ -55,37 +55,18 @@ export function SearchForm() {
           value={zip}
           onChange={(event) => setZip(event.target.value)}
           aria-invalid={error ? "true" : "false"}
-          aria-describedby={error ? "zip-error zip-hint" : "zip-hint"}
+          aria-describedby={error ? "zip-error" : undefined}
         />
         {/* Fixed slot so validation copy does not shove the radius/submit down. */}
         <p
           id="zip-error"
           role={error ? "alert" : undefined}
-          className={`mt-0.5 min-h-3 text-sm text-blush-600 sm:mt-1.5 sm:min-h-5 ${
+          className={`mt-1 min-h-5 text-sm text-blush-600 sm:mt-1.5 ${
             error ? "" : "invisible"
           }`}
           aria-hidden={error ? undefined : true}
         >
           {error ?? "\u00a0"}
-        </p>
-        <p id="zip-hint" className="mt-0 text-xs leading-relaxed text-mauve-400 sm:mt-0.5">
-          <span className="text-[0.6875rem] text-mauve-300">Try:</span>{" "}
-          {SAMPLE_KNOWN_ZIPS.map((sampleZip, index) => (
-            <span key={sampleZip}>
-              <button
-                type="button"
-                onClick={() => setZip(sampleZip)}
-                className="inline-flex min-h-9 items-center px-0.5 text-xs underline decoration-dotted underline-offset-2 hover:text-mauve-600 sm:px-1"
-              >
-                {sampleZip}
-              </button>
-              {index < SAMPLE_KNOWN_ZIPS.length - 1 ? (
-                <span className="mx-0.5 text-mauve-300 sm:mx-1" aria-hidden="true">
-                  ·
-                </span>
-              ) : null}
-            </span>
-          ))}
         </p>
       </div>
 
