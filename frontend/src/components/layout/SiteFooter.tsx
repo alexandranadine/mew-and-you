@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { brand } from "../../config/brand";
-import { PawIcon } from "../decorative/PawIcon";
 
 export function SiteFooter() {
   return (
@@ -12,7 +11,15 @@ export function SiteFooter() {
           directly with the organization.
         </p>
         <p className="mt-2">
-          <PawIcon className="mr-1 inline-block size-[1em] align-[-0.125em]" />
+          <img
+            src="/images/paw-icon.png"
+            alt=""
+            aria-hidden="true"
+            width={1306}
+            height={1204}
+            decoding="async"
+            className="mr-1 inline-block h-[1em] w-auto align-[-0.125em]"
+          />
           Made with love for cats without homes yet.
         </p>
         <p className="mt-3 flex flex-wrap items-center justify-center gap-x-1 gap-y-1">
