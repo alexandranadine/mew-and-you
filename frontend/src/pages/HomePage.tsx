@@ -52,13 +52,13 @@ export function HomePage() {
             {brand.description}
           </p>
 
-          <div className="relative mt-32 w-full max-w-md sm:mt-40">
+          <div className="relative mt-40 w-full max-w-md sm:mt-60">
             <img
               src="/images/mew-and-you-cat-peek.png"
               alt=""
               aria-hidden="true"
-              width={1200}
-              height={600}
+              width={1536}
+              height={1024}
               decoding="async"
               fetchPriority="high"
               className="
@@ -67,11 +67,12 @@ export function HomePage() {
                           left-1/2
                           top-0
                           z-30
-                          w-[min(300px,calc(100vw-2rem))]
+                          h-auto
+                          w-[min(21rem,calc(100vw-2rem))]
                           -translate-x-1/2
-                          -translate-y-[74.5%]
+                          -translate-y-[79%]
                           select-none
-                          sm:w-[450px]
+                          sm:w-[28rem]
                       "
             />
 
