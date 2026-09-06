@@ -74,6 +74,32 @@ describe("CatCard missing-data display", () => {
   });
 });
 
+describe("CatCard keyboard focus", () => {
+  it("keeps the primary link focusable and styles the card shell on link focus-visible", () => {
+    const { container } = renderCard();
+
+    const card = container.querySelector(".card");
+    expect(card).not.toBeNull();
+    expect(card!.className).toMatch(/has-\[a:focus-visible\]:outline/);
+    expect(card!.className).toMatch(/has-\[a:focus-visible\]:outline-mauve-400/);
+
+    const link = screen.getByRole("link", { name: /Meet Miso/i });
+    expect(link).toHaveAttribute("href", "/cats/rescuegroups%3A1");
+    expect(link.className).toMatch(/outline-none/);
+    expect(link.className).not.toMatch(/focus-ring/);
+
+    link.focus();
+    expect(link).toHaveFocus();
+
+    const favorite = screen.getByRole("button", {
+      name: /Add Miso to favorites/i,
+    });
+    expect(favorite.className).toMatch(/focus-ring/);
+    expect(card!.contains(favorite)).toBe(true);
+    expect(link.contains(favorite)).toBe(false);
+  });
+});
+
 describe("CatCard photo selection", () => {
   const thumb = "https://cdn.example.org/miso-small.jpg";
   const full = "https://cdn.example.org/miso-large.jpg";

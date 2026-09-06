@@ -83,7 +83,7 @@ export function CatCard({
   }
 
   return (
-    <div className="card group relative flex flex-col overflow-hidden rounded-[2rem] transition hover:-translate-y-1.5 hover:shadow-[0_22px_44px_-12px_rgba(95,58,77,0.38)]">
+    <div className="card group relative flex flex-col overflow-hidden rounded-[2rem] transition hover:-translate-y-1.5 hover:shadow-[0_22px_44px_-12px_rgba(95,58,77,0.38)] has-[a:focus-visible]:outline has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-mauve-400">
       <FavoriteButton
         catId={cat.id}
         catName={displayName}
@@ -93,7 +93,7 @@ export function CatCard({
         to={detailHref}
         state={linkState}
         onClick={handleDetailClick}
-        className="focus-ring flex flex-1 flex-col overflow-hidden rounded-[2rem]"
+        className="flex flex-1 flex-col overflow-hidden rounded-[2rem] outline-none"
       >
         {/* Fixed aspect ratio reserves space up front so the layout doesn't shift once the image loads. */}
         <div className="aspect-[4/3] w-full overflow-hidden bg-blush-100">
