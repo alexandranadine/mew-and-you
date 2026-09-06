@@ -36,11 +36,11 @@ export function SearchForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="card flex flex-col gap-4 p-5 text-left sm:p-8"
+      className="card flex flex-col gap-3 p-4 text-left sm:gap-4 sm:p-8"
       noValidate
     >
       <div>
-        <label htmlFor="zip" className="field-label">
+        <label htmlFor="zip" className="field-label mb-1 sm:mb-1.5">
           ZIP code
         </label>
         <input
@@ -61,7 +61,7 @@ export function SearchForm() {
         <p
           id="zip-error"
           role={error ? "alert" : undefined}
-          className={`mt-1.5 min-h-5 text-sm text-blush-600 ${
+          className={`mt-1 min-h-5 text-sm text-blush-600 sm:mt-1.5 ${
             error ? "" : "invisible"
           }`}
           aria-hidden={error ? undefined : true}
@@ -75,18 +75,22 @@ export function SearchForm() {
               <button
                 type="button"
                 onClick={() => setZip(sampleZip)}
-                className="inline-flex min-h-9 items-center px-1 underline decoration-dotted underline-offset-2 hover:text-mauve-600"
+                className="inline-flex min-h-9 items-center px-0.5 underline decoration-dotted underline-offset-2 hover:text-mauve-600 sm:px-1"
               >
                 {sampleZip}
               </button>
-              {index < SAMPLE_KNOWN_ZIPS.length - 1 ? " · " : ""}
+              {index < SAMPLE_KNOWN_ZIPS.length - 1 ? (
+                <span className="mx-0.5 text-mauve-300 sm:mx-1" aria-hidden="true">
+                  ·
+                </span>
+              ) : null}
             </span>
           ))}
         </p>
       </div>
 
       <div>
-        <label htmlFor="radius" className="field-label">
+        <label htmlFor="radius" className="field-label mb-1 sm:mb-1.5">
           Search radius
         </label>
         <select
@@ -106,7 +110,7 @@ export function SearchForm() {
 
       <button
         type="submit"
-        className="btn-primary mt-1 min-h-12 w-full sm:w-auto"
+        className="btn-primary min-h-12 w-full sm:mt-1 sm:w-auto"
       >
         <svg
           aria-hidden="true"

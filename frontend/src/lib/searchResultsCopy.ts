@@ -10,20 +10,29 @@ export function formatResultsHeadline(options: {
   totalCount: number;
   radiusMiles: number;
   hasActiveFilters: boolean;
+  /** When false, omit "within N miles" (e.g. radius already shown nearby). Default true. */
+  includeRadius?: boolean;
 }): string {
-  const { matchedCount, fetchedCount, totalCount, radiusMiles, hasActiveFilters } =
-    options;
+  const {
+    matchedCount,
+    fetchedCount,
+    totalCount,
+    radiusMiles,
+    hasActiveFilters,
+    includeRadius = true,
+  } = options;
+  const radiusSuffix = includeRadius ? ` within ${radiusMiles} miles` : "";
 
   if (
     !hasActiveFilters &&
     fetchedCount < totalCount &&
     fetchedCount > 0
   ) {
-    return `Showing the closest ${fetchedCount.toLocaleString("en-US")} of ${totalCount.toLocaleString("en-US")} cats within ${radiusMiles} miles`;
+    return `Showing the closest ${fetchedCount.toLocaleString("en-US")} of ${totalCount.toLocaleString("en-US")} cats${radiusSuffix}`;
   }
 
   const noun = matchedCount === 1 ? "roommate" : "roommates";
-  return `${matchedCount} potential ${noun} within ${radiusMiles} miles`;
+  return `${matchedCount} potential ${noun}${radiusSuffix}`;
 }
 
 /** Progressive reveal footer — always based on locally matched cats. */

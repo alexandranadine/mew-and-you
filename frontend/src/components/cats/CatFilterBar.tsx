@@ -76,9 +76,9 @@ export function CatFilterBar({
   hasActiveFilters,
 }: CatFilterBarProps) {
   return (
-    <div className="card rounded-[1.75rem] border-blush-50 px-3 py-3 sm:px-4 sm:py-3.5">
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap gap-x-6 gap-y-3">
+    <div className="card rounded-[1.75rem] border-blush-50 px-3 py-2.5 sm:px-4 sm:py-3.5">
+      <div className="flex flex-col gap-2.5 sm:gap-3">
+        <div className="flex flex-wrap gap-x-6 gap-y-2.5 sm:gap-y-3">
           <FilterChipGroup
             legend="Age"
             options={AGE_GROUP_OPTIONS}
@@ -123,14 +123,14 @@ export function CatFilterBar({
           />
         </div>
 
-        <div className="flex flex-col gap-2.5 border-t border-blush-100/80 pt-3 sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-3">
+        <div className="flex flex-col gap-2 border-t border-blush-100/80 pt-2.5 sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-3 sm:pt-3">
           <div className="min-w-0 sm:max-w-[18rem] sm:flex-1 sm:basis-[14rem]">
-            <label htmlFor="filter-org" className="field-label">
+            <label htmlFor="filter-org" className="field-label mb-1 sm:mb-1.5">
               Organization
             </label>
             <select
               id="filter-org"
-              className="field-input min-h-11 w-full py-2.5 text-sm"
+              className="field-input min-h-11 w-full py-2 text-sm sm:py-2.5"
               value={filters.organizationId ?? ""}
               onChange={(event) =>
                 onChange({ organizationId: event.target.value || undefined })
@@ -146,12 +146,12 @@ export function CatFilterBar({
           </div>
 
           <div className="min-w-0 sm:max-w-[14rem] sm:basis-[11rem]">
-            <label htmlFor="filter-sort" className="field-label">
+            <label htmlFor="filter-sort" className="field-label mb-1 sm:mb-1.5">
               Sort by
             </label>
             <select
               id="filter-sort"
-              className="field-input min-h-11 w-full py-2.5 text-sm"
+              className="field-input min-h-11 w-full py-2 text-sm sm:py-2.5"
               value={sort}
               onChange={(event) =>
                 onChange({ sort: event.target.value as CatSortOption })

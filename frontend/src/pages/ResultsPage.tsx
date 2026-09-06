@@ -241,29 +241,47 @@ export function ResultsPage() {
   const meta = searchSeo(activeQuery.zip);
   const showUpdating = isFetching && isPlaceholderData;
 
+  const resultsHeadline = data
+    ? formatResultsHeadline({
+        matchedCount: matchedCats.length,
+        fetchedCount: data.cats.length,
+        totalCount: data.totalCount,
+        radiusMiles: activeQuery.radiusMiles,
+        hasActiveFilters: filtersActive,
+        includeRadius: false,
+      })
+    : "";
+  const radiusClause = ` within ${activeQuery.radiusMiles} miles`;
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+    <div className="mx-auto max-w-6xl px-4 pt-5 pb-8 sm:px-6 sm:py-12">
       <PageMeta
         title={meta.title}
         description={meta.description}
         canonicalPath={meta.canonicalPath}
       />
-      <div className="mb-6">
+      <div className="mb-5 sm:mb-6">
         <Link
           to="/"
           className="focus-ring inline-flex min-h-11 items-center py-1 text-sm font-medium text-mauve-500 hover:text-mauve-700"
         >
           ← New search
         </Link>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-2">
+        <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2">
           <h1 className="text-2xl font-semibold text-mauve-700 sm:text-3xl">
             Cats near {activeQuery.zip}
           </h1>
           <div className="flex min-w-0 items-center gap-2">
-            <span className="text-sm text-mauve-400" aria-hidden="true">
+            <span
+              className="hidden text-sm text-mauve-400 sm:inline"
+              aria-hidden="true"
+            >
               within
             </span>
-            <label htmlFor="results-radius" className="sr-only">
+            <label
+              htmlFor="results-radius"
+              className="shrink-0 text-xs font-medium text-mauve-500 sm:sr-only"
+            >
               Search radius
             </label>
             <select
@@ -282,24 +300,32 @@ export function ResultsPage() {
             </select>
           </div>
         </div>
-        <p className="mt-1.5 text-sm leading-snug text-mauve-400 sm:text-base" aria-live="polite">
-          {showInitialLoading
-            ? `Searching within ${activeQuery.radiusMiles} miles\u2026`
-            : showUpdating
-              ? `Updating results within ${activeQuery.radiusMiles} miles\u2026`
-              : data
-                ? formatResultsHeadline({
-                    matchedCount: matchedCats.length,
-                    fetchedCount: data.cats.length,
-                    totalCount: data.totalCount,
-                    radiusMiles: activeQuery.radiusMiles,
-                    hasActiveFilters: filtersActive,
-                  })
-                : ""}
+        <p
+          className="mt-1.5 text-sm leading-snug text-mauve-400 sm:text-base"
+          aria-live="polite"
+        >
+          {showInitialLoading ? (
+            <>
+              Searching
+              <span className="hidden sm:inline">{radiusClause}</span>
+              {"\u2026"}
+            </>
+          ) : showUpdating ? (
+            <>
+              Updating results
+              <span className="hidden sm:inline">{radiusClause}</span>
+              {"\u2026"}
+            </>
+          ) : resultsHeadline ? (
+            <>
+              {resultsHeadline}
+              <span className="hidden sm:inline">{radiusClause}</span>
+            </>
+          ) : null}
         </p>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-7 sm:mb-8">
         <CatFilterBar
           filters={activeQuery.filters}
           sort={activeQuery.sort}

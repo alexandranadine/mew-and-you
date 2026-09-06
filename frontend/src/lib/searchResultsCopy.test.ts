@@ -52,6 +52,30 @@ describe("formatResultsHeadline", () => {
       }),
     ).toBe("1 potential roommate within 15 miles");
   });
+
+  it("can omit the radius when it is already shown nearby", () => {
+    expect(
+      formatResultsHeadline({
+        matchedCount: 350,
+        fetchedCount: 350,
+        totalCount: 350,
+        radiusMiles: 25,
+        hasActiveFilters: false,
+        includeRadius: false,
+      }),
+    ).toBe("350 potential roommates");
+
+    expect(
+      formatResultsHeadline({
+        matchedCount: 500,
+        fetchedCount: 500,
+        totalCount: 1171,
+        radiusMiles: 25,
+        hasActiveFilters: false,
+        includeRadius: false,
+      }),
+    ).toBe("Showing the closest 500 of 1,171 cats");
+  });
 });
 
 describe("formatRevealFooter", () => {
