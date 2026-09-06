@@ -9,6 +9,23 @@ const indexHtml = readFileSync(
   "utf8",
 );
 
+describe("siteOrigin", () => {
+  it("normalizes a bare hostname to https", () => {
+    expect(siteOrigin({ VITE_SITE_URL: "mewandyou.com" })).toBe(
+      "https://mewandyou.com",
+    );
+  });
+
+  it("preserves an explicit http(s) origin and strips a trailing slash", () => {
+    expect(siteOrigin({ VITE_SITE_URL: "https://mewandyou.com/" })).toBe(
+      "https://mewandyou.com",
+    );
+    expect(siteOrigin({ VITE_SITE_URL: "http://localhost:5173" })).toBe(
+      "http://localhost:5173",
+    );
+  });
+});
+
 describe("transformSeoIndexHtml", () => {
   it("absolutizes og:url with the production site origin", () => {
     const origin = siteOrigin({ VITE_SITE_URL: "https://mewandyou.com" });
@@ -19,6 +36,21 @@ describe("transformSeoIndexHtml", () => {
     );
     expect(html).toContain(
       '<link rel="canonical" href="https://mewandyou.com/" />',
+    );
+  });
+
+  it("normalizes a bare production hostname in crawler fallback URLs", () => {
+    const origin = siteOrigin({ VITE_SITE_URL: "mewandyou.com" });
+    const html = transformSeoIndexHtml(indexHtml, origin);
+
+    expect(html).toContain(
+      '<meta property="og:url" content="https://mewandyou.com/" />',
+    );
+    expect(html).toContain(
+      '<link rel="canonical" href="https://mewandyou.com/" />',
+    );
+    expect(html).toContain(
+      'content="https://mewandyou.com/images/mew-and-you-cat-peek.png"',
     );
   });
 

@@ -141,13 +141,13 @@ Copy [`frontend/.env.example`](frontend/.env.example).
 
 | Variable | Where | Required | Default | Notes |
 | -------- | ----- | -------- | ------- | ----- |
-| `VITE_SITE_URL` | Cloudflare Pages **build** env (Production / Preview) | **Yes** for staging/prod | `http://localhost:5173` | Public SPA origin, **no trailing slash**. Baked into `robots.txt`, `sitemap.xml`, canonical `<link>`, `og:url`, and Open Graph image URLs at build time. |
+| `VITE_SITE_URL` | `frontend/.env.production` + optional Cloudflare Pages **build** env override | **Yes** for staging/prod | `http://localhost:5173` (dev) / `https://mewandyou.com` (`.env.production`) | Public SPA origin, **no trailing slash**, prefer `https://…`. Schemeless hostnames are normalized to HTTPS. Baked into `robots.txt`, `sitemap.xml`, canonical `<link>`, `og:url`, and Open Graph image URLs at build time. |
 | `API_ORIGIN` | Cloudflare Pages **runtime** env (Production / Preview) | **Yes** when using the Pages Function proxy | — | Render API origin, **no trailing slash** (e.g. `https://YOUR-SERVICE.onrender.com`). Read only by `frontend/functions/api/[[path]].ts`. Never commit the real hostname into source. |
 
-**Production build example**:
+**Production build** (from `frontend/.env.production`; override in the Pages dashboard for Preview/staging):
 
 ```env
-VITE_SITE_URL=https://mew-and-you.pages.dev
+VITE_SITE_URL=https://mewandyou.com
 ```
 
 **Cloudflare Pages dashboard (runtime)**:
@@ -258,7 +258,7 @@ Both return a JSON liveness response and are **not** rate-limited.
 - [ ] `DATA_PROVIDER` and `RESCUEGROUPS_API_KEY` set in the Render dashboard
       (`sync: false` in `render.yaml` — Blueprint sync will not overwrite them;
       use `rescuegroups` + key for live launch data)
-- [ ] Cloudflare Pages build env: `VITE_SITE_URL=https://mew-and-you.pages.dev`
+- [ ] Cloudflare Pages build env (optional override): Production uses `frontend/.env.production` (`https://mewandyou.com`); Preview may set `VITE_SITE_URL=https://mew-and-you.pages.dev`
 - [ ] Cloudflare Pages runtime env: `API_ORIGIN=https://YOUR-SERVICE.onrender.com`
       (required — missing/invalid origin returns 503 `api_proxy_not_configured`)
 - [ ] `frontend/public/_headers` present in the deploy artifact (tracked in git)

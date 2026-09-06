@@ -1,11 +1,17 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig, type Plugin } from "vitest/config";
+import { loadEnv, type Plugin } from "vite";
+import { defineConfig } from "vitest/config";
 
+/** Public site origin for SEO artifacts. Schemeless hostnames become https://. */
 export function siteOrigin(
   env: NodeJS.ProcessEnv = process.env,
 ): string {
-  return (env.VITE_SITE_URL ?? "http://localhost:5173").replace(/\/$/, "");
+  const configured = env.VITE_SITE_URL?.trim();
+  const raw = (configured || "http://localhost:5173").replace(/\/$/, "");
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith("//")) return `https:${raw}`;
+  return `https://${raw}`;
 }
 
 /** Rewrite crawler-fallback absolute URLs using the build-time site origin. */
@@ -53,8 +59,8 @@ ${entries}
 `;
 }
 
-function seoStaticFiles(): Plugin {
-  const origin = siteOrigin();
+function seoStaticFiles(env: NodeJS.ProcessEnv): Plugin {
+  const origin = siteOrigin(env);
   const robots = robotsTxt(origin);
   const sitemap = sitemapXml(origin);
 
@@ -111,21 +117,28 @@ function seoStaticFiles(): Plugin {
 }
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), tailwindcss(), seoStaticFiles()],
-  server: {
-    // Forward API calls to the local Express backend during development so
-    // the frontend can just fetch("/api/...") without worrying about CORS
-    // or hardcoding a base URL.
-    proxy: {
-      "/api": {
-        target: "http://localhost:3001",
-        changeOrigin: true,
+export default defineConfig(({ mode }) => {
+  // Config runs before Vite's client env injection; load mode files so
+  // `siteOrigin()` sees `.env.production` during `vite build`. Process env
+  // (Cloudflare Pages build vars) still wins when set.
+  const env = { ...loadEnv(mode, process.cwd(), ""), ...process.env };
+
+  return {
+    plugins: [react(), tailwindcss(), seoStaticFiles(env)],
+    server: {
+      // Forward API calls to the local Express backend during development so
+      // the frontend can just fetch("/api/...") without worrying about CORS
+      // or hardcoding a base URL.
+      proxy: {
+        "/api": {
+          target: "http://localhost:3001",
+          changeOrigin: true,
+        },
       },
     },
-  },
-  test: {
-    environment: "happy-dom",
-    setupFiles: ["./src/test/setup.ts"],
-  },
+    test: {
+      environment: "happy-dom",
+      setupFiles: ["./src/test/setup.ts"],
+    },
+  };
 });

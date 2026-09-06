@@ -10,7 +10,11 @@ export const DEFAULT_SHARE_IMAGE_ALT =
 
 export function getSiteOrigin(): string {
   const configured = import.meta.env.VITE_SITE_URL?.trim().replace(/\/$/, "");
-  if (configured) return configured;
+  if (configured) {
+    if (/^https?:\/\//i.test(configured)) return configured;
+    if (configured.startsWith("//")) return `https:${configured}`;
+    return `https://${configured}`;
+  }
   if (typeof window !== "undefined") return window.location.origin;
   return "";
 }
