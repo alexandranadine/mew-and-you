@@ -12,11 +12,11 @@ export function SiteFooter() {
         </p>
         <p className="mt-2">
           <img
-            src="/images/paw-icon.png"
+            src="/favicon.svg"
             alt=""
             aria-hidden="true"
-            width={1306}
-            height={1204}
+            width={32}
+            height={32}
             decoding="async"
             className="mr-1 inline-block h-[1em] w-auto align-[-0.125em]"
           />
