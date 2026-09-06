@@ -78,6 +78,9 @@ export function CatFilterBar({
   return (
     <div className="card rounded-[1.75rem] border-blush-50 px-3 py-2.5 sm:px-4 sm:py-3.5">
       <div className="flex flex-col gap-2.5 sm:gap-3">
+        <h2 className="font-display text-sm font-medium tracking-wide text-blush-600">
+          Narrow it down
+        </h2>
         <div className="flex flex-wrap gap-x-6 gap-y-2.5 sm:gap-y-3">
           <FilterChipGroup
             legend="Age"
@@ -136,7 +139,7 @@ export function CatFilterBar({
                 onChange({ organizationId: event.target.value || undefined })
               }
             >
-              <option value="">All organizations</option>
+              <option value="">Any organization</option>
               {organizationOptions.map((org) => (
                 <option key={org.id} value={org.id}>
                   {org.name}

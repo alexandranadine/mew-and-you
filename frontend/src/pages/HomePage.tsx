@@ -16,8 +16,7 @@ import RotatingTagline from "../components/layout/RotatingTagline";
 export function HomePage() {
   const { data, isPending, isError } = useHomeCatSample();
   const featuredCats = data ?? [];
-  const showSampleSection =
-    isPending || (!isError && featuredCats.length > 0);
+  const showSampleSection = isPending || (!isError && featuredCats.length > 0);
 
   return (
     <div>
@@ -92,7 +91,8 @@ export function HomePage() {
               Go ahead, get attached.
             </h2>
             <p className="mt-2 px-1 text-pretty text-mauve-400">
-              Sample listings shown here — search above to see cats near you!
+              A few adoptable faces to get you started~ search above to find
+              cats near you.
             </p>
           </div>
 
