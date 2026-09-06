@@ -26,6 +26,11 @@ interface CatCardProps {
     detailHref: string,
     detailState: CatDetailLocationState | undefined,
   ) => void;
+  /**
+   * Opt-in LCP hint for the first above-the-fold result image.
+   * Default keeps lazy loading for Home, Favorites, and later result cards.
+   */
+  priorityImage?: boolean;
 }
 
 function isModifiedOrNonPrimaryClick(event: MouseEvent): boolean {
@@ -44,6 +49,7 @@ export function CatCard({
   detailQuery,
   detailState,
   onPrimaryDetailNavigation,
+  priorityImage = false,
 }: CatCardProps) {
   const photo = cat.photos[0];
   const [imgCatId, setImgCatId] = useState(cat.id);
@@ -106,7 +112,8 @@ export function CatCard({
               width={800}
               height={600}
               className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-              loading="lazy"
+              loading={priorityImage ? "eager" : "lazy"}
+              fetchPriority={priorityImage ? "high" : undefined}
               decoding="async"
               onError={handleImgError}
             />

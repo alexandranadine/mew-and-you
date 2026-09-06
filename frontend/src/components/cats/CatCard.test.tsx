@@ -120,7 +120,30 @@ describe("CatCard photo selection", () => {
     );
     expect(img).toHaveAttribute("sizes", CAT_CARD_IMAGE_SIZES);
     expect(img).toHaveAttribute("loading", "lazy");
+    expect(img).not.toHaveAttribute("fetchpriority");
     expect(img).toHaveAttribute("decoding", "async");
+  });
+
+  it("eagerly prioritizes the image only when priorityImage is set", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <CatCard
+          cat={makeCat({
+            photos: [{ url: full, thumbnailUrl: thumb }],
+          })}
+          priorityImage
+        />
+      </MemoryRouter>,
+    );
+
+    const img = container.querySelector("img");
+    expect(img).toHaveAttribute("loading", "eager");
+    expect(img).toHaveAttribute("fetchpriority", "high");
+    expect(img).toHaveAttribute(
+      "srcSet",
+      `${thumb} ${CAT_PHOTO_THUMB_WIDTH}w, ${full} ${CAT_PHOTO_FULL_WIDTH}w`,
+    );
+    expect(img).toHaveAttribute("sizes", CAT_CARD_IMAGE_SIZES);
   });
 
   it("omits srcSet when only one URL is available", () => {

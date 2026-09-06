@@ -339,8 +339,10 @@ export function ResultsPage() {
       <h2 className="sr-only">Search results</h2>
 
       {showInitialLoading && (
+        // Match the first progressive-reveal batch so the site footer stays
+        // below the fold during load (avoids CLS when real cards replace skeletons).
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, index) => (
+          {Array.from({ length: REVEAL_PAGE_SIZE }).map((_, index) => (
             <CatCardSkeleton key={index} />
           ))}
         </div>
@@ -391,7 +393,7 @@ export function ResultsPage() {
       {!showInitialLoading && data && matchedCats.length > 0 && (
         <>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {revealedCats.map((cat) => (
+            {revealedCats.map((cat, index) => (
               <CatCard
                 key={cat.id}
                 cat={cat}
@@ -403,6 +405,7 @@ export function ResultsPage() {
                     : undefined
                 }
                 onPrimaryDetailNavigation={handlePrimaryDetailNavigation}
+                priorityImage={index === 0}
               />
             ))}
           </div>

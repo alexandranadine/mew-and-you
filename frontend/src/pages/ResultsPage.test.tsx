@@ -10,6 +10,7 @@ import {
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ResultsPage, revealResetKeyForQuery } from "./ResultsPage";
+import { REVEAL_PAGE_SIZE } from "../lib/resultsBrowsing";
 import { makeCat } from "../test/catFixture";
 import type { CatSex } from "../types/cat";
 import type { CatWithDistance } from "../types/search";
@@ -298,5 +299,67 @@ describe("ResultsPage filters and radius", () => {
       expect(names[0]).toBe("Aster");
       expect(names[1]).toBe("Biscuit");
     });
+  });
+});
+
+describe("ResultsPage loading layout and image priority", () => {
+  it("reserves a full first-page skeleton grid hidden from assistive tech", () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockReturnValue(new Promise(() => undefined)),
+    );
+
+    const { container } = renderResults("/cats?zip=91350&radius=25");
+
+    expect(screen.getByText(/Searching/i)).toBeInTheDocument();
+
+    const skeletons = container.querySelectorAll("[aria-hidden='true'].card");
+    expect(skeletons).toHaveLength(REVEAL_PAGE_SIZE);
+
+    const loadingGrid = skeletons[0]?.parentElement;
+    expect(loadingGrid).not.toBeNull();
+    expect(loadingGrid!.className).toMatch(/grid-cols-1/);
+    expect(loadingGrid!.className).toMatch(/sm:grid-cols-2/);
+    expect(loadingGrid!.className).toMatch(/lg:grid-cols-3/);
+    expect(loadingGrid!.querySelectorAll("[aria-hidden='true'].card")).toHaveLength(
+      REVEAL_PAGE_SIZE,
+    );
+  });
+
+  it("prioritizes only the first result card image", async () => {
+    const cats = Array.from({ length: 3 }, (_, index) =>
+      catWithDistance({
+        id: String(index),
+        name: `Cat ${index}`,
+        photos: [
+          {
+            url: `https://cdn.example.org/cat-${index}-large.jpg`,
+            thumbnailUrl: `https://cdn.example.org/cat-${index}-small.jpg`,
+          },
+        ],
+      }),
+    );
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ cats, totalCount: 3 }),
+      }),
+    );
+
+    const { container } = renderResults("/cats?zip=91350&radius=25");
+    await screen.findByText("Cat 0");
+
+    const images = [...container.querySelectorAll("img")].filter((img) =>
+      img.getAttribute("alt")?.startsWith("Photo of"),
+    );
+    expect(images).toHaveLength(3);
+    expect(images[0]).toHaveAttribute("loading", "eager");
+    expect(images[0]).toHaveAttribute("fetchpriority", "high");
+    expect(images[1]).toHaveAttribute("loading", "lazy");
+    expect(images[1]).not.toHaveAttribute("fetchpriority");
+    expect(images[2]).toHaveAttribute("loading", "lazy");
+    expect(images[2]).not.toHaveAttribute("fetchpriority");
   });
 });
