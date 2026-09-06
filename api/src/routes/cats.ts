@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { ApiError } from "../lib/errors";
 import { getHomepageSampleCats } from "../lib/homepageSample";
+import { assertSupportedServiceAreaZip } from "../lib/serviceArea";
 import {
   validateRadius,
   validateSampleCount,
@@ -35,6 +36,7 @@ catsRouter.get("/sample", async (req, res, next) => {
 catsRouter.get("/", async (req, res, next) => {
   try {
     const zip = validateZip(req.query.zip);
+    assertSupportedServiceAreaZip(zip);
     const radiusMiles = validateRadius(req.query.radius);
 
     const provider = getCatProvider();

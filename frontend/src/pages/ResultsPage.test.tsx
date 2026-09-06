@@ -365,6 +365,43 @@ describe("ResultsPage loading layout and image priority", () => {
 });
 
 describe("ResultsPage API error state", () => {
+  it("shows the service-area message when the API returns OUTSIDE_SERVICE_AREA", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 400,
+        json: async () => ({
+          error: {
+            code: "OUTSIDE_SERVICE_AREA",
+            message: "Mew & You currently searches Southern California only.",
+          },
+        }),
+      }),
+    );
+
+    renderResults("/cats?zip=95814&radius=25");
+
+    expect(
+      await screen.findByText(
+        "Mew & You currently searches Southern California only.",
+        { exact: true },
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Outside our search area" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Try a new search" })).toHaveAttribute(
+      "href",
+      "/",
+    );
+    expect(screen.queryByText(/400/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/OUTSIDE_SERVICE_AREA/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Something went wrong" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("shows fixed error copy without raw fetch or library messages", async () => {
     vi.stubGlobal(
       "fetch",

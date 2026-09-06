@@ -8,6 +8,7 @@ import {
 } from "../components/cats/CatFilterBar";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
 import { PageMeta } from "../components/seo/PageMeta";
+import { ApiRequestError } from "../api/catsApi";
 import { useCatsSearch } from "../hooks/useCatsSearch";
 import { filterCats, hasActiveFilters } from "../lib/catFilters";
 import {
@@ -59,6 +60,7 @@ export function ResultsPage() {
 
   const {
     data,
+    error,
     isPending,
     isError,
     refetch,
@@ -324,16 +326,18 @@ export function ResultsPage() {
         </p>
       </div>
 
-      <div className="mb-9 sm:mb-8">
-        <CatFilterBar
-          filters={activeQuery.filters}
-          sort={activeQuery.sort}
-          organizationOptions={organizationOptions}
-          onChange={handleFilterChange}
-          onReset={handleResetFilters}
-          hasActiveFilters={filtersActive}
-        />
-      </div>
+      {!(isError && !data && isOutsideServiceAreaError(error)) && (
+        <div className="mb-9 sm:mb-8">
+          <CatFilterBar
+            filters={activeQuery.filters}
+            sort={activeQuery.sort}
+            organizationOptions={organizationOptions}
+            onChange={handleFilterChange}
+            onReset={handleResetFilters}
+            hasActiveFilters={filtersActive}
+          />
+        </div>
+      )}
 
       <h2 className="sr-only">Search results</h2>
 
@@ -348,20 +352,11 @@ export function ResultsPage() {
       )}
 
       {!showInitialLoading && isError && !data && (
-        <SearchStateCard
-          icon="⚠️"
-          title="Something went wrong"
-          message="We couldn't load the cats right now. Please try again in a moment."
-        >
-          <button
-            type="button"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="btn-primary"
-          >
-            {isFetching ? "Retrying…" : "Try again"}
-          </button>
-        </SearchStateCard>
+        <SearchLoadError
+          error={error}
+          isFetching={isFetching}
+          onRetry={() => refetch()}
+        />
       )}
 
       {!showInitialLoading && !isError && data && matchedCats.length === 0 && (
@@ -424,6 +419,53 @@ export function ResultsPage() {
         </>
       )}
     </div>
+  );
+}
+
+function isOutsideServiceAreaError(error: unknown): boolean {
+  return (
+    error instanceof ApiRequestError && error.code === "OUTSIDE_SERVICE_AREA"
+  );
+}
+
+function SearchLoadError({
+  error,
+  isFetching,
+  onRetry,
+}: {
+  error: unknown;
+  isFetching: boolean;
+  onRetry: () => void;
+}) {
+  if (isOutsideServiceAreaError(error)) {
+    return (
+      <SearchStateCard
+        icon="⚠️"
+        title="Outside our search area"
+        message="Mew & You currently searches Southern California only."
+      >
+        <Link to="/" className="btn-primary">
+          Try a new search
+        </Link>
+      </SearchStateCard>
+    );
+  }
+
+  return (
+    <SearchStateCard
+      icon="⚠️"
+      title="Something went wrong"
+      message="We couldn't load the cats right now. Please try again in a moment."
+    >
+      <button
+        type="button"
+        onClick={onRetry}
+        disabled={isFetching}
+        className="btn-primary"
+      >
+        {isFetching ? "Retrying…" : "Try again"}
+      </button>
+    </SearchStateCard>
   );
 }
 

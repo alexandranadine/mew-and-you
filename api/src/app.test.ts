@@ -37,6 +37,31 @@ describe("GET /api/cats validation", () => {
     const res = await request(app).get("/api/cats?zip=abc");
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe("invalid_zip");
+    expect(res.body.error.message).toMatch(/not a valid 5-digit ZIP/i);
+  });
+
+  it("rejects a Sacramento ZIP as outside the service area", async () => {
+    const res = await request(app).get("/api/cats?zip=95814");
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("OUTSIDE_SERVICE_AREA");
+    expect(res.body.error.message).toBe(
+      "Mew & You currently searches Southern California only.",
+    );
+  });
+
+  it("rejects a San Francisco ZIP as outside the service area", async () => {
+    const res = await request(app).get("/api/cats?zip=94102");
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("OUTSIDE_SERVICE_AREA");
+  });
+
+  it("accepts supported Southern California ZIPs without a service-area error", async () => {
+    const supported = ["90012", "92101", "92660", "92501", "92401", "93003"];
+    for (const zip of supported) {
+      const res = await request(app).get(`/api/cats?zip=${zip}`);
+      expect(res.body.error?.code).not.toBe("OUTSIDE_SERVICE_AREA");
+      expect(res.status).not.toBe(400);
+    }
   });
 
   it("rejects an out-of-range radius with 400", async () => {
@@ -51,6 +76,14 @@ describe("GET /api/cats/sample validation", () => {
     const res = await request(app).get("/api/cats/sample");
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe("missing_zip");
+  });
+
+  it("still accepts the homepage sample ZIP contract", async () => {
+    const res = await request(app).get(
+      "/api/cats/sample?zip=90012&radius=50&count=3",
+    );
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body.cats)).toBe(true);
   });
 
   it("rejects an invalid sample count with 400", async () => {
