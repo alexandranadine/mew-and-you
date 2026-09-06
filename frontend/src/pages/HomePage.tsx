@@ -33,7 +33,7 @@ export function HomePage() {
         canonicalPath={homeSeo.canonicalPath}
         jsonLd={websiteJsonLd(getSiteOrigin())}
       />
-      <section className="relative overflow-hidden px-6 pt-16 pb-8 sm:pt-24 sm:pb-8">
+      <section className="relative overflow-hidden px-4 pt-14 pb-8 sm:px-6 sm:pt-24">
         {/* soft decorative blobs to echo the cozy stationery-shop mood */}
         <div
           aria-hidden="true"
@@ -48,15 +48,17 @@ export function HomePage() {
           {/* <span className="pill mb-4 px-4 py-2 text-[13px]">
             🌸 Serving {brand.serviceArea}
           </span> */}
-          <h1 className="text-4xl font-semibold text-mauve-700 sm:text-5xl">
+          <h1 className="text-[2.125rem] leading-tight font-semibold text-mauve-700 sm:text-5xl sm:leading-none">
             {brand.name}
           </h1>
-          <p className="mt-4 max-w-xl font-semibold text-lg text-mauve-500">
+          <p className="mt-4 max-w-xl px-1 text-balance font-semibold text-lg leading-snug text-mauve-500">
             <RotatingTagline />
           </p>
-          <p className="mt-2 max-w-xl text-mauve-400">{brand.description}</p>
+          <p className="mt-2 max-w-xl px-1 text-pretty text-mauve-400">
+            {brand.description}
+          </p>
 
-          <div className="relative mt-40 w-full max-w-md">
+          <div className="relative mt-36 w-full max-w-md sm:mt-40">
             <img
               src="/images/mew-and-you-cat-peek.png"
               alt=""
@@ -71,7 +73,7 @@ export function HomePage() {
                           left-1/2
                           top-0
                           z-30
-                          w-[320px]
+                          w-[min(300px,calc(100vw-2rem))]
                           -translate-x-1/2
                           -translate-y-[74.5%]
                           select-none
@@ -89,12 +91,12 @@ export function HomePage() {
       <PawDivider />
 
       {(isLoading || featuredCats.length > 0) && (
-        <section className="mx-auto max-w-6xl px-6 pb-20">
+        <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
           <div className="mb-8 text-center">
             <h2 className="text-2xl font-semibold text-mauve-700">
               Go ahead, get attached.
             </h2>
-            <p className="mt-2 text-mauve-400">
+            <p className="mt-2 px-1 text-pretty text-mauve-400">
               Sample listings shown here — search above to see cats near you!
             </p>
           </div>

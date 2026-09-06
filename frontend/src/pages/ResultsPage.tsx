@@ -242,7 +242,7 @@ export function ResultsPage() {
   const showUpdating = isFetching && isPlaceholderData;
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12">
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
       <PageMeta
         title={meta.title}
         description={meta.description}
@@ -251,15 +251,15 @@ export function ResultsPage() {
       <div className="mb-6">
         <Link
           to="/"
-          className="focus-ring inline-block py-1 text-sm font-medium text-mauve-500 hover:text-mauve-700"
+          className="focus-ring inline-flex min-h-11 items-center py-1 text-sm font-medium text-mauve-500 hover:text-mauve-700"
         >
           ← New search
         </Link>
-        <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-2">
-          <h1 className="text-3xl font-semibold text-mauve-700">
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 className="text-2xl font-semibold text-mauve-700 sm:text-3xl">
             Cats near {activeQuery.zip}
           </h1>
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             <span className="text-sm text-mauve-400" aria-hidden="true">
               within
             </span>
@@ -268,7 +268,7 @@ export function ResultsPage() {
             </label>
             <select
               id="results-radius"
-              className="field-input w-auto min-w-0 py-1.5 pl-3 pr-8 text-sm"
+              className="field-input min-h-11 w-auto min-w-[7.5rem] py-2 pl-3 pr-8 text-sm"
               value={activeQuery.radiusMiles}
               onChange={(event) =>
                 handleRadiusChange(Number(event.target.value))
@@ -282,7 +282,7 @@ export function ResultsPage() {
             </select>
           </div>
         </div>
-        <p className="mt-1.5 text-mauve-400" aria-live="polite">
+        <p className="mt-1.5 text-sm leading-snug text-mauve-400 sm:text-base" aria-live="polite">
           {showInitialLoading
             ? `Searching within ${activeQuery.radiusMiles} miles\u2026`
             : showUpdating
@@ -385,13 +385,13 @@ export function ResultsPage() {
           </div>
 
           {hasMoreToReveal && (
-            <div className="mt-10 flex flex-col items-center gap-3">
-              <p className="text-sm text-mauve-400">
+            <div className="mt-10 mb-2 flex w-full flex-col items-stretch gap-3 pb-6 sm:items-center sm:pb-2">
+              <p className="text-center text-sm text-mauve-400">
                 {formatRevealFooter(revealedCount, matchedCats.length)}
               </p>
               <button
                 type="button"
-                className="btn-secondary"
+                className="btn-secondary min-h-12 w-full max-w-sm self-center sm:w-auto"
                 onClick={() =>
                   setVisibleCount((count) => count + REVEAL_PAGE_SIZE)
                 }

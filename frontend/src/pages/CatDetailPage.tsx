@@ -181,7 +181,7 @@ export function CatDetailPage() {
   const meta = catDetailSeo(cat);
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-12">
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12">
       <PageMeta
         title={meta.title}
         description={meta.description}
@@ -193,12 +193,12 @@ export function CatDetailPage() {
       <Link
         to={backHref}
         state={backState}
-        className="focus-ring inline-block py-1 text-sm font-medium text-mauve-500 hover:text-mauve-700"
+        className="focus-ring inline-flex min-h-11 items-center py-1 text-sm font-medium text-mauve-500 hover:text-mauve-700"
       >
         {backLabel}
       </Link>
 
-      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-2">
+      <div className="mt-5 grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div className="min-w-0">
           {/* Fixed aspect ratio reserves space up front so the layout doesn't shift once the image loads. */}
           <div className="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-blush-100 shadow-[var(--shadow-cozy)]">
@@ -225,7 +225,7 @@ export function CatDetailPage() {
 
           {cat.photos.length > 1 && (
             <div
-              className="-mx-1 mt-3 flex gap-3 overflow-x-auto px-1 pb-1"
+              className="-mx-1 mt-3 flex gap-2.5 overflow-x-auto overscroll-x-contain px-1 pb-1 sm:gap-3"
               role="group"
               aria-label={`${displayName}'s photos`}
             >
@@ -241,7 +241,7 @@ export function CatDetailPage() {
                     onClick={() => setSelectedPhotoIndex(index)}
                     aria-label={`View photo ${index + 1} of ${cat.photos.length}`}
                     aria-current={isSelected}
-                    className={`focus-ring h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition ${
+                    className={`focus-ring h-[4.5rem] w-[5.5rem] shrink-0 overflow-hidden rounded-xl border-2 transition sm:h-16 sm:w-20 ${
                       isSelected
                         ? "border-mauve-500"
                         : "border-transparent opacity-80 hover:opacity-100"
@@ -258,8 +258,8 @@ export function CatDetailPage() {
                       <img
                         src={photo.thumbnailUrl ?? photo.url}
                         alt=""
-                        width={80}
-                        height={64}
+                        width={88}
+                        height={72}
                         loading="lazy"
                         decoding="async"
                         className="h-full w-full object-cover"
@@ -278,7 +278,7 @@ export function CatDetailPage() {
         <div className="min-w-0">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h1 className="break-words text-3xl font-semibold text-mauve-700">
+              <h1 className="break-words text-2xl font-semibold text-mauve-700 sm:text-3xl">
                 {displayName}
               </h1>
               {kennelIdName ? (
@@ -286,7 +286,9 @@ export function CatDetailPage() {
                   Shelter ID
                 </p>
               ) : null}
-              <p className="mt-1 text-lg text-mauve-500">{cat.breed}</p>
+              <p className="mt-1 break-words text-base text-mauve-500 sm:text-lg">
+                {cat.breed}
+              </p>
               {typeof distanceMiles === "number" ? (
                 <p className="mt-1 text-sm text-mauve-400">
                   {distanceMiles.toFixed(1)} mi away
@@ -313,7 +315,7 @@ export function CatDetailPage() {
                   <dt className="text-xs uppercase tracking-wide text-mauve-400">
                     {attr.label}
                   </dt>
-                  <dd className="mt-1 break-words font-medium text-mauve-700">
+                  <dd className="mt-1 break-words text-sm font-medium text-mauve-700 sm:text-base">
                     {attr.value}
                     {attr.subvalue ? (
                       <span className="block text-xs font-normal text-mauve-400">
@@ -330,33 +332,33 @@ export function CatDetailPage() {
             <CatTraitBadges traits={cat.traits} />
           </div>
 
-          <h2 className="mt-6 font-display text-lg font-semibold text-mauve-700">
+          <h2 className="mt-6 break-words font-display text-lg font-semibold text-mauve-700">
             About {displayName}
           </h2>
           {hasBio ? (
-            <p className="mt-2 leading-relaxed text-mauve-600">
+            <p className="mt-2 max-w-prose leading-relaxed text-pretty text-mauve-600">
               {cat.description.trim()}
             </p>
           ) : (
-            <p className="mt-2 text-sm leading-relaxed text-mauve-400">
+            <p className="mt-2 max-w-prose text-sm leading-relaxed text-pretty text-mauve-400">
               {missingBioMessage(cat.name)}
             </p>
           )}
 
           <section className="mt-8">
-            <h2 className="font-display text-lg font-semibold text-mauve-700">
+            <h2 className="break-words font-display text-lg font-semibold text-mauve-700">
               Interested in {displayName}?
             </h2>
             <a
               href={cat.adoptionUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary mt-3 w-full justify-center px-8 py-4 text-base"
+              className="btn-primary mt-3 min-h-12 w-full flex-wrap justify-center gap-x-2 gap-y-1 px-5 py-3.5 text-center text-base leading-snug sm:px-8 sm:py-4"
             >
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
-                className="h-4 w-4 -rotate-32 text-cream-50"
+                className="h-4 w-4 shrink-0 -rotate-32 text-cream-50"
                 fill="currentColor"
               >
                 <circle cx="12" cy="15" r="5" />
@@ -365,10 +367,14 @@ export function CatDetailPage() {
                 <circle cx="15" cy="4" r="2.4" />
                 <circle cx="19" cy="8" r="2.4" />
               </svg>
-              {adoptionCta.label}
-              <span aria-hidden="true">↗</span>
+              <span className="min-w-0 break-words">{adoptionCta.label}</span>
+              <span aria-hidden="true" className="shrink-0">
+                ↗
+              </span>
             </a>
-            <p className="mt-2 text-sm text-mauve-400">{adoptionCta.helper}</p>
+            <p className="mt-2 max-w-prose text-sm leading-snug text-pretty text-mauve-400">
+              {adoptionCta.helper}
+            </p>
           </section>
 
           <section className="mt-8 border-t border-blush-100 pt-5">
@@ -378,12 +384,12 @@ export function CatDetailPage() {
             <p className="mt-2 break-words font-medium text-mauve-600">
               {cat.organization.name}
             </p>
-            <p className="mt-0.5 text-sm text-mauve-400">
+            <p className="mt-0.5 break-words text-sm text-mauve-400">
               {cat.organization.city}, {cat.organization.state}{" "}
               {cat.organization.zip}
             </p>
             {cat.organization.phone ? (
-              <p className="mt-0.5 text-sm text-mauve-400">
+              <p className="mt-0.5 break-words text-sm text-mauve-400">
                 {cat.organization.phone}
               </p>
             ) : null}
@@ -392,7 +398,7 @@ export function CatDetailPage() {
                 href={cat.organization.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="focus-ring mt-1 inline-block text-sm text-mauve-500 underline-offset-2 hover:underline"
+                className="focus-ring mt-1 inline-flex min-h-11 items-center text-sm text-mauve-500 underline-offset-2 hover:underline"
               >
                 Visit website
               </a>
@@ -405,15 +411,15 @@ export function CatDetailPage() {
 }
 
 function attributeListClass(count: number): string {
-  if (count >= 3) return "grid grid-cols-3 gap-2 sm:gap-3";
+  if (count >= 3) return "grid grid-cols-3 gap-1.5 sm:gap-3";
   return "flex flex-wrap gap-2 sm:gap-3";
 }
 
 function attributeTileClass(count: number): string {
   if (count >= 3) {
-    return "min-w-0 rounded-2xl bg-blush-50 px-1.5 py-3 sm:px-2";
+    return "min-w-0 rounded-2xl bg-blush-50 px-1 py-2.5 sm:px-2 sm:py-3";
   }
-  return "w-max min-w-[7.5rem] max-w-[11rem] flex-none rounded-2xl bg-blush-50 px-3 py-3";
+  return "w-full min-w-0 max-w-none flex-none rounded-2xl bg-blush-50 px-3 py-3 sm:w-max sm:min-w-[7.5rem] sm:max-w-[11rem]";
 }
 
 function adoptionCtaCopy(cat: Cat): { label: string; helper: string } {

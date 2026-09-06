@@ -30,7 +30,7 @@ export function CatTraitBadges({
         return (
           <span
             key={def.key}
-            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
+            className={`inline-flex max-w-full items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium ${
               value
                 ? "bg-sage-100 text-mauve-700"
                 : "bg-blush-50 text-mauve-300 line-through opacity-70"

@@ -36,7 +36,7 @@ export function SearchForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="card flex flex-col gap-4 p-6 sm:p-8"
+      className="card flex flex-col gap-4 p-5 text-left sm:p-8"
       noValidate
     >
       <div>
@@ -51,29 +51,31 @@ export function SearchForm() {
           autoComplete="postal-code"
           maxLength={5}
           placeholder="e.g. 91350"
-          className="field-input"
+          className="field-input min-h-11"
           value={zip}
           onChange={(event) => setZip(event.target.value)}
           aria-invalid={error ? "true" : "false"}
-          aria-describedby={error ? "zip-error" : undefined}
+          aria-describedby={error ? "zip-error zip-hint" : "zip-hint"}
         />
-        {error && (
-          <p
-            id="zip-error"
-            role="alert"
-            className="mt-1.5 text-sm text-blush-600"
-          >
-            {error}
-          </p>
-        )}
-        <p className="mt-1.5 text-xs text-mauve-400">
+        {/* Fixed slot so validation copy does not shove the radius/submit down. */}
+        <p
+          id="zip-error"
+          role={error ? "alert" : undefined}
+          className={`mt-1.5 min-h-5 text-sm text-blush-600 ${
+            error ? "" : "invisible"
+          }`}
+          aria-hidden={error ? undefined : true}
+        >
+          {error ?? "\u00a0"}
+        </p>
+        <p id="zip-hint" className="mt-0.5 text-xs leading-relaxed text-mauve-400">
           Try:{" "}
           {SAMPLE_KNOWN_ZIPS.map((sampleZip, index) => (
             <span key={sampleZip}>
               <button
                 type="button"
                 onClick={() => setZip(sampleZip)}
-                className="underline decoration-dotted underline-offset-2 hover:text-mauve-600"
+                className="inline-flex min-h-9 items-center px-1 underline decoration-dotted underline-offset-2 hover:text-mauve-600"
               >
                 {sampleZip}
               </button>
@@ -90,7 +92,7 @@ export function SearchForm() {
         <select
           id="radius"
           name="radius"
-          className="field-input"
+          className="field-input min-h-11"
           value={radius}
           onChange={(event) => setRadius(Number(event.target.value))}
         >
@@ -102,7 +104,10 @@ export function SearchForm() {
         </select>
       </div>
 
-      <button type="submit" className="btn-primary mt-2 w-full sm:w-auto">
+      <button
+        type="submit"
+        className="btn-primary mt-1 min-h-12 w-full sm:w-auto"
+      >
         <svg
           aria-hidden="true"
           viewBox="0 0 20 20"

@@ -54,8 +54,8 @@ function FilterChipGroup<T extends string>({
               onClick={() => onToggle(option.value)}
               className={
                 isActive
-                  ? "focus-ring rounded-full border-2 border-blush-400 bg-blush-100 px-3.5 py-1.5 text-sm font-medium text-mauve-700"
-                  : "focus-ring rounded-full border-2 border-blush-200 bg-white/80 px-3.5 py-1.5 text-sm font-medium text-mauve-500 hover:border-blush-300 hover:text-mauve-700"
+                  ? "focus-ring min-h-10 rounded-full border-2 border-blush-400 bg-blush-100 px-3.5 py-2 text-sm font-medium text-mauve-700"
+                  : "focus-ring min-h-10 rounded-full border-2 border-blush-200 bg-white/80 px-3.5 py-2 text-sm font-medium text-mauve-500 hover:border-blush-300 hover:text-mauve-700"
               }
             >
               {option.label}
@@ -123,14 +123,14 @@ export function CatFilterBar({
           />
         </div>
 
-        <div className="flex flex-wrap items-end gap-x-3 gap-y-2.5 border-t border-blush-100/80 pt-3">
-          <div className="min-w-0">
+        <div className="flex flex-col gap-2.5 border-t border-blush-100/80 pt-3 sm:flex-row sm:flex-wrap sm:items-end sm:gap-x-3">
+          <div className="min-w-0 sm:max-w-[18rem] sm:flex-1 sm:basis-[14rem]">
             <label htmlFor="filter-org" className="field-label">
               Organization
             </label>
             <select
               id="filter-org"
-              className="field-input w-auto max-w-[14rem] py-2 text-sm"
+              className="field-input min-h-11 w-full py-2.5 text-sm"
               value={filters.organizationId ?? ""}
               onChange={(event) =>
                 onChange({ organizationId: event.target.value || undefined })
@@ -145,13 +145,13 @@ export function CatFilterBar({
             </select>
           </div>
 
-          <div className="min-w-0">
+          <div className="min-w-0 sm:max-w-[14rem] sm:basis-[11rem]">
             <label htmlFor="filter-sort" className="field-label">
               Sort by
             </label>
             <select
               id="filter-sort"
-              className="field-input w-auto max-w-[11rem] py-2 text-sm"
+              className="field-input min-h-11 w-full py-2.5 text-sm"
               value={sort}
               onChange={(event) =>
                 onChange({ sort: event.target.value as CatSortOption })
@@ -169,7 +169,7 @@ export function CatFilterBar({
             <button
               type="button"
               onClick={onReset}
-              className="focus-ring mb-0.5 inline-block py-1.5 text-sm font-medium text-mauve-500 underline-offset-2 hover:text-mauve-700 hover:underline"
+              className="focus-ring inline-flex min-h-11 items-center self-start py-1.5 text-sm font-medium text-mauve-500 underline-offset-2 hover:text-mauve-700 hover:underline sm:mb-0.5 sm:self-auto"
             >
               Reset filters
             </button>

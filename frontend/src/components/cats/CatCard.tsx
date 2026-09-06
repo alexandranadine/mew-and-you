@@ -120,13 +120,15 @@ export function CatCard({
           )}
         </div>
 
-        <div className="flex flex-1 flex-col gap-2 p-5">
-          <h3 className="text-xl font-semibold text-mauve-700">{displayName}</h3>
+        <div className="flex min-w-0 flex-1 flex-col gap-2 p-4 sm:p-5">
+          <h3 className="break-words text-xl font-semibold text-mauve-700">
+            {displayName}
+          </h3>
 
-          <p className="text-sm text-mauve-500">{cat.breed}</p>
+          <p className="break-words text-sm text-mauve-500">{cat.breed}</p>
 
           {metadata ? (
-            <p className="text-sm text-mauve-400">{metadata}</p>
+            <p className="break-words text-sm text-mauve-400">{metadata}</p>
           ) : null}
 
           <CatTraitBadges traits={cat.traits} onlyTrue />
@@ -138,11 +140,11 @@ export function CatCard({
             </p>
           )}
 
-          <p className="text-sm font-medium text-mauve-600">
+          <p className="break-words text-sm font-medium text-mauve-600">
             {cat.organization.name}
           </p>
 
-          <p className="mt-auto pt-2 text-sm font-semibold text-mauve-500 transition group-hover:text-mauve-700">
+          <p className="mt-auto break-words pt-2 text-sm font-semibold text-mauve-500 transition group-hover:text-mauve-700">
             Meet {displayName}{" "}
             <span
               aria-hidden="true"
