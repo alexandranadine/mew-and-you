@@ -63,6 +63,29 @@ function renderDetail(
   );
 }
 
+function renderPendingDetail(catId = "pending-cat") {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, gcTime: 0 },
+    },
+  });
+
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockReturnValue(new Promise(() => undefined)),
+  );
+
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={[`/cats/${catId}`]}>
+        <Routes>
+          <Route path="/cats/:catId" element={<CatDetailPage />} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
 async function loadedHeading(name: string): Promise<HTMLElement> {
   return screen.findByRole("heading", { level: 1, name });
 }
@@ -70,6 +93,57 @@ async function loadedHeading(name: string): Promise<HTMLElement> {
 function attributeTiles(container: HTMLElement) {
   return container.querySelectorAll("dl > div");
 }
+
+describe("CatDetailPage loading layout", () => {
+  it("reserves a detail-shaped skeleton hidden from assistive tech", () => {
+    const { container } = renderPendingDetail();
+
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("Fetching this cat's profile…");
+    expect(status).toHaveTextContent("One moment.");
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Fetching this cat's profile…",
+      }),
+    ).toBeInTheDocument();
+    expect(status).toContainElement(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Fetching this cat's profile…",
+      }),
+    );
+
+    const skeleton = container.querySelector("[aria-hidden='true']");
+    expect(skeleton).not.toBeNull();
+    expect(
+      [...skeleton!.querySelectorAll("div")].some((el) =>
+        el.className.includes("aspect-"),
+      ),
+    ).toBe(true);
+    expect(skeleton!.querySelector(".grid.grid-cols-1")).toBeTruthy();
+    expect(skeleton!.className).not.toMatch(/\bcard\b/);
+    expect(
+      skeleton!.querySelectorAll(".animate-pulse, [class*='pulse']").length,
+    ).toBeGreaterThan(5);
+    expect(skeleton!.querySelector(".grid-cols-3")).toBeTruthy();
+    expect(skeleton!.textContent?.trim()).toBe("");
+  });
+
+  it("keeps the loading status announcement separate from the skeleton", () => {
+    const { container } = renderPendingDetail();
+
+    const status = screen.getByRole("status");
+    expect(status).toHaveClass("sr-only");
+    expect(status).toHaveAttribute("aria-live", "polite");
+    expect(status.querySelector("[aria-hidden='true']")).toBeNull();
+
+    const skeleton = container.querySelector("[aria-hidden='true']");
+    expect(skeleton).not.toBeNull();
+    expect(status.contains(skeleton)).toBe(false);
+    expect(skeleton!.contains(status)).toBe(false);
+  });
+});
 
 describe("CatDetailPage identity and stats", () => {
   it("keeps the name heading, breed beneath it, and distance in identity metadata", async () => {

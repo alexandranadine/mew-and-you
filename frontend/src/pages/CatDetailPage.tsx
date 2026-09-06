@@ -5,6 +5,7 @@ import {
   useParams,
   useSearchParams,
 } from "react-router-dom";
+import { CatDetailSkeleton } from "../components/cats/CatDetailSkeleton";
 import { CatTraitBadges } from "../components/cats/CatTraitBadges";
 import { FavoriteButton } from "../components/cats/FavoriteButton";
 import { SearchStateCard } from "../components/cats/SearchStateCard";
@@ -98,18 +99,17 @@ export function CatDetailPage() {
   if (isPending) {
     const meta = catDetailLoadingSeo(catId);
     return (
-      <div className="mx-auto max-w-4xl px-6 py-16">
+      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12">
         <PageMeta
           title={meta.title}
           description={meta.description}
           canonicalPath={meta.canonicalPath}
         />
-        <SearchStateCard
-          headingLevel={1}
-          icon="🐾"
-          title="Fetching this cat's profile…"
-          message="One moment."
-        />
+        <div role="status" aria-live="polite" className="sr-only">
+          <h1>Fetching this cat's profile…</h1>
+          <p>One moment.</p>
+        </div>
+        <CatDetailSkeleton />
       </div>
     );
   }
