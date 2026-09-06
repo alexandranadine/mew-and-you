@@ -320,7 +320,7 @@ describe("CatDetailPage adoption CTA", () => {
     ).toHaveAttribute("href", "https://example.com/sunset-paws");
     expect(
       screen.getByText(
-        "We couldn't grab a direct link for this cat, but you can visit Sunset Paws to learn more.",
+        "We don't have a direct link to this listing, but you can visit Sunset Paws to learn more and ask about Miso.",
       ),
     ).toBeInTheDocument();
     expect(

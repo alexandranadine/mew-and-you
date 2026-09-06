@@ -337,7 +337,7 @@ export function CatDetailPage() {
           </div>
 
           <h2 className="mt-6 break-words font-display text-lg font-semibold text-mauve-700">
-            About {displayName}
+            Meet {displayName}
           </h2>
           {hasBio ? (
             <p className="mt-2 max-w-prose leading-relaxed text-pretty text-mauve-600">
@@ -446,7 +446,7 @@ function adoptionCtaCopy(cat: Cat): {
     case "organizationWebsite":
       return {
         label: "Visit shelter website",
-        helper: `We couldn't grab a direct link for this cat, but you can visit ${organizationName} to learn more.`,
+        helper: `We don't have a direct link to this listing, but you can visit ${organizationName} to learn more and ask about ${formatCatDisplayName(cat.name)}.`,
         mentionsNewTab: false,
       };
     case "fallback":
